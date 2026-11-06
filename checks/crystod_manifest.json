@@ -1,0 +1,42 @@
+{
+  "allowed": [
+    "point_group",
+    "shared_irrep_degeneracy",
+    "axis_mapped_labels",
+    "within_irrep_order"
+  ],
+  "archive_filename": null,
+  "archive_sha256": null,
+  "comparisons": [],
+  "diatomic_gate": "B2,C2,O2,F2,CO missing; N2 scope undecided",
+  "engine_UI_gate": "separate, not exercised by this script",
+  "precedence": "Appendix A oracles win; discrepancies recorded for the owner",
+  "prohibited": [
+    "energy_values",
+    "compositions",
+    "bond_orders"
+  ],
+  "reason": "Original supplied CrystOD zip unavailable; cannot compute version/hash or execute checker",
+  "required_cases": [
+    "H2O model",
+    "H2O lecture",
+    "CH4",
+    "BH3",
+    "SF6 model",
+    "SF6 lecture",
+    "H2",
+    "H3+",
+    "neutral H3",
+    "allyl cation pi",
+    "six H Oh",
+    "four H Td",
+    "B2",
+    "C2",
+    "O2",
+    "F2",
+    "CO"
+  ],
+  "schema_version": "1.2",
+  "status": "BLOCKED",
+  "version": null
+}

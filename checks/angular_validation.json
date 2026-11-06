@@ -1,0 +1,8 @@
+{
+  "channels": "s/p, sd, pd; dd not checked",
+  "directions": 124,
+  "max_error": 4.440892098500626e-16,
+  "reference": "pysktb 0.5.6 get_hop_int",
+  "reverse_transpose_error": 0.0,
+  "status": "PASS"
+}
