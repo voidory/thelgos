@@ -43,6 +43,14 @@ th, td { text-align: right; padding: 2px 4px; border-bottom: 1px solid var(--rul
 th:first-child, td:first-child { text-align: left; }
 #ledger { max-height: 360px; overflow: auto; }
 footer { color: var(--muted); padding-bottom: 24px; }
+.about { margin-top: 12px; }
+.about h3 { font-size: 0.9rem; margin: 10px 0 2px; }
+.about p { margin: 0 0 6px; font-size: 0.9rem; }
+.comparisons { list-style: none; padding: 0; margin: 0 0 6px; }
+.comparisons li { border-left: 4px solid var(--rule); padding: 4px 8px; margin: 4px 0; background: var(--panel); font-size: 0.9rem; }
+.comparisons li.disagrees { border-left-color: var(--warn); }
+.comparisons .verdict { font-weight: 600; }
+.comparisons .src { color: var(--muted); font-size: 0.75rem; display: block; }
 @media (max-width: 760px) {
   svg text { font-size: 18px; }
   main { grid-template-columns: minmax(0, 1fr); grid-template-areas: "controls" "diagram" "inspector"; }

@@ -1,0 +1,12 @@
+{
+  "schema_version": "1.3",
+  "note": "Curated reference data for the in-app comparison panel (groundwork for the spec section 7 fidelity bar). Every entry cites its source. Orderings follow CONVENTIONS A.6; ground states are as listed on the NIST CCCBDB pages snapshotted in evidence/.",
+  "diatomics": {
+    "B2": {"ordering": "pi_u_below_sigma_g_2p", "ground_state": "³Σg", "multiplicity": 3, "source": "CONVENTIONS A.6; NIST CCCBDB (evidence/cccbdb_B2.html)"},
+    "C2": {"ordering": "pi_u_below_sigma_g_2p", "ground_state": "¹Σg⁺", "multiplicity": 1, "source": "CONVENTIONS A.6; NIST CCCBDB (evidence/cccbdb_C2.html)"},
+    "N2": {"ordering": "pi_u_below_sigma_g_2p", "ground_state": "¹Σg⁺", "multiplicity": 1, "source": "CONVENTIONS A.6; NIST CCCBDB (evidence/cccbdb_N2.html)"},
+    "O2": {"ordering": "sigma_g_2p_below_pi_u", "ground_state": "³Σg⁻", "multiplicity": 3, "source": "CONVENTIONS A.6; NIST CCCBDB (evidence/cccbdb_O2.html)"},
+    "F2": {"ordering": "sigma_g_2p_below_pi_u", "ground_state": "¹Σg⁺", "multiplicity": 1, "source": "CONVENTIONS A.6; NIST CCCBDB (evidence/cccbdb_F2.html)"},
+    "CO": {"ordering": null, "ground_state": "¹Σ⁺", "multiplicity": 1, "source": "NIST CCCBDB (evidence/cccbdb_CO.html)"}
+  }
+}

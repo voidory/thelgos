@@ -8,6 +8,7 @@ from .schedule import build_schedule, hamiltonian_at, checkpoints, lambdas
 from .symmetry import Group
 from .diagram import diagram_spec
 from .ledger import contact_ledger
+from . import fidelity
 
 
 def case_list(params):
@@ -22,7 +23,7 @@ def _system(params, name):
     raise ValueError(f"unknown case {name!r}")
 
 
-def view(params, groups, name, s=1.0, level=None, conventions_sha256=None):
+def view(params, groups, name, s=1.0, level=None, conventions_sha256=None, extras=None):
     """Everything one screen needs: result, diagram, schedule, slider state and ledger."""
     system = _system(params, name)
     result = run(system, params, groups, conventions_sha256)
@@ -41,8 +42,18 @@ def view(params, groups, name, s=1.0, level=None, conventions_sha256=None):
         ledger["level"] = level
         ledger["eigenvalue_eV"] = lv["energy_eV"]
         ledger["basis_labels"] = [f.label for f in system.basis]
+    notes = []
+    if extras:
+        n = extras["notes"]
+        notes = list(n.get("all", []))
+        if any(a.element == "H" for a in system.atoms):
+            notes += n.get("has_hydrogen", [])
+        notes += n.get("cases", {}).get(name, [])
+    comparisons = fidelity.compare(system, result, extras["curated"]) if extras else []
     return {
         "case": name,
+        "notes": notes,
+        "comparisons": comparisons,
         "preset": {"id": system.preset, "provenance_tag": params.presets[system.preset]["provenance_tag"]},
         "result": {k: result[k] for k in ("levels", "frontier", "bond_orders", "warnings", "checks", "version", "conventions_sha256")},
         "diagram": diagram,

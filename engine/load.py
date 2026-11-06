@@ -27,3 +27,10 @@ def load_groups(root=ROOT):
 
 def conventions_sha256(root=ROOT):
     return hashlib.sha256(Path(root, "CONVENTIONS.md").read_bytes()).hexdigest()
+
+
+def load_extras(root=ROOT):
+    """Reading notes and curated reference data for the app panel (not used by the calculation)."""
+    root = Path(root)
+    return {"notes": json.loads((root / "params/case_notes.json").read_text()),
+            "curated": json.loads((root / "params/curated_checks.json").read_text())}

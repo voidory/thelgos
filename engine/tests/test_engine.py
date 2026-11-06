@@ -264,6 +264,26 @@ class DiagramSpec(unittest.TestCase):
         self.assertEqual([(x["irrep"], x["multiplicity"]) for x in d["right"]], [("A1", 1), ("T2", 3)])
 
 
+class ReadingPanel(unittest.TestCase):
+    """The app's comparison panel uses the same rules as the checker (scripts/check_release1.py)."""
+
+    def test_diatomic_comparisons_match_checker(self):
+        from load import load_extras
+        from lgo_engine import app_api
+        X = load_extras()
+        val = json.loads((ROOT / "checks/release1_validation.json").read_text())
+        for r in val["diatomics"]:
+            got = {c["category"]: c["agrees"] for c in app_api.view(P, G, r["case"], extras=X)["comparisons"]}
+            self.assertEqual(got["Ground-state spin"], r["spin_state"]["agrees"], r["case"])
+            if "orbital_ordering" in r:
+                self.assertEqual(got["Orbital ordering"], r["orbital_ordering"]["agrees"], r["case"])
+
+    def test_every_case_name_in_notes_exists(self):
+        from load import load_extras
+        names = {s.name for s in cases.release1(P)}
+        self.assertTrue(set(load_extras()["notes"]["cases"]) <= names)
+
+
 class Mutation(unittest.TestCase):
     """Spec section 12: flipping one angular-factor sign must make at least one check fail."""
 

@@ -61,6 +61,16 @@ const check = (name, ok, detail = "") => { results.push({ name, ok, detail }); c
     check("SF6 slider runs four stages", true);
     if (shots) await page.screenshot({ path: path.join(shots, "sf6-stage1.png"), fullPage: true });
 
+    await page.selectOption("#case", "N2");
+    await page.waitForFunction(() => document.body.dataset.rendered === "N2|1|");
+    const verdicts = await page.$$eval("#comparisons li", (ls) => ls.map((l) => l.dataset.agrees + ":" + l.textContent.split(":")[0]));
+    check("N2 panel: ordering disagrees, spin agrees", JSON.stringify(verdicts) === JSON.stringify(["0:Orbital ordering", "1:Ground-state spin"]), verdicts.join(", "));
+    await page.selectOption("#case", "CO");
+    await page.waitForFunction(() => document.body.dataset.rendered === "CO|1|");
+    const coNote = await page.textContent("#notes");
+    check("CO reading note explains the starred HOMO", coNote.includes("carbon lone pair"));
+    if (shots) await page.locator(".diagram").screenshot({ path: path.join(shots, "co-about.png") });
+
     await page.selectOption("#case", "CH4");
     await page.waitForFunction(() => document.body.dataset.rendered === "CH4|1|");
     const narr = await page.textContent("#narration");

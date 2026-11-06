@@ -4,9 +4,10 @@
 importScripts("https://cdn.jsdelivr.net/pyodide/v0.27.7/full/pyodide.js");
 
 const ENGINE = ["__init__.py", "model.py", "params.py", "hamiltonian.py", "solve.py", "symmetry.py",
-  "analysis.py", "ledger.py", "result.py", "schedule.py", "cases.py", "diagram.py", "app_api.py"];
+  "analysis.py", "ledger.py", "result.py", "schedule.py", "cases.py", "diagram.py", "fidelity.py", "app_api.py"];
 const GROUPS = ["C2h", "C2v", "D2d", "D2h", "D3h", "D4h", "D6h", "D8h", "Oh", "Td"];
 const DATA = ["params/onsite.csv", "params/pairs.csv", "params/presets.json", "params/channel_defaults.json",
+  "params/case_notes.json", "params/curated_checks.json",
   "CONVENTIONS.md", "engine/load.py", ...GROUPS.map(g => `groups/${g}.json`),
   ...ENGINE.map(f => `engine/lgo_engine/${f}`)];
 
@@ -27,9 +28,9 @@ const ready = (async () => {
   py.runPython(`
 import sys, json
 sys.path[:0] = ["/bundle/engine"]
-from load import load_params, load_groups, conventions_sha256
+from load import load_params, load_groups, conventions_sha256, load_extras
 from lgo_engine import app_api, __version__
-P = load_params("/bundle"); G = load_groups("/bundle"); CSHA = conventions_sha256("/bundle")
+P = load_params("/bundle"); G = load_groups("/bundle"); CSHA = conventions_sha256("/bundle"); X = load_extras("/bundle")
 `);
   return { load_ms: performance.now() - t0, version: py.runPython("__version__"),
            python: py.runPython("sys.version.split()[0]"), numpy: py.runPython("import numpy; numpy.__version__") };
@@ -47,7 +48,7 @@ self.onmessage = async (ev) => {
       const t0 = performance.now();
       out = JSON.parse(py.runPython(`
 a = json.loads(ARGS)
-json.dumps(app_api.view(P, G, a["case"], s=a.get("s", 1.0), level=a.get("level"), conventions_sha256=CSHA), allow_nan=False)`));
+json.dumps(app_api.view(P, G, a["case"], s=a.get("s", 1.0), level=a.get("level"), conventions_sha256=CSHA, extras=X), allow_nan=False)`));
       out.compute_ms = performance.now() - t0;
     } else throw new Error(`unknown command ${cmd}`);
     self.postMessage({ id, ok: true, out });

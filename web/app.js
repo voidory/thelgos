@@ -186,6 +186,35 @@ function bonds(view) {
     `${dm.definition}: ${dmText}. These are different definitions and need not agree.</p>`;
 }
 
+function about(view) {
+  const ul = $("comparisons");
+  ul.replaceChildren();
+  for (const c of view.comparisons || []) {
+    const li = document.createElement("li");
+    li.className = c.agrees ? "agrees" : "disagrees";
+    li.dataset.agrees = c.agrees ? "1" : "0";
+    const v = document.createElement("span");
+    v.className = "verdict";
+    v.textContent = `${c.category}: ${c.agrees ? "agrees with experiment" : "disagrees with experiment"}. `;
+    const t = document.createElement("span");
+    t.textContent = `${c.model}. ${c.reference}.`;
+    const src = document.createElement("span");
+    src.className = "src";
+    src.textContent = `Source: ${c.source}`;
+    li.append(v, t, src);
+    ul.append(li);
+  }
+  const box = $("notes");
+  box.replaceChildren();
+  for (const n of view.notes || []) {
+    const h = document.createElement("h3");
+    h.textContent = n.title;
+    const p = document.createElement("p");
+    p.textContent = n.text;
+    box.append(h, p);
+  }
+}
+
 function banner(view) {
   const tag = view.preset.provenance_tag;
   $("banner").textContent = `Model units (eV scale) · preset: ${tag} (${view.preset.id}) · not a spectral prediction · ` +
@@ -198,7 +227,7 @@ async function refresh() {
   const view = await call("view", { case: state.case, s: state.s, level: state.s >= 1 ? state.level : null });
   if (mine !== latest) return state.view;  // a newer request superseded this one
   state.view = view;
-  draw(view); narrate(view); ledger(view); bonds(view); banner(view);
+  draw(view); narrate(view); ledger(view); bonds(view); banner(view); about(view);
   document.body.dataset.computeMs = view.compute_ms.toFixed(1);
   document.body.dataset.rendered = `${view.case}|${view.schedule.s}|${view.ledger ? view.ledger.level : ""}`;
   return view;

@@ -18,6 +18,7 @@ python3 -m http.server 8000
 | Watch mode | Plays the construction stage by stage |
 | F3.1–F3.4 | Three-column diagram: central-atom orbitals, MOs, ligand group orbitals; diatomics in the textbook layout (atom 1 orbitals, MOs, atom 2 orbitals, with σg/πu* labels); two columns for other systems without a central atom; symmetry-adapted fragment levels; dashed allowed and solid mixing layers, each with its own toggle; axis labelled in model units; electron arrows |
 | F3.9 | Usable at 360 px with no horizontal scroll |
+| — | "About this diagram" panel: reading notes (`params/case_notes.json`, explanatory text written for the app) and comparisons with curated experimental data (`params/curated_checks.json`, cited), computed by `engine/lgo_engine/fidelity.py` with the checker's rules. Groundwork for the spec §7 fidelity bar |
 | F5.7 | Scope banner: model units, preset tag, not a spectral prediction, engine and CONVENTIONS versions |
 
 ## Browser tests
@@ -28,6 +29,7 @@ python3 -m http.server 8000
 - warm recompute stays under 100 ms. This is measured on the build machine, not the reference phone;
 - the ledger total equals the eigenvalue;
 - the slider and its four SF6 stages, and the CH4 B5 skip note;
+- the reading panel: N2's ordering disagreement and CO's note on its starred HOMO;
 - Watch mode plays through;
 - there is no horizontal scroll at 360 px, and no page errors.
 
