@@ -1,0 +1,127 @@
+[
+  {
+    "bilbao_max_error": 0.0,
+    "bilbao_status": "PASS_GEOMETRY_MAPPED",
+    "closure_max_error": 0.0,
+    "group": "Oh",
+    "order": 48,
+    "orthogonality_max_error": 0.0,
+    "raw_library_max_error": 0.0,
+    "snap_character_max_residual": 2.220446049250313e-16,
+    "snap_matrix_max_residual": 1.2274132327800357e-15
+  },
+  {
+    "bilbao_max_error": 0.0,
+    "bilbao_status": "PASS_GEOMETRY_MAPPED",
+    "closure_max_error": 0.0,
+    "group": "Td",
+    "order": 24,
+    "orthogonality_max_error": 0.0,
+    "raw_library_max_error": 0.0,
+    "snap_character_max_residual": 2.220446049250313e-16,
+    "snap_matrix_max_residual": 6.661338147750941e-16
+  },
+  {
+    "axis_assertions": {
+      "C2prime_contains_x_axis": true
+    },
+    "bilbao_max_error": 0.0,
+    "bilbao_status": "PASS_GEOMETRY_MAPPED",
+    "closure_max_error": 1.1102230246251565e-16,
+    "group": "D3h",
+    "order": 12,
+    "orthogonality_max_error": 0.0,
+    "raw_library_max_error": 0.0,
+    "snap_character_max_residual": 8.881784197001252e-16,
+    "snap_matrix_max_residual": 3.3306690738754696e-16
+  },
+  {
+    "axis_assertions": {
+      "x": "B1",
+      "y": "B2",
+      "z": "A1"
+    },
+    "bilbao_max_error": 0.0,
+    "bilbao_status": "PASS_GEOMETRY_MAPPED",
+    "closure_max_error": 0.0,
+    "group": "C2v",
+    "order": 4,
+    "orthogonality_max_error": 0.0,
+    "raw_library_max_error": 0.0,
+    "snap_character_max_residual": 0.0,
+    "snap_matrix_max_residual": 1.2246467991473532e-16
+  },
+  {
+    "axis_assertions": {
+      "x": "B3u",
+      "y": "B2u",
+      "z": "B1u"
+    },
+    "bilbao_max_error": 0.0,
+    "bilbao_status": "PASS_GEOMETRY_MAPPED",
+    "closure_max_error": 0.0,
+    "group": "D2h",
+    "order": 8,
+    "orthogonality_max_error": 0.0,
+    "raw_library_max_error": 2.0,
+    "snap_character_max_residual": 0.0,
+    "snap_matrix_max_residual": 1.2246467991473532e-16
+  },
+  {
+    "bilbao_max_error": 0.0,
+    "bilbao_status": "PASS_GEOMETRY_MAPPED",
+    "closure_max_error": 0.0,
+    "group": "D4h",
+    "order": 16,
+    "orthogonality_max_error": 0.0,
+    "raw_library_max_error": 0.0,
+    "snap_character_max_residual": 3.6739403974420594e-16,
+    "snap_matrix_max_residual": 1.8369701987210297e-16
+  },
+  {
+    "bilbao_max_error": 0.0,
+    "bilbao_status": "PASS_GEOMETRY_MAPPED",
+    "closure_max_error": 0.0,
+    "group": "D2d",
+    "order": 8,
+    "orthogonality_max_error": 0.0,
+    "raw_library_max_error": 0.0,
+    "snap_character_max_residual": 3.6739403974420594e-16,
+    "snap_matrix_max_residual": 3.4450928483976665e-16
+  },
+  {
+    "bilbao_max_error": 0.0,
+    "bilbao_status": "PASS_GEOMETRY_MAPPED",
+    "closure_max_error": 0.0,
+    "group": "C2h",
+    "order": 4,
+    "orthogonality_max_error": 0.0,
+    "raw_library_max_error": 0.0,
+    "snap_character_max_residual": 0.0,
+    "snap_matrix_max_residual": 1.2246467991473532e-16
+  },
+  {
+    "axis_assertions": {
+      "C2prime_contains_x_axis": true
+    },
+    "benzene_atoms_on_pm_x": true,
+    "bilbao_max_error": 0.0,
+    "bilbao_status": "PASS_GEOMETRY_MAPPED",
+    "closure_max_error": 1.1102230246251565e-16,
+    "group": "D6h",
+    "order": 24,
+    "orthogonality_max_error": 0.0,
+    "raw_library_max_error": 0.0,
+    "snap_character_max_residual": 1.5543122344752192e-15,
+    "snap_matrix_max_residual": 5.551115123125783e-16
+  },
+  {
+    "bilbao_status": "NOT_COVERED_NONCRYSTALLOGRAPHIC",
+    "closure_max_error": 2.220446049250313e-16,
+    "group": "D8h",
+    "order": 32,
+    "orthogonality_max_error": 1.1102230246251565e-16,
+    "snap_character_max_residual": 1.9984014443252818e-15,
+    "snap_matrix_max_residual": 5.787273125476827e-16
+  }
+]
