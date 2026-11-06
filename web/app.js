@@ -53,6 +53,12 @@ function draw(view) {
                                  : { right: [80, 220], centre: [380, 520] };
   for (const c of cols) svg.append(el("text", { x: (colX[c][0] + colX[c][1]) / 2, y: 18, "text-anchor": "middle", class: "muted" }, d.column_titles[c]));
   svg.append(el("text", { x: 12, y: H / 2, transform: `rotate(-90 12 ${H / 2})`, "text-anchor": "middle", class: "muted" }, d.axis_label));
+  if (proposal) {
+    for (let e = Math.ceil(lo / 5) * 5; e <= hi; e += 5) {
+      svg.append(el("line", { x1: 30, x2: W - 10, y1: y(e), y2: y(e), class: "axis", "stroke-width": 0.5 }));
+      svg.append(el("text", { x: 34, y: y(e) - 3, class: "muted", "font-size": 9 }, String(e)));
+    }
+  }
 
   const pos = {};
   const showIrreps = $("t-irreps").checked;
@@ -244,6 +250,7 @@ async function refresh() {
   state.view = view;
   draw(view); narrate(view); ledger(view); bonds(view); banner(view); about(view);
   structure(view); matching(view); slotBadges(view);
+  if (proposal) proposalUpdate(view);
   if ($("t-3d").checked) view3d.render(view);
   document.body.dataset.computeMs = view.compute_ms.toFixed(1);
   document.body.dataset.rendered = `${view.case}|${view.schedule.s}|${view.ledger ? view.ledger.level : ""}`;
@@ -571,6 +578,67 @@ const view3d = (() => {
   return { render };
 })();
 
+
+// ---- Design proposal preview (?design=proposal). Layout only; same engine data and the same draw code. ----
+const proposal = new URLSearchParams(location.search).get("design") === "proposal";
+function proposalSetup(cases) {
+  document.body.classList.add("proposal");
+  const link = document.createElement("link"); link.rel = "stylesheet"; link.href = "proposal.css"; document.head.append(link);
+  const main = document.querySelector("main");
+  // Left rail: cases grouped by family, instead of a long select.
+  const rail = document.createElement("nav"); rail.className = "rail"; rail.setAttribute("aria-label", "Cases");
+  const fams = [...new Set(cases.map((c) => c.family))];
+  for (const f of fams) {
+    const h = document.createElement("h2"); h.textContent = f; rail.append(h);
+    const list = document.createElement("div"); list.className = "list";
+    for (const c of cases.filter((c) => c.family === f)) {
+      const b = document.createElement("button"); b.className = "case"; b.type = "button"; b.dataset.case = c.name;
+      b.innerHTML = `${c.name}<small>${c.group}</small>`;
+      b.addEventListener("click", () => { $("case").value = c.name; $("case").dispatchEvent(new Event("change")); });
+      list.append(b);
+    }
+    rail.append(list);
+  }
+  main.prepend(rail);
+  // Construction timeline above the diagram: named lecture steps plus play.
+  const tl = document.createElement("div"); tl.className = "timeline";
+  const play = $("watch"); const steps = document.createElement("div"); steps.className = "steps"; steps.id = "steps";
+  const left = document.createElement("div"); left.append(play.cloneNode(true));
+  left.firstChild.id = "watch2"; left.firstChild.disabled = false; left.firstChild.addEventListener("click", () => play.click());
+  const right = document.createElement("div"); right.append(steps, document.querySelector(".slider"));
+  tl.append(left, right);
+  document.querySelector(".diagram").prepend(tl, $("narration"), $("badges"), $("rule-detail"), document.querySelector(".toggles"));
+  // Inspector as tabs, one per h2 section.
+  const insp = document.querySelector(".inspector");
+  const kids = [...insp.children]; const tabs = document.createElement("div"); tabs.className = "tabs"; tabs.setAttribute("role", "tablist");
+  const panels = []; let cur = null;
+  for (const k of kids) {
+    if (k.tagName === "H2") { cur = document.createElement("div"); cur.className = "tabpanel"; cur.setAttribute("role", "tabpanel"); panels.push([k.firstChild.textContent.trim(), cur]); }
+    if (cur) cur.append(k);
+  }
+  insp.replaceChildren(tabs, ...panels.map((p) => p[1]));
+  panels.forEach(([name, panel], i) => {
+    const b = document.createElement("button"); b.type = "button"; b.setAttribute("role", "tab"); b.textContent = name;
+    b.addEventListener("click", () => panels.forEach(([, p], j) => { p.hidden = j !== i; tabs.children[j].setAttribute("aria-selected", j === i); }));
+    tabs.append(b);
+  });
+  tabs.children[0].click();
+}
+function proposalUpdate(view) {
+  for (const b of document.querySelectorAll(".rail button.case")) b.setAttribute("aria-current", b.dataset.case === view.case);
+  const steps = $("steps"); if (!steps) return;
+  const sc = view.schedule, K = sc.stages.length;
+  const names = { within_set: "Fix one, flip partner", combine: "Combine equal-energy sets", between_sets: "Put the central atom back" };
+  const items = [["Separate atoms", 0], ...sc.stages.map((st, k) => [names[st.kind] || st.kind, (k + 1) / K])];
+  steps.replaceChildren();
+  for (const [label, s] of items) {
+    const b = document.createElement("button"); b.type = "button"; b.className = "step"; b.textContent = label;
+    b.setAttribute("aria-current", Math.abs(view.schedule.s - s) < 1e-9);
+    b.addEventListener("click", () => { $("s").value = s; $("s").dispatchEvent(new Event("input")); });
+    steps.append(b);
+  }
+}
+
 (async () => {
   try {
     const info = await call("info");
@@ -579,6 +647,7 @@ const view3d = (() => {
     const cases = await call("cases");
     const sel = $("case");
     for (const c of cases) sel.append(new Option(`${c.name} (${c.group})`, c.name));
+    if (proposal) proposalSetup(cases);
     state.case = cases.find((c) => c.name === "SF6 model").name;
     if (await fromLink()) $("s").value = state.s;
     sel.value = state.case;

@@ -14,9 +14,19 @@ from . import views
 from .symmetry import projectors
 
 
+def _family(s):
+    if len(s.atoms) == 2 and s.central_atom is None:
+        return "Diatomics"
+    if s.central_atom is not None:
+        return "Central atom with ligands"
+    if s.name.startswith(("six H", "four H")):
+        return "Ligand sets on their own"
+    return "Rings and chains"
+
+
 def case_list(params):
     return [{"name": s.name, "preset": s.preset, "provenance_tag": params.presets[s.preset]["provenance_tag"],
-             "group": s.group, "electrons": s.electrons} for s in cases.release1(params)]
+             "group": s.group, "electrons": s.electrons, "family": _family(s)} for s in cases.release1(params)]
 
 
 def _system(params, name):
