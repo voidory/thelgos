@@ -112,6 +112,11 @@ Each entry in `levels` needs `irrep`, `energy`, `multiplicity`, `canonical_level
 - *Outputs:* `release1_energies.csv`, `release1_validation.json` and `crystod_cases.json` gain the five fixtures, and the old twelve are byte-identical as a prefix and subset. `preset_schema_validation.json` counts 16 presets. `crystod_manifest.json` updates its `diatomic_gate` text. `compare_crystod.py` de-duplicates `required_cases`, now that the diatomics are real cases.
 - *Not done:* N2 (owner decision B4). CONVENTIONS §2, A.6 and Appendix B are not edited; proposed text is in the draft.
 
+### Makefile (patch 7)
+
+**K15. `make check` also runs the engine tests.** A new target, `test-engine`, runs `engine/tests/test_engine.py`, and `check` now depends on `check-baseline test-engine` before the CrystOD gate. The engine (`engine/`, provisional, outside the v1.2 package) is described in `engine/README.md`.
+*Observation behind the mutation test:* flipping the sign of only the s(a)–p(b) couplings leaves every central-atom fixture's spectrum unchanged, because it only flips the sign of a whole off-diagonal block. Only cases where s–p couplings run in both directions in one block (the diatomics, CO especially) detect it. Before K14, such a mutation would have passed every check.
+
 ## Verification
 
 **Environment.** `requirements-checker.lock` was installed with `--require-hashes` into `.venv` (CPython 3.12.3), and `pip check` passed. This is not the README's 3.12.8 host and not the production 3.12.7.
