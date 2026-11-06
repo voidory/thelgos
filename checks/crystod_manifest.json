@@ -3,10 +3,20 @@
     "point_group",
     "shared_irrep_degeneracy",
     "axis_mapped_labels",
-    "within_irrep_order"
+    "within_irrep_descriptor_order"
   ],
   "archive_filename": null,
   "archive_sha256": null,
+  "comparison_rules": {
+    "changes": "CHECKER-CHANGES.md K5-K11",
+    "contract_basis_weight_min": 0.5,
+    "descriptor_keys": [
+      "character",
+      "dominant_fragment"
+    ],
+    "linear_point_group": "Dinfh/Cinfv from geometry",
+    "order_mismatch": "logged for the owner, nonblocking (spec section 12)"
+  },
   "comparisons": [],
   "diatomic_gate": "B2,C2,O2,F2,CO missing; N2 scope undecided",
   "engine_UI_gate": "separate, not exercised by this script",

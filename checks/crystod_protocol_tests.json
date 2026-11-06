@@ -1,6 +1,18 @@
 {
+  "blocking_mutations_rejected": [
+    "point_group",
+    "degeneracy",
+    "labels",
+    "extra_inside_contract_basis",
+    "missing_weight",
+    "missing_descriptor"
+  ],
   "hand_set_PASS_ignored": true,
-  "point_group_degeneracy_order_label_mutations_rejected": true,
+  "order_mutations_sent_to_review": [
+    "energy_swap",
+    "descriptor_swap"
+  ],
+  "outside_contract_level_excluded": true,
   "real_archive_or_adapter_executed": false,
   "status": "PASS_MOCK_PROTOCOL_ONLY"
 }

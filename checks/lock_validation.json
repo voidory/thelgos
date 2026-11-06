@@ -2,7 +2,7 @@
   "clean_hash_install": "performed in separate environment; see evidence/hash_install.txt",
   "hashed_distributions": 50,
   "production_python_pin": "3.12.7; this CPython check is not the browser gate",
+  "runtime_python": "printed at run time, not committed (CHECKER-CHANGES.md K12)",
   "scope": "complete CPython3.12/Linux checker dependency graph; bootstrap pip excluded",
-  "status": "PASS",
-  "test_runtime_python": "3.12.8"
+  "status": "PASS"
 }

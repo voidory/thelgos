@@ -1,6 +1,6 @@
 # Checker changes after the v1.2 review candidate
 
-**Patches:** checker-patch-1 (K1–K9), checker-patch-2 (K10–K11, plus corrections to this record) and checker-patch-3 (K3 revised against the real `params/`), 2026-11-06. Made by Claude with direct approval from the repository owner (@void). The CONVENTIONS owner has **not** reviewed either patch.
+**Patches:** checker-patch-1 (K1–K9), checker-patch-2 (K10–K11, plus corrections to this record) checker-patch-3 (K3 revised against the real `params/`) and checker-patch-4 (K12, plus regeneration of the four committed `checks/` files the patches change), 2026-11-06. Made by Claude with direct approval from the repository owner (@void). The CONVENTIONS owner has **not** reviewed any of these patches.
 **Scope:** `scripts/check_release1.py`, `scripts/compare_crystod.py` and `scripts/check_support.py`. `CONVENTIONS.md`, the oracles, `params/` and all committed data are untouched.
 **Base:** the v1.2 bundle as uploaded. The uploaded scripts are preserved byte-for-byte in git:
 - commit `31e24c9` holds `check_release1.py` and `compare_crystod.py`;
@@ -12,7 +12,13 @@
 |---|---|---|
 | `scripts/check_release1.py` | `1f09df815cde4ed0b9a63d9eef87d96ed953ad04b6b7a6d97e5a037d6d9e0dda` | `6d04b108a17c5bbe8465893433043b20d9ec035234bdf9e971c4667465e3929d` |
 | `scripts/compare_crystod.py` | `358ef92c9ca3b37068abcb6daaf1f6e5542a599920d4ed3ee154cfd1d111ce85` | `4ac5957405fa4e07c7ac3d0cf725b4f7e28ee67bb7a30a953375ca18c74503db` |
-| `scripts/check_support.py` | `19b577d27119600ca8a46b6724a4659bba8c1219551218ec378cb63a9b2c0e95` | `cd0ae57aec55639f22463237a8a75b1196fd4a2973a7088e98bc64d022f7c3ce` |
+| `scripts/check_support.py` | `19b577d27119600ca8a46b6724a4659bba8c1219551218ec378cb63a9b2c0e95` | `0760cfaa7c3fd21d7dd6c3feb0cfa03777c257048f3c397dde108216189c3ddc` |
+| `checks/crystod_cases.json` (regenerated, K4) | `da57c7daae9ace0dd9fedc4a6f65eda51f9df8c58c25b6588daba16297feac36` | `4f84b51a6d401bee0d4dfda022cb63623a18acc1a6185c433d2e99804c90fd78` |
+| `checks/crystod_manifest.json` (regenerated, K5–K11) | `83be906cda98f2e9b2e5398a884681e1da21925bc66201f937d78280a9159c9d` | `91ba95ff54f3976313c2c50069a0a21318e9993426c2ea40a0bfbe034189bbda` |
+| `checks/crystod_protocol_tests.json` (regenerated, K10) | `10dc65fd76f356a7bd8bb33e64fa472e89eed5c7e248a9c8bf3c1cd6a1658e0a` | `3feed09ae3d94b5e2679f99569bb17e737ec3a8d43b3746fd453d5150cb065d4` |
+| `checks/lock_validation.json` (regenerated, K12) | `31e2b8daf51133098220d779022353b766e9a9744b63e595b009e9f865495ff8` | `69e771d427b50d46fdedd6d7b24bc2cd178f7ffa613a20d21a6335047170942a` |
+
+The v1.2 versions of the four regenerated `checks/` files are in git at commits `bef9ffb`, `fb56ce2` and `cf304c8`, byte-for-byte as uploaded.
 
 `SHA256SUMS` lists the current hashes and this file.
 
@@ -87,6 +93,9 @@ Each entry in `levels` needs `irrep`, `energy`, `multiplicity`, `canonical_level
 - `contract_basis_weight`: the fraction of the level on functions that correspond to the contract basis. With extended Hückel's nonorthogonal basis, state whether this is a Mulliken or Löwdin weight in `level_identity_evidence`.
 - `descriptor`: `{character, dominant_fragment}`, computed by the K4 rule from the checker's own eigenvectors and Hamiltonian.
 
+**K12 (patch 4). Host Python version no longer written into a committed check file.** `checks/lock_validation.json` recorded `test_runtime_python` (3.12.8 in v1.2). `make check-baseline` byte-compares the regenerated `checks/` against the committed one, so the baseline could pass only on a 3.12.8 host — not on this machine's 3.12.3, and not on the production pin 3.12.7. The field is replaced by `runtime_python: "printed at run time, not committed"`, and `check_support.py` prints the interpreter version to stdout instead. The lock file's hashes, not this field, are what pin the environment.
+*Evidence for the change:* regenerating the whole bundle under 3.12.8 and under 3.12.3 gave identical output in every file except this one field.
+
 ## Verification
 
 **Environment.** `requirements-checker.lock` was installed with `--require-hashes` into `.venv` (CPython 3.12.3), and `pip check` passed. This is not the README's 3.12.8 host and not the production 3.12.7.
@@ -119,12 +128,12 @@ The stand-in parameter files are mine, not the owner's. This shows the scripts a
 
 **Not run:** `make check-baseline` and `make check` against the real bundle.
 
+**Baseline run (patch 4).** All 68 `SHA256SUMS` entries verified once the full bundle had arrived. Then:
+1. *v1.2 as shipped.* A copy of the tree with the three uploaded scripts restored and the uploaded `SHA256SUMS`, run under CPython 3.12.8 in a fresh venv installed from `requirements-checker.lock` with `--require-hashes` (`pip check` clean): `make check-baseline` **PASS**; `make check` fails with exit 2, `Original supplied CrystOD zip unavailable`. This matches the README's stated expectation.
+2. *Patches 1–3 before regeneration.* Regenerated output differed from the committed `checks/` in exactly `crystod_cases.json`, `crystod_manifest.json` and `crystod_protocol_tests.json` (the predicted K4/K5–K11/K10 fields), plus `lock_validation.json` on 3.12.3 only. `groups/` and every other `checks/` file matched byte-for-byte.
+3. *After K12 and regeneration.* `make check-baseline` **PASS** under CPython 3.12.8 and under 3.12.3 (temporary regeneration, `diff -r groups/ checks/`, `sha256sum -c`, no mutation). `make check` fails with exit 2, `Original supplied CrystOD zip unavailable`, which is the correct blocked state. Not run: the production interpreter 3.12.7 or Pyodide.
+
 ## Required follow-ups
 
-1. **When `params/channel_defaults.json`, `groups/`, `checks/` and `evidence/` arrive:**
-   - run `make check-baseline`;
-   - regenerate `checks/crystod_cases.json` (K4), `checks/crystod_manifest.json` (K5–K11 fields) and `checks/crystod_protocol_tests.json` (K10);
-   - update their `SHA256SUMS` lines.
-
-   Until then a diff in `checks/` from the baseline is expected and caused by these patches.
+1. ~~Run the baseline and regenerate the patch-affected `checks/` files~~ — done in patch 4.
 2. **For the owner:** if accepted, fold the K4 descriptor rule, the K7 threshold, the K8 order criterion and the K11 blocking/review split into CONVENTIONS §11. Only he may edit that file.

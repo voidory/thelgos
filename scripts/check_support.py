@@ -55,7 +55,9 @@ def run(out):
  assert tables and tables[0]==[2]*11,tables[:1];assert all(len(set(t))==1 for t in tables)
  write_json(out/'checks/markdown_validation.json',{'status':'PASS','sign_table_columns_by_row':tables[0],'rectangular_tables':len(tables)})
  lock=(ROOT/'requirements-checker.lock').read_text();blocks=[b for b in lock.split('\n\n') if '==' in b];assert all('--hash=sha256:' in b for b in blocks)
- write_json(out/'checks/lock_validation.json',{'status':'PASS','hashed_distributions':len(blocks),'scope':'complete CPython3.12/Linux checker dependency graph; bootstrap pip excluded','clean_hash_install':'performed in separate environment; see evidence/hash_install.txt','test_runtime_python':__import__('platform').python_version(),'production_python_pin':'3.12.7; this CPython check is not the browser gate'})
+ write_json(out/'checks/lock_validation.json',{'status':'PASS','hashed_distributions':len(blocks),'scope':'complete CPython3.12/Linux checker dependency graph; bootstrap pip excluded','clean_hash_install':'performed in separate environment; see evidence/hash_install.txt','production_python_pin':'3.12.7; this CPython check is not the browser gate','runtime_python':'printed at run time, not committed (CHECKER-CHANGES.md K12)'})
+ # [K12] The host interpreter version is reported, not written into a byte-compared committed file.
+ print('check_support: runtime Python',__import__('platform').python_version())
  # Checker comparator unit tests are mock protocol tests only, not claimed CrystOD results.
  from compare_crystod import compare,run as crystod_run
  import copy
