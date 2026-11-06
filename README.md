@@ -1,6 +1,6 @@
 # LGO conventions v1.2 review candidate
 
-This is an actual generated audit package, not a claim that a file has been produced elsewhere. `CONVENTIONS.md` is the primary candidate. **Not frozen. the owner has not approved v1.2.** The input TODO is preserved in `evidence/CONVENTIONS-v1.2-TODO.md`.
+This is an actual generated audit package, not a claim that a file has been produced elsewhere. `CONVENTIONS.md` is the primary candidate. **Not frozen. The owner has not approved v1.2.** The input TODO is preserved in `evidence/CONVENTIONS-v1.2-TODO.md`.
 
 ## What changed
 

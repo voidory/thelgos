@@ -126,7 +126,7 @@ The header names only CrystOD as blocking Release 1. Line 77 also concedes that 
 
 ---
 
-## B. the owner's decisions
+## B. The owner's decisions
 
 | # | Decision | Default if you don't choose | Notes |
 |---|---|---|---|
@@ -202,7 +202,7 @@ These don't block the release, but the alias data needs the actual slides. Add i
 ## Shortest path to starting Release 1
 
 1. The agent closes A1–A13 and sends a v1.2 candidate, while the owner answers B2–B5.
-2. the owner supplies the zip (B1) and signs off (B6).
+2. The owner supplies the zip (B1) and signs off (B6).
 3. The agent completes C2 (diatomics) and C1 (CrystOD run).
 4. I update the spec (D).
 5. Release 1 build begins.

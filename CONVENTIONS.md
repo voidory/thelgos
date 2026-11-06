@@ -171,7 +171,7 @@ All p directions share the p on-site. No main-group d parameters. Source snapsho
 
 Precedence: **preset matrix-element override → element-pair/channel row → explicit channel default → error**. Defaults live in `params/channel_defaults.json`; the supplied default list is empty. A no-match lookup must raise an error, never silently return zero. Missing orbital channels are not requested; absence is not a fit to zero. Reverse-pair Hermiticity follows §1.
 
-For `harrison_inverse_square`, V=scale×eta×K/d². Coefficients remain ss=−1.40, sp=+1.84, pp sigma=+3.24, pp pi=−0.81. **All H-containing couplings extrapolate this scheme beyond the Harrison table's H coverage.** The 0.6 factor is a declared pedagogical correction, not a published coefficient or measured fit. The strict ordering constraints give 0.4914651002<sH<0.8938796155. the owner's B2 decision remains pending; 0.6 is the requested default. The audit reads the CSV rather than these prose numbers.
+For `harrison_inverse_square`, V=scale×eta×K/d². Coefficients remain ss=−1.40, sp=+1.84, pp sigma=+3.24, pp pi=−0.81. **All H-containing couplings extrapolate this scheme beyond the Harrison table's H coverage.** The 0.6 factor is a declared pedagogical correction, not a published coefficient or measured fit. The strict ordering constraints give 0.4914651002<sH<0.8938796155. The owner's B2 decision remains pending; 0.6 is the requested default. The audit reads the CSV rather than these prose numbers.
 
 Neighbour lists are explicit: H2O/CH4/BH3 central-H on, H–H off; SF6 central-F and all F–F on; ligand-only H diagnostics have their declared edges on. No distance cutoff silently re-enables absent edges.
 
