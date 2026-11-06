@@ -3,7 +3,7 @@
 **Patches:** checker-patch-1 (K1–K9), checker-patch-2 (K10–K11, plus corrections to this record) checker-patch-3 (K3 revised against the real `params/`) and checker-patch-4 (K12, plus regeneration of the four committed `checks/` files the patches change), 2026-11-06. Made by Claude with direct approval from the repository owner (@void). The CONVENTIONS owner has **not** reviewed any of these patches.
 **Scope:** `scripts/check_release1.py`, `scripts/compare_crystod.py` and `scripts/check_support.py`. `CONVENTIONS.md`, the oracles, `params/` and all committed data are untouched.
 **Base:** the v1.2 bundle as uploaded. The uploaded scripts are preserved byte-for-byte in git:
-- commit `31e24c9` holds `check_release1.py` and `compare_crystod.py`;
+- commit `fc16043` holds `check_release1.py` and `compare_crystod.py`;
 - the commit that adds patch 2 also adds the uploaded `check_support.py`, `generate_groups.py`, `build_checks.py` and `parameters.py`, with `check_support.py` already patched. Its v1.2 hash is in the table below.
 
 `git log -p -- scripts/` shows every change. Each changed line carries its `[K#]` tag in a code comment.
@@ -18,7 +18,7 @@
 | `checks/crystod_protocol_tests.json` (regenerated, K10) | `10dc65fd76f356a7bd8bb33e64fa472e89eed5c7e248a9c8bf3c1cd6a1658e0a` | `3feed09ae3d94b5e2679f99569bb17e737ec3a8d43b3746fd453d5150cb065d4` |
 | `checks/lock_validation.json` (regenerated, K12) | `31e2b8daf51133098220d779022353b766e9a9744b63e595b009e9f865495ff8` | `69e771d427b50d46fdedd6d7b24bc2cd178f7ffa613a20d21a6335047170942a` |
 
-The v1.2 versions of the four regenerated `checks/` files are in git at commits `bef9ffb`, `fb56ce2` and `cf304c8`, byte-for-byte as uploaded.
+The v1.2 versions of the four regenerated `checks/` files are in git at commits `929f976`, `89eb597` and `100ba13`, byte-for-byte as uploaded.
 
 `SHA256SUMS` lists the current hashes and this file.
 
@@ -96,7 +96,9 @@ Each entry in `levels` needs `irrep`, `energy`, `multiplicity`, `canonical_level
 **K12 (patch 4). Host Python version no longer written into a committed check file.** `checks/lock_validation.json` recorded `test_runtime_python` (3.12.8 in v1.2). `make check-baseline` byte-compares the regenerated `checks/` against the committed one, so the baseline could pass only on a 3.12.8 host — not on this machine's 3.12.3, and not on the production pin 3.12.7. The field is replaced by `runtime_python: "printed at run time, not committed"`, and `check_support.py` prints the interpreter version to stdout instead. The lock file's hashes, not this field, are what pin the environment.
 *Evidence for the change:* regenerating the whole bundle under 3.12.8 and under 3.12.3 gave identical output in every file except this one field.
 
-**K13 (patch 5). Personal name removed from the public repository.** At the repository owner's request, every occurrence of the CONVENTIONS change authority's personal name was replaced by a role term, in all files including the uploaded v1.2 documents (`CONVENTIONS.md`, `README.md`, `evidence/CONVENTIONS-v1.2-TODO.md`, `params/decision_defaults.json`, the spec) and the checker scripts and outputs. Wording: "the owner" / "the project owner"; this file uses "the CONVENTIONS owner" where it must be told apart from the repository owner. Identifiers changed: status `ORDER_REVIEW_FOR_OWNER` (was the name in capitals) and decision status `default_pending_owner_approval`. No numerical content, rule or check changed. Earlier git history still contains the name until that history is rewritten.
+**K13 (patch 5). Personal name removed from the public repository.** At the repository owner's request, every occurrence of the CONVENTIONS change authority's personal name was replaced by a role term, in all files including the uploaded v1.2 documents (`CONVENTIONS.md`, `README.md`, `evidence/CONVENTIONS-v1.2-TODO.md`, `params/decision_defaults.json`, the spec) and the checker scripts and outputs. Wording: "the owner" / "the project owner"; this file uses "the CONVENTIONS owner" where it must be told apart from the repository owner. Identifiers changed: status `ORDER_REVIEW_FOR_OWNER` (was the name in capitals) and decision status `default_pending_owner_approval`. No numerical content, rule or check changed.
+
+*History rewrite (patch 5, owner-approved):* the branch history was then rewritten with `git filter-repo` so that no commit's files or messages contain the name, and force-pushed; every commit ID changed, and the IDs quoted in this file were updated. Consequence for provenance: the "v1.2 SHA-256" column above records the bytes as originally uploaded. For `scripts/compare_crystod.py` and `checks/crystod_manifest.json`, whose originals contained the name, the redacted copies now in git history no longer hash to those values; all other v1.2 originals in history are unchanged byte-for-byte. The unredacted originals are not in the public repository.
 
 ## Verification
 
