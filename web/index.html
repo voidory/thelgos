@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LGO Method Explorer</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>
+  <h1>LGO Method Explorer</h1>
+  <p id="banner" class="banner" role="note">Loading the engine…</p>
+</header>
+<main>
+  <section class="controls" aria-label="Case and construction">
+    <label>Case <select id="case" disabled></select></label>
+    <div class="slider">
+      <label for="s">Construction</label>
+      <input id="s" type="range" min="0" max="1" step="0.001" value="1" disabled>
+      <button id="watch" type="button" disabled>Watch</button>
+      <div id="ticks" class="ticks"></div>
+    </div>
+    <p id="narration" class="narration" aria-live="polite"></p>
+    <fieldset class="toggles">
+      <legend>Show</legend>
+      <label><input type="checkbox" id="t-mixing" checked> Mixing lines</label>
+      <label><input type="checkbox" id="t-allowed"> Symmetry-allowed lines</label>
+      <label><input type="checkbox" id="t-irreps" checked> Irrep labels</label>
+    </fieldset>
+  </section>
+  <section class="diagram" aria-label="Molecular-orbital diagram">
+    <svg id="diagram" role="img" aria-label="MO diagram"></svg>
+  </section>
+  <section class="inspector" aria-label="Contact ledger">
+    <h2>Contact ledger</h2>
+    <p id="ledger-hint">Tap a molecular orbital to see every contact that sets its energy.</p>
+    <div id="ledger"></div>
+    <h2>Bond order</h2>
+    <div id="bonds"></div>
+  </section>
+</main>
+<footer><small id="footer"></small></footer>
+<script src="app.js"></script>
+</body>
+</html>

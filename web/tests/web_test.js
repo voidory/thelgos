@@ -1,0 +1,86 @@
+// Browser acceptance tests (gate C4, Release 1 subset) against the real Pyodide 0.27.7 runtime.
+// Usage: node web/tests/web_test.js [screenshot-dir]. Needs network access to cdn.jsdelivr.net.
+const { chromium } = require("playwright");
+const { spawn } = require("child_process");
+const fs = require("fs");
+const path = require("path");
+const ROOT = path.resolve(__dirname, "../..");
+const REF = JSON.parse(fs.readFileSync(path.join(ROOT, "evidence/reference_spectra.json")));
+const shots = process.argv[2];
+const results = [];
+const check = (name, ok, detail = "") => { results.push({ name, ok, detail }); console.log(`${ok ? "PASS" : "FAIL"} ${name}${detail ? " — " + detail : ""}`); };
+
+(async () => {
+  const port = 8000 + Math.floor(Math.random() * 1000);
+  const server = spawn("python3", ["-m", "http.server", String(port), "--bind", "127.0.0.1"], { cwd: ROOT, stdio: "ignore" });
+  await new Promise((r) => setTimeout(r, 800));
+  const proxy = process.env.HTTPS_PROXY || process.env.https_proxy;
+  const browser = await chromium.launch({ proxy: proxy ? { server: proxy, bypass: "127.0.0.1,localhost" } : undefined });
+  try {
+    const ctx = await browser.newContext({ ignoreHTTPSErrors: true, viewport: { width: 1200, height: 900 } });
+    const page = await ctx.newPage();
+    const errors = [];
+    page.on("pageerror", (e) => errors.push(String(e)));
+    const t0 = Date.now();
+    await page.goto(`http://127.0.0.1:${port}/web/`);
+    await page.waitForFunction(() => document.body.dataset.ready || document.body.dataset.error, null, { timeout: 180000 });
+    const err = await page.evaluate(() => document.body.dataset.error);
+    check("engine loads in Pyodide", !err, err || `cold load ${((Date.now() - t0) / 1000).toFixed(1)} s`);
+    const footer = await page.textContent("#footer");
+    check("runtime is Python 3.12.7 + NumPy 2.0.2", /Python 3\.12\.7 · NumPy 2\.0\.2/.test(footer), footer);
+
+    const names = await page.$$eval("#case option", (os) => os.map((o) => o.value));
+    check("all reference fixtures offered", JSON.stringify([...names].sort()) === JSON.stringify(Object.keys(REF).sort()), `${names.length} cases`);
+    let worst = 0, timings = [];
+    for (const n of names) {
+      await page.selectOption("#case", n);
+      await page.waitForFunction((n) => document.body.dataset.rendered === `${n}|1|`, n);
+      const got = await page.$$eval("[data-mo]", (hs) => hs.map((h) => Number(h.dataset.energy)));
+      const want = REF[n].map((x) => x.energy_eV);
+      const err = got.length === want.length ? Math.max(...got.map((g, i) => Math.abs(g - want[i]))) : Infinity;
+      worst = Math.max(worst, err);
+      timings.push(Number(await page.evaluate(() => document.body.dataset.computeMs)));
+    }
+    check("browser energies equal committed reference spectra (1e-9 eV)", worst < 1e-9, `max error ${worst.toExponential(2)}`);
+    check("warm recompute under 100 ms (this machine, not the reference phone)", Math.max(...timings) < 100, `max ${Math.max(...timings).toFixed(1)} ms`);
+
+    await page.selectOption("#case", "SF6 model");
+    await page.waitForFunction(() => document.body.dataset.rendered === "SF6 model|1|");
+    await page.click('[data-mo="0"]');
+    await page.waitForFunction(() => document.body.dataset.rendered === "SF6 model|1|0");
+    await page.waitForSelector("#ledger table");
+    const [tot, eig] = await page.$eval("#ledger table", (t) => [Number(t.dataset.total), Number(t.dataset.eigen)]);
+    check("ledger total equals eigenvalue (1e-10 eV)", Math.abs(tot - eig) < 1e-10, `${tot} vs ${eig}`);
+    if (shots) await page.screenshot({ path: path.join(shots, "sf6-ledger.png"), fullPage: true });
+
+    await page.$eval("#s", (s) => { s.value = 0; s.dispatchEvent(new Event("input")); });
+    await page.waitForFunction(() => document.querySelector("#narration").textContent.startsWith("Separate atoms"));
+    check("slider at 0 shows separate atoms", true);
+    await page.$eval("#s", (s) => { s.value = 0.125; s.dispatchEvent(new Event("input")); });
+    await page.waitForFunction(() => /Stage 1 of 4/.test(document.querySelector("#narration").textContent));
+    check("SF6 slider runs four stages", true);
+    if (shots) await page.screenshot({ path: path.join(shots, "sf6-stage1.png"), fullPage: true });
+
+    await page.selectOption("#case", "CH4");
+    await page.waitForFunction(() => document.body.dataset.rendered === "CH4|1|");
+    const narr = await page.textContent("#narration");
+    check("CH4 shows B5 skip note", narr.includes("No ligand–ligand coupling in this model."), narr.slice(0, 120));
+    await page.click("#watch");
+    await page.waitForFunction(() => document.body.dataset.watchDone === "1", null, { timeout: 60000 });
+    const after = await page.$eval("#s", (s) => Number(s.value));
+    check("Watch mode plays to the finished diagram", after === 1);
+
+    await page.setViewportSize({ width: 360, height: 800 });
+    await page.waitForTimeout(300);
+    const sw = await page.evaluate(() => document.scrollingElement.scrollWidth);
+    check("no horizontal scroll at 360 px", sw <= 360, `scrollWidth ${sw}`);
+    if (shots) await page.screenshot({ path: path.join(shots, "ch4-phone.png"), fullPage: true });
+    check("no page errors", errors.length === 0, errors.join("; "));
+  } finally {
+    await browser.close();
+    server.kill();
+  }
+  const failed = results.filter((r) => !r.ok).length;
+  console.log(`${results.length - failed}/${results.length} browser checks passed`);
+  process.exit(failed ? 1 : 0);
+})().catch((e) => { console.error(e); process.exit(1); });

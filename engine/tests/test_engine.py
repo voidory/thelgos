@@ -226,6 +226,32 @@ class Schedule(unittest.TestCase):
         np.testing.assert_allclose(np.linalg.eigvalsh(E.hamiltonian_at(rev, 1.0)), np.linalg.eigvalsh(H), atol=1e-10)
 
 
+class DiagramSpec(unittest.TestCase):
+    """F3.1-F3.4: every level once at its stored energy; the two line layers never mixed."""
+
+    def test_views_for_all_cases(self):
+        from lgo_engine import app_api
+        for c in app_api.case_list(P):
+            v = app_api.view(P, G, c["name"], s=1.0, level=0)
+            json.dumps(v, allow_nan=False)
+            d = v["diagram"]
+            self.assertEqual([x["energy_eV"] for x in d["centre"]], [x["energy_eV"] for x in v["result"]["levels"]])
+            self.assertEqual(sum(x["electrons"] for x in d["centre"]), d["electrons"], c["name"])
+            for ln in d["lines"]:
+                self.assertIn((ln["layer"], ln["style"]), {("mixing", "solid"), ("allowed", "dashed")})
+                if ln["layer"] == "mixing":
+                    self.assertGreaterEqual(ln["weight"], 0.05)
+            frag = d["left"] + d["right"]
+            if d["columns"][0] == "left":
+                self.assertTrue(all(x["irrep"] != "—" for x in frag), c["name"])
+            self.assertAlmostEqual(v["ledger"]["total_eV"], v["ledger"]["eigenvalue_eV"], delta=1e-10)
+
+    def test_ch4_lgos_are_symmetry_adapted(self):
+        from lgo_engine import app_api
+        d = app_api.view(P, G, "CH4")["diagram"]
+        self.assertEqual([(x["irrep"], x["multiplicity"]) for x in d["right"]], [("A1", 1), ("T2", 3)])
+
+
 class Mutation(unittest.TestCase):
     """Spec section 12: flipping one angular-factor sign must make at least one check fail."""
 

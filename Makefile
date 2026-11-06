@@ -1,11 +1,13 @@
 PYTHON ?= python
 export PYTHONDONTWRITEBYTECODE=1
 export OPENBLAS_NUM_THREADS=1
-.PHONY: check-baseline test-engine check check-release
+.PHONY: check-baseline test-engine test-web check check-release
 check-baseline:
 	$(PYTHON) scripts/check_baseline.py
 test-engine:
 	$(PYTHON) engine/tests/test_engine.py
+test-web:
+	node web/tests/web_test.js
 check: check-baseline test-engine
 	@echo 'CrystOD comparison deferred by owner decision B1 (DECISIONS.md); run make check-release for the release gate.'
 check-release: check
