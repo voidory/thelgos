@@ -127,11 +127,11 @@ def run(data,out,groups,check_reference=True):
  try:P.get('N','N','pp_pi',1.,'H2_fixture')
  except ValueError:pass
  else:raise AssertionError('missing pair silently accepted')
- # [K3] Both elements exist in onsite.csv, so only the pair-row lookup can raise here.
- P.onsite('B','p');P.onsite('S','p')
- try:P.get('B','S','pp_pi',2.,'H2_fixture')
+ # [K3, revised in patch 3] An existing element pair with an absent channel: O-H has ss/sp rows but no pp_pi row.
+ assert any(sorted([r['element_a'],r['element_b']])==['H','O'] for r in P.rows) and not any(sorted([r['element_a'],r['element_b']])==['H','O'] and r['channel']=='pp_pi' for r in P.rows),'K3 precondition: O-H rows exist without pp_pi'
+ try:P.get('O','H','pp_pi',1.,'H2O_model')
  except (ValueError,LookupError):pass
- else:raise AssertionError('missing B-S pair row for known elements silently accepted')
+ else:raise AssertionError('absent O-H pp_pi channel silently accepted')
  if check_reference:
   baseline=json.loads((ROOT/'evidence'/'reference_spectra.json').read_text());assert set(baseline)==set(refs)
   for name,levels in refs.items():

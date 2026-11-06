@@ -1,0 +1,147 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "presets": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "coupling_overrides": {
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "element_a": {
+                  "type": "string"
+                },
+                "element_b": {
+                  "type": "string"
+                },
+                "orbital_a": {
+                  "type": "string"
+                },
+                "orbital_b": {
+                  "type": "string"
+                },
+                "provenance_kind": {
+                  "enum": [
+                    "lecture_decoupling",
+                    "pedagogical_override"
+                  ]
+                },
+                "value_eV": {
+                  "type": "number"
+                }
+              },
+              "required": [
+                "element_a",
+                "orbital_a",
+                "element_b",
+                "orbital_b",
+                "value_eV",
+                "provenance_kind"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "edge_policy": {
+            "additionalProperties": false,
+            "properties": {
+              "edges_off": {
+                "items": {
+                  "enum": [
+                    "central_ligand",
+                    "ligand_ligand",
+                    "cis",
+                    "trans",
+                    "all",
+                    "nearest_neighbor"
+                  ],
+                  "type": "string"
+                },
+                "type": "array",
+                "uniqueItems": true
+              },
+              "edges_on": {
+                "items": {
+                  "enum": [
+                    "central_ligand",
+                    "ligand_ligand",
+                    "cis",
+                    "trans",
+                    "all",
+                    "nearest_neighbor"
+                  ],
+                  "type": "string"
+                },
+                "type": "array",
+                "uniqueItems": true
+              }
+            },
+            "required": [
+              "edges_on",
+              "edges_off"
+            ],
+            "type": "object"
+          },
+          "geometry_overrides": {
+            "additionalProperties": false,
+            "properties": {
+              "angle_degrees": {
+                "maximum": 180,
+                "minimum": 0,
+                "type": "number"
+              },
+              "bond_length_angstrom": {
+                "exclusiveMinimum": 0,
+                "type": "number"
+              },
+              "radius_angstrom": {
+                "exclusiveMinimum": 0,
+                "type": "number"
+              }
+            },
+            "type": "object"
+          },
+          "hydrogen_scale": {
+            "exclusiveMinimum": 0,
+            "maximum": 1,
+            "type": "number"
+          },
+          "id": {
+            "type": "string"
+          },
+          "note": {
+            "type": "string"
+          },
+          "provenance_tag": {
+            "enum": [
+              "model",
+              "lecture",
+              "pedagogical_override"
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "edge_policy",
+          "coupling_overrides",
+          "hydrogen_scale",
+          "geometry_overrides",
+          "provenance_tag"
+        ],
+        "type": "object"
+      },
+      "minItems": 1,
+      "type": "array"
+    },
+    "schema_version": {
+      "const": "1.2"
+    }
+  },
+  "required": [
+    "schema_version",
+    "presets"
+  ],
+  "type": "object"
+}

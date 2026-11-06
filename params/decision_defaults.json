@@ -1,0 +1,18 @@
+{
+  "B2": {
+    "status": "default_pending_owner_approval",
+    "value": 0.6
+  },
+  "B3": {
+    "status": "default_pending_owner_approval",
+    "value": "benzene xy, atom at +x, C2prime through atoms"
+  },
+  "B4": {
+    "status": "unresolved_N_parameters_not_added",
+    "value": "N2 excluded pending scope decision"
+  },
+  "B5": {
+    "status": "default_pending_owner_approval",
+    "value": "skip zero-coupling construction stages, show no ligand-ligand coupling note"
+  }
+}

@@ -1,6 +1,6 @@
 # Checker changes after the v1.2 review candidate
 
-**Patches:** checker-patch-1 (K1–K9) and checker-patch-2 (K10–K11, plus corrections to this record), 2026-11-06. Made by Claude with direct approval from the repository owner (@void). The CONVENTIONS owner has **not** reviewed either patch.
+**Patches:** checker-patch-1 (K1–K9), checker-patch-2 (K10–K11, plus corrections to this record) and checker-patch-3 (K3 revised against the real `params/`), 2026-11-06. Made by Claude with direct approval from the repository owner (@void). The CONVENTIONS owner has **not** reviewed either patch.
 **Scope:** `scripts/check_release1.py`, `scripts/compare_crystod.py` and `scripts/check_support.py`. `CONVENTIONS.md`, the oracles, `params/` and all committed data are untouched.
 **Base:** the v1.2 bundle as uploaded. The uploaded scripts are preserved byte-for-byte in git:
 - commit `31e24c9` holds `check_release1.py` and `compare_crystod.py`;
@@ -10,7 +10,7 @@
 
 | File | v1.2 SHA-256 | Current |
 |---|---|---|
-| `scripts/check_release1.py` | `1f09df815cde4ed0b9a63d9eef87d96ed953ad04b6b7a6d97e5a037d6d9e0dda` | `402db65652ade7b7dcb0ad93bf30cf52f0815dfbed469b51500190215bba0a41` |
+| `scripts/check_release1.py` | `1f09df815cde4ed0b9a63d9eef87d96ed953ad04b6b7a6d97e5a037d6d9e0dda` | `6d04b108a17c5bbe8465893433043b20d9ec035234bdf9e971c4667465e3929d` |
 | `scripts/compare_crystod.py` | `358ef92c9ca3b37068abcb6daaf1f6e5542a599920d4ed3ee154cfd1d111ce85` | `4ac5957405fa4e07c7ac3d0cf725b4f7e28ee67bb7a30a953375ca18c74503db` |
 | `scripts/check_support.py` | `19b577d27119600ca8a46b6724a4659bba8c1219551218ec378cb63a9b2c0e95` | `cd0ae57aec55639f22463237a8a75b1196fd4a2973a7088e98bc64d022f7c3ce` |
 
@@ -29,7 +29,11 @@
 
 The label spellings (`A1'`, `E'`, `A2''`, `Ag`, `B1u`, …) were confirmed against MolSym 1.3.1 output after `generate_groups.norm`.
 
-**K3. Additional missing-pair test on elements that exist.** The patch adds a B–S `pp_pi` lookup. It first confirms both elements have on-sites, then expects `ValueError` or `LookupError`. The original N–N test is kept.
+**K3. Additional missing-channel test on a pair that exists.** The original N–N test is kept.
+
+*Patch 1 version (withdrawn):* a B–S `pp_pi` lookup, on the assumption that no B–S row existed. The real `params/pairs.csv` has full B–S rows (lines 29–32), so that lookup succeeds and the patch-1 test fails with `missing B-S pair row … silently accepted`. The assumption was mine and wrong; it was found when the real `params/` arrived.
+
+*Patch 3 version:* an `O,H,pp_pi` lookup, expecting `ValueError` or `LookupError`. O–H has `ss_sigma` and `sp_sigma` rows but no `pp_pi` row; a precondition assert reads `pairs.csv` and checks exactly that, so the test cannot silently become vacuous if rows are added. This exercises a missing channel for an existing pair, which the N–N test (no rows at all) does not.
 *Correction (patch 2):* patch 1 said the N–N test only showed that a missing *element* raises. That was wrong. `Parameters.get` never reads the on-site table, so N–N already went through the missing-pair-row path. K3 adds a case with known elements; it doesn't close a gap.
 
 **K4. Level descriptors written to `checks/crystod_cases.json`.** Each level gets `{character, dominant_fragment, bond_energy_eV}`:
@@ -108,11 +112,16 @@ Results on that stand-in data:
 
 The stand-in parameter files are mine, not the owner's. This shows the scripts are internally consistent and reproduce Appendix B. It does not show that the real `params/` pass.
 
+**Real `params/` (patch 3).** The five parameter files that arrived match `SHA256SUMS`; `params/channel_defaults.json` was not supplied, so the run used a temporary copy with `{"defaults":[]}` (CONVENTIONS §9.2 says the supplied default list is empty). Groups were still generated without Bilbao parsing, and `evidence/reference_spectra.json` was still a stand-in built from the smoke run. On that setup:
+- `check_release1.run` passed all twelve fixtures with the reference check on; `release1_energies.csv` is byte-identical to the smoke run's, so my stand-in parameters and the real ones give the same spectra;
+- `check_support.run` passed: parameter mutation, the real preset schema (including rejection of a missing `edge_policy`), angular validation, Markdown, lock and the K10 mock protocol tests;
+- `checks/unscaled_reference_couplings.csv` reproduces the asserted O–H sp value 15.277130068296 eV.
+
 **Not run:** `make check-baseline` and `make check` against the real bundle.
 
 ## Required follow-ups
 
-1. **When `params/`, `groups/`, `checks/` and `evidence/` arrive:**
+1. **When `params/channel_defaults.json`, `groups/`, `checks/` and `evidence/` arrive:**
    - run `make check-baseline`;
    - regenerate `checks/crystod_cases.json` (K4), `checks/crystod_manifest.json` (K5–K11 fields) and `checks/crystod_protocol_tests.json` (K10);
    - update their `SHA256SUMS` lines.

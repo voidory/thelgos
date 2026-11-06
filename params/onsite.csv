@@ -1,0 +1,12 @@
+element,orbital,energy_eV,source
+H,1s,-13.61,https://chem.libretexts.org/Bookshelves/Inorganic_Chemistry/Supplemental_Modules_and_Websites_(Inorganic_Chemistry)/Advanced_Inorganic_Chemistry_(Wikibook)/01%3A_Chapters/1.07%3A_Diatomic_Molecular_Orbitals
+B,2s,-12.54,https://github.com/jarvist/HarrisonSolidStateTable.jl/blob/master/src/SolidStateTable.jl
+B,2p,-6.64,https://github.com/jarvist/HarrisonSolidStateTable.jl/blob/master/src/SolidStateTable.jl
+C,2s,-17.52,https://github.com/jarvist/HarrisonSolidStateTable.jl/blob/master/src/SolidStateTable.jl
+C,2p,-8.97,https://github.com/jarvist/HarrisonSolidStateTable.jl/blob/master/src/SolidStateTable.jl
+O,2s,-29.14,https://github.com/jarvist/HarrisonSolidStateTable.jl/blob/master/src/SolidStateTable.jl
+O,2p,-14.13,https://github.com/jarvist/HarrisonSolidStateTable.jl/blob/master/src/SolidStateTable.jl
+F,2s,-40.17,https://chem.libretexts.org/Bookshelves/Inorganic_Chemistry/Supplemental_Modules_and_Websites_(Inorganic_Chemistry)/Advanced_Inorganic_Chemistry_(Wikibook)/01%3A_Chapters/1.07%3A_Diatomic_Molecular_Orbitals
+F,2p,-18.65,https://chem.libretexts.org/Bookshelves/Inorganic_Chemistry/Supplemental_Modules_and_Websites_(Inorganic_Chemistry)/Advanced_Inorganic_Chemistry_(Wikibook)/01%3A_Chapters/1.07%3A_Diatomic_Molecular_Orbitals
+S,3s,-20.8,https://github.com/jarvist/HarrisonSolidStateTable.jl/blob/master/src/SolidStateTable.jl
+S,3p,-10.27,https://github.com/jarvist/HarrisonSolidStateTable.jl/blob/master/src/SolidStateTable.jl

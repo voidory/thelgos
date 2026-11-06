@@ -1,0 +1,206 @@
+{
+  "presets": [
+    {
+      "coupling_overrides": [],
+      "edge_policy": {
+        "edges_off": [
+          "ligand_ligand"
+        ],
+        "edges_on": [
+          "central_ligand"
+        ]
+      },
+      "geometry_overrides": {
+        "angle_degrees": 104.4776,
+        "bond_length_angstrom": 0.958
+      },
+      "hydrogen_scale": 0.6,
+      "id": "H2O_model",
+      "note": "Defaults pending owner approval; no slide calibration claim.",
+      "provenance_tag": "model"
+    },
+    {
+      "coupling_overrides": [
+        {
+          "element_a": "O",
+          "element_b": "H",
+          "orbital_a": "s",
+          "orbital_b": "s",
+          "provenance_kind": "lecture_decoupling",
+          "value_eV": 0.0
+        }
+      ],
+      "edge_policy": {
+        "edges_off": [
+          "ligand_ligand"
+        ],
+        "edges_on": [
+          "central_ligand"
+        ]
+      },
+      "geometry_overrides": {
+        "angle_degrees": 104.4776,
+        "bond_length_angstrom": 0.958
+      },
+      "hydrogen_scale": 0.6,
+      "id": "H2O_lecture",
+      "note": "Defaults pending owner approval; no slide calibration claim.",
+      "provenance_tag": "lecture"
+    },
+    {
+      "coupling_overrides": [],
+      "edge_policy": {
+        "edges_off": [
+          "ligand_ligand"
+        ],
+        "edges_on": [
+          "central_ligand"
+        ]
+      },
+      "geometry_overrides": {
+        "bond_length_angstrom": 1.087
+      },
+      "hydrogen_scale": 0.6,
+      "id": "CH4_model",
+      "note": "Defaults pending owner approval; no slide calibration claim.",
+      "provenance_tag": "model"
+    },
+    {
+      "coupling_overrides": [],
+      "edge_policy": {
+        "edges_off": [
+          "ligand_ligand"
+        ],
+        "edges_on": [
+          "central_ligand"
+        ]
+      },
+      "geometry_overrides": {
+        "bond_length_angstrom": 1.19
+      },
+      "hydrogen_scale": 0.6,
+      "id": "BH3_model",
+      "note": "Defaults pending owner approval; no slide calibration claim.",
+      "provenance_tag": "model"
+    },
+    {
+      "coupling_overrides": [],
+      "edge_policy": {
+        "edges_off": [],
+        "edges_on": [
+          "central_ligand",
+          "cis",
+          "trans"
+        ]
+      },
+      "geometry_overrides": {
+        "bond_length_angstrom": 1.561
+      },
+      "hydrogen_scale": 0.6,
+      "id": "SF6_model",
+      "note": "Defaults pending owner approval; no slide calibration claim.",
+      "provenance_tag": "model"
+    },
+    {
+      "coupling_overrides": [],
+      "edge_policy": {
+        "edges_off": [],
+        "edges_on": [
+          "central_ligand",
+          "cis",
+          "trans"
+        ]
+      },
+      "geometry_overrides": {
+        "bond_length_angstrom": 1.561
+      },
+      "hydrogen_scale": 0.6,
+      "id": "SF6_lecture",
+      "note": "Defaults pending owner approval; no slide calibration claim.",
+      "provenance_tag": "lecture"
+    },
+    {
+      "coupling_overrides": [],
+      "edge_policy": {
+        "edges_off": [],
+        "edges_on": [
+          "cis",
+          "trans"
+        ]
+      },
+      "geometry_overrides": {
+        "radius_angstrom": 1.0
+      },
+      "hydrogen_scale": 0.6,
+      "id": "sixH_lecture",
+      "note": "Defaults pending owner approval; no slide calibration claim.",
+      "provenance_tag": "lecture"
+    },
+    {
+      "coupling_overrides": [],
+      "edge_policy": {
+        "edges_off": [],
+        "edges_on": [
+          "all"
+        ]
+      },
+      "geometry_overrides": {
+        "radius_angstrom": 1.087
+      },
+      "hydrogen_scale": 0.6,
+      "id": "fourH_diagnostic",
+      "note": "Defaults pending owner approval; no slide calibration claim.",
+      "provenance_tag": "model"
+    },
+    {
+      "coupling_overrides": [],
+      "edge_policy": {
+        "edges_off": [],
+        "edges_on": [
+          "all"
+        ]
+      },
+      "geometry_overrides": {
+        "bond_length_angstrom": 1.0
+      },
+      "hydrogen_scale": 0.6,
+      "id": "H2_fixture",
+      "note": "Defaults pending owner approval; no slide calibration claim.",
+      "provenance_tag": "model"
+    },
+    {
+      "coupling_overrides": [],
+      "edge_policy": {
+        "edges_off": [],
+        "edges_on": [
+          "all"
+        ]
+      },
+      "geometry_overrides": {
+        "bond_length_angstrom": 1.0
+      },
+      "hydrogen_scale": 0.6,
+      "id": "H3_fixture",
+      "note": "Defaults pending owner approval; no slide calibration claim.",
+      "provenance_tag": "model"
+    },
+    {
+      "coupling_overrides": [],
+      "edge_policy": {
+        "edges_off": [],
+        "edges_on": [
+          "nearest_neighbor"
+        ]
+      },
+      "geometry_overrides": {
+        "angle_degrees": 120.0,
+        "bond_length_angstrom": 1.4
+      },
+      "hydrogen_scale": 0.6,
+      "id": "allyl_pi",
+      "note": "Defaults pending owner approval; no slide calibration claim.",
+      "provenance_tag": "model"
+    }
+  ],
+  "schema_version": "1.2"
+}
