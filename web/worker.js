@@ -4,7 +4,7 @@
 importScripts("https://cdn.jsdelivr.net/pyodide/v0.27.7/full/pyodide.js");
 
 const ENGINE = ["__init__.py", "model.py", "params.py", "hamiltonian.py", "solve.py", "symmetry.py",
-  "analysis.py", "ledger.py", "result.py", "schedule.py", "cases.py", "diagram.py", "fidelity.py", "app_api.py"];
+  "analysis.py", "ledger.py", "result.py", "schedule.py", "cases.py", "diagram.py", "fidelity.py", "views.py", "app_api.py"];
 const GROUPS = ["C2h", "C2v", "D2d", "D2h", "D3h", "D4h", "D6h", "D8h", "Oh", "Td"];
 const DATA = ["params/onsite.csv", "params/pairs.csv", "params/presets.json", "params/channel_defaults.json",
   "params/case_notes.json", "params/curated_checks.json",
@@ -50,6 +50,14 @@ self.onmessage = async (ev) => {
 a = json.loads(ARGS)
 json.dumps(app_api.view(P, G, a["case"], s=a.get("s", 1.0), level=a.get("level"), conventions_sha256=CSHA, extras=X), allow_nan=False)`));
       out.compute_ms = performance.now() - t0;
+    } else if (cmd === "export") {
+      py.globals.set("ARGS", JSON.stringify(args));
+      out = JSON.parse(py.runPython(`
+a = json.loads(ARGS)
+json.dumps(app_api.export(P, G, a["case"], s=a.get("s", 1.0), level=a.get("level"), conventions_sha256=CSHA), allow_nan=False)`));
+    } else if (cmd === "import") {
+      py.globals.set("ARGS", JSON.stringify(args));
+      out = JSON.parse(py.runPython(`json.dumps(app_api.validate_import(P, json.loads(ARGS), conventions_sha256=CSHA))`));
     } else throw new Error(`unknown command ${cmd}`);
     self.postMessage({ id, ok: true, out });
   } catch (e) {

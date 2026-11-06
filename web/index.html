@@ -21,6 +21,8 @@
       <div id="ticks" class="ticks"></div>
     </div>
     <p id="narration" class="narration" aria-live="polite"></p>
+    <div id="badges" class="badges"></div>
+    <div id="rule-detail" class="rule-detail" hidden></div>
     <fieldset class="toggles">
       <legend>Show</legend>
       <label><input type="checkbox" id="t-mixing" checked> Mixing lines</label>
@@ -32,16 +34,33 @@
     <svg id="diagram" role="img" aria-label="MO diagram"></svg>
     <section class="about" aria-label="About this diagram">
       <h2>About this diagram</h2>
+      <p id="explanation" class="explanation"></p>
       <ul id="comparisons" class="comparisons"></ul>
       <div id="notes"></div>
     </section>
   </section>
-  <section class="inspector" aria-label="Contact ledger">
-    <h2>Contact ledger</h2>
+  <section class="inspector" aria-label="Inspector">
+    <h2>Structure <span class="badge-slot" data-rules="R1"></span></h2>
+    <div class="structure-tools"><label><input type="checkbox" id="t-3d"> 3D view</label></div>
+    <svg id="structure" role="img" aria-label="Structure with orbital lobes and contacts"></svg>
+    <canvas id="view3d" width="600" height="420" hidden aria-label="3D view: drag to rotate"></canvas>
+    <h2>Contact ledger <span class="badge-slot" data-rules="R1 R6"></span></h2>
     <p id="ledger-hint">Tap a molecular orbital to see every contact that sets its energy.</p>
+    <button id="whyjump" type="button" hidden>Show where this level appeared</button>
     <div id="ledger"></div>
-    <h2>Bond order</h2>
+    <h2>Matching <span class="badge-slot" data-rules="R7"></span></h2>
+    <div id="matching"></div>
+    <h2>Bond order <span class="badge-slot" data-rules="R8"></span></h2>
     <div id="bonds"></div>
+    <h2>Export and share</h2>
+    <div class="export">
+      <button type="button" id="ex-svg">SVG</button>
+      <button type="button" id="ex-png">PNG</button>
+      <button type="button" id="ex-json">JSON</button>
+      <button type="button" id="ex-link">Copy link</button>
+      <label class="import">Import JSON <input type="file" id="im-json" accept="application/json,.json"></label>
+    </div>
+    <p id="export-status" class="muted-text" aria-live="polite"></p>
   </section>
 </main>
 <footer><small id="footer"></small></footer>

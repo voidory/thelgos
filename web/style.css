@@ -41,7 +41,9 @@ svg .warn { fill: var(--warn); }
 table { border-collapse: collapse; width: 100%; font-size: 0.8rem; }
 th, td { text-align: right; padding: 2px 4px; border-bottom: 1px solid var(--rule); white-space: nowrap; }
 th:first-child, td:first-child { text-align: left; }
-#ledger { max-height: 360px; overflow: auto; }
+#ledger { max-height: 360px; overflow: auto; max-width: 100%; }
+#matching { overflow-x: auto; max-width: 100%; }
+.inspector svg, .inspector canvas { max-width: 100%; }
 footer { color: var(--muted); padding-bottom: 24px; }
 .about { margin-top: 12px; }
 .about h3 { font-size: 0.9rem; margin: 10px 0 2px; }
@@ -55,3 +57,23 @@ footer { color: var(--muted); padding-bottom: 24px; }
   svg text { font-size: 18px; }
   main { grid-template-columns: minmax(0, 1fr); grid-template-areas: "controls" "diagram" "inspector"; }
 }
+
+.badges { display: flex; flex-wrap: wrap; gap: 6px; margin: 2px 0 6px; }
+.badge { font: inherit; font-size: 0.75rem; padding: 1px 8px; border: 1px solid var(--rule); border-radius: 999px; background: var(--panel); color: var(--fg); cursor: pointer; }
+.badge .kind { color: var(--muted); }
+.badge-slot { font-weight: normal; }
+.rule-detail { font-size: 0.85rem; border-left: 3px solid var(--rule); padding: 4px 8px; margin: 0 0 8px; background: var(--panel); }
+.explanation { font-size: 0.9rem; }
+#structure { margin-bottom: 4px; }
+#view3d { width: 100%; height: auto; border: 1px solid var(--rule); background: var(--panel); touch-action: none; }
+svg .atom { fill: var(--panel); stroke: var(--muted); }
+svg .lobe-pos { fill: var(--pos); fill-opacity: 0.75; }
+svg .lobe-neg { fill: var(--neg); fill-opacity: 0.75; }
+svg .contact { stroke: var(--fg); fill: none; }
+svg .contact.dashed { stroke-dasharray: 4 3; }
+svg .contact.hot, tr.hot td { stroke: var(--warn); background: color-mix(in srgb, var(--warn) 18%, transparent); }
+.muted-text { color: var(--muted); font-size: 0.8rem; overflow-wrap: anywhere; }
+.export { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.export .import { font-size: 0.85rem; }
+.export input[type=file] { max-width: 100%; }
+#matching table td.zero { color: var(--muted); }

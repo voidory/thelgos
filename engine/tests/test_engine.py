@@ -284,6 +284,60 @@ class ReadingPanel(unittest.TestCase):
         self.assertTrue(set(load_extras()["notes"]["cases"]) <= names)
 
 
+class InspectorViews(unittest.TestCase):
+    """L2, L3, P3, P6, F5.1, F5.2, F5.4-F5.5 on the engine side."""
+
+    def setUp(self):
+        from load import load_extras
+        from lgo_engine import app_api
+        self.api, self.X = app_api, load_extras()
+
+    def test_structure_lines_match_ledger_rows(self):
+        for c in self.api.case_list(P):
+            v = self.api.view(P, G, c["name"], level=0)
+            rows = {k for k, r in enumerate(v["ledger"]["rows"]) if r["kind"] == "contact" and abs(r["energy_eV"]) >= 1e-9}
+            self.assertEqual({x["ledger_row"] for x in v["structure"]["contacts"]}, rows, c["name"])
+
+    def test_matching_zero_pattern_follows_irreps(self):
+        for c in self.api.case_list(P):
+            m = self.api.view(P, G, c["name"])["diagram"]["matching"]
+            if not m or m["rows"][0]["irrep"] == "—":
+                continue
+            for i, r in enumerate(m["rows"]):
+                for j, col in enumerate(m["cols"]):
+                    if r["irrep"] != col["irrep"]:
+                        self.assertEqual(m["tally_eV"][i][j], 0.0, (c["name"], r, col))
+        m = self.api.view(P, G, "H2O lecture")["diagram"]["matching"]
+        self.assertEqual(m["tally_eV"][0], [0.0, 0.0])  # O 2s decoupled in the lecture preset
+
+    def test_origins(self):
+        v = self.api.view(P, G, "SF6 model")
+        eg = [k for k, lv in enumerate(v["result"]["levels"]) if lv["irrep"] == "Eg"][0]
+        self.assertEqual(v["origins"][eg]["checkpoint"], 3)  # eg is complete once all F-F couplings are on
+        self.assertTrue(all(o["checkpoint"] == 4 for k, o in enumerate(v["origins"]) if k != eg))
+        v = self.api.view(P, G, "H2O lecture")
+        self.assertEqual([o["checkpoint"] for o in v["origins"]], [0, 1, 1, 0, 1, 1])
+
+    def test_explanation_is_deterministic(self):
+        a = self.api.view(P, G, "SF6 model")["explanation"]
+        self.assertEqual(a, self.api.view(P, G, "SF6 model")["explanation"])
+        self.assertIn("Eg have no partner", a)
+
+    def test_stage_badges(self):
+        v = self.api.view(P, G, "SF6 model")
+        self.assertEqual([st["rules"] for st in v["schedule"]["stages"]], [["R5"], ["R5"], ["R5"], ["R7", "R2"]])
+        self.assertEqual(set(v["rules"]), {f"R{i}" for i in range(1, 11)})
+
+    def test_export_and_import(self):
+        d = self.api.export(P, G, "CO", s=1.0, level=3, conventions_sha256=conventions_sha256())
+        json.loads(json.dumps(d, allow_nan=False))
+        ok = self.api.validate_import(P, d, conventions_sha256())
+        self.assertEqual(ok["config"], {"case": "CO", "s": 1.0, "level": 3})
+        bad = json.loads(json.dumps(d)); bad["config"]["case"] = "XeF2"
+        with self.assertRaisesRegex(ValueError, "config.case"):
+            self.api.validate_import(P, bad)
+
+
 class Mutation(unittest.TestCase):
     """Spec section 12: flipping one angular-factor sign must make at least one check fail."""
 

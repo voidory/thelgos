@@ -12,6 +12,12 @@ python3 -m http.server 8000
 
 | Spec | Built |
 |---|---|
+| L2 | Structure view: atoms in a fixed 2D projection, orbital lobes coloured by phase (red positive, blue negative), one contact line per ledger contact row (solid stabilising, dashed destabilising, width by size); hovering a row or a line highlights both |
+| L3 | Rule badges (R1–R10) on each construction stage, the ledger, matching and bond order; tapping one shows the rule, its meaning in the model and its badge |
+| P3 | Why-jump: "Show where this level appeared" moves the slider to the checkpoint at which the selected level first reached its final energy, with that moment's ledger and structure |
+| P6 | Matching table: ⟨central orbital\|H\|LGO⟩ tallies; zero means no interaction, and the zero pattern follows the irreps |
+| F3.7 | 3D view (WebGL2): atoms and the selected orbital's lobes; drag to rotate |
+| F5.1–F5.6 | Provenance tooltips; generated explanation; SVG, PNG and JSON export; JSON import with validation; share links (compressed config in the URL fragment, nothing stored on a server) |
 | L1 | Contact ledger for the selected level: every on-site and contact row, phase, contact weight, energy contribution, running total. The total equals the eigenvalue |
 | P1–P2 | Construction slider over H(s), with stage ticks and narration, and B5 notes for skipped stages |
 | P7 | Filling arrows; counting and density-matrix bond orders, side by side |
@@ -29,6 +35,8 @@ python3 -m http.server 8000
 - warm recompute stays under 100 ms. This is measured on the build machine, not the reference phone;
 - the ledger total equals the eigenvalue;
 - the slider and its four SF6 stages, and the CH4 B5 skip note;
+- L2 one-to-one ledger rows and structure lines, L3 badges, F5.1 tooltips, P6 zero tallies, P3 why-jump for SF6 eg (checkpoint 3 of 4);
+- JSON export, re-import and rejection of an invalid file (failing field named); a share link opened in a new page; the 3D view painting;
 - the reading panel: N2's ordering disagreement and CO's note on its starred HOMO;
 - Watch mode plays through;
 - there is no horizontal scroll at 360 px, and no page errors.
@@ -37,4 +45,4 @@ python3 -m http.server 8000
 
 ## Not built yet
 
-L2–L3 contact lines and rule badges on the structure, P3 why-jump, P6 per-lobe matching view, the F3.7 3D viewer, export (section 11), and the Release 2+ features.
+The Release 2+ features (L4–L5, P4–P5, Practice and Exam modes, D1–D10), and the design pass. The 3D view draws p lobes as axis-aligned ellipsoids, which is exact for the Cartesian and axial directions used in Release 1 but not for arbitrary directions.
