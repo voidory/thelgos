@@ -29,7 +29,7 @@ def view(params, groups, name, s=1.0, level=None, conventions_sha256=None):
     H = np.array(result["hamiltonian_eV"])
     sched = build_schedule(system, Group(groups[system.group]) if system.group != "C1" else None, H)
     Hs = hamiltonian_at(sched, s)
-    diagram = diagram_spec(system, H, result, groups, H_now=Hs)
+    diagram = diagram_spec(system, H, result, groups, H_now=Hs, params=params)
     K = len(sched["stages"])
     lam = lambdas(s, K)
     active = next((k for k, x in enumerate(lam) if 0 < x < 1), None)

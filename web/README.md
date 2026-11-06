@@ -16,7 +16,7 @@ python3 -m http.server 8000
 | P1–P2 | Construction slider over H(s), with stage ticks and narration, and B5 notes for skipped stages |
 | P7 | Filling arrows; counting and density-matrix bond orders, side by side |
 | Watch mode | Plays the construction stage by stage |
-| F3.1–F3.4 | Three-column diagram (two columns without a central atom); symmetry-adapted fragment levels; dashed allowed and solid mixing layers, each with its own toggle; axis labelled in model units; electron arrows |
+| F3.1–F3.4 | Three-column diagram: central-atom orbitals, MOs, ligand group orbitals; diatomics in the textbook layout (atom 1 orbitals, MOs, atom 2 orbitals, with σg/πu* labels); two columns for other systems without a central atom; symmetry-adapted fragment levels; dashed allowed and solid mixing layers, each with its own toggle; axis labelled in model units; electron arrows |
 | F3.9 | Usable at 360 px with no horizontal scroll |
 | F5.7 | Scope banner: model units, preset tag, not a spectral prediction, engine and CONVENTIONS versions |
 

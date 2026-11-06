@@ -8,6 +8,7 @@ row for the channel -> explicit channel default -> error. Absent is never silent
 class ParameterSet:
     def __init__(self, onsite_rows, pair_rows, presets, channel_defaults=()):
         self.onsite = {(r["element"], r["orbital"][-1]): float(r["energy_eV"]) for r in onsite_rows}
+        self.orbital_name = {(r["element"], r["orbital"][-1]): r["orbital"] for r in onsite_rows}
         self.rows = list(pair_rows)
         self.defaults = list(channel_defaults)
         self.presets = {p["id"]: p for p in presets}

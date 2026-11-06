@@ -242,9 +242,21 @@ class DiagramSpec(unittest.TestCase):
                 if ln["layer"] == "mixing":
                     self.assertGreaterEqual(ln["weight"], 0.05)
             frag = d["left"] + d["right"]
-            if d["columns"][0] == "left":
+            if d["columns"][0] == "left" and d["column_titles"]["right"] == "Ligand group orbitals":
                 self.assertTrue(all(x["irrep"] != "—" for x in frag), c["name"])
             self.assertAlmostEqual(v["ledger"]["total_eV"], v["ledger"]["eigenvalue_eV"], delta=1e-10)
+
+    def test_diatomic_textbook_layout(self):
+        """Atom 1 | MOs | atom 2; each MO's atomic weights over both sides sum to one."""
+        from lgo_engine import app_api
+        for name in ["H2", "B2", "C2", "N2", "O2", "F2", "CO"]:
+            d = app_api.view(P, G, name)["diagram"]
+            self.assertEqual(d["columns"], ["left", "centre", "right"], name)
+            self.assertEqual(sum(x["multiplicity"] for x in d["left"] + d["right"]), sum(x["multiplicity"] for x in d["centre"]), name)
+        d = app_api.view(P, G, "CO")["diagram"]
+        self.assertEqual([x["label"] for x in d["left"]], ["C 2s", "C 2p"])
+        self.assertEqual([x["label"] for x in d["right"]], ["O 2s", "O 2p"])
+        self.assertEqual((d["column_titles"]["left"], d["column_titles"]["right"]), ("C (atom 1)", "O (atom 2)"))
 
     def test_ch4_lgos_are_symmetry_adapted(self):
         from lgo_engine import app_api

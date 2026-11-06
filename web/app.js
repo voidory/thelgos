@@ -27,7 +27,13 @@ function el(tag, attrs = {}, text) {
 }
 
 const fmt = (x, d = 3) => (x >= 0 ? "+" : "−") + Math.abs(x).toFixed(d);
-const irrepText = (lv) => lv.linear_label ? `${lv.linear_label.replace("_", "")} (${lv.irrep})` : lv.irrep;
+// D∞h/C∞v names in the textbook form (σg, πu*, …); the star marks an antibonding level as the engine classifies it.
+const GREEK = { sigma: "σ", pi: "π" };
+const irrepText = (lv) => {
+  if (!lv.linear_label) return lv.irrep;
+  const [base, par] = lv.linear_label.split("_");
+  return `${GREEK[base] || base}${par || ""}${lv.character === "antibonding" ? "*" : ""}`;
+};
 
 function draw(view) {
   const svg = $("diagram");

@@ -39,8 +39,9 @@ def _fragment_levels(H, idx, P, N):
     return sorted(out, key=lambda x: (x[0], x[2]))
 
 
-def diagram_spec(system, H, result, groups, H_now=None):
-    """H is the full Hamiltonian (for the fragment columns); H_now the slider Hamiltonian, if any."""
+def diagram_spec(system, H, result, groups, H_now=None, params=None):
+    """H is the full Hamiltonian (for the fragment columns); H_now the slider Hamiltonian, if any.
+    Diatomics use the textbook layout: atom 1 orbitals | MOs | atom 2 orbitals."""
     N = len(system.basis)
     P = None
     if system.group != "C1":
@@ -49,7 +50,25 @@ def diagram_spec(system, H, result, groups, H_now=None):
     left_idx = [i for i, f in enumerate(system.basis) if f.atom == centre] if centre is not None else []
     right_idx = [i for i, f in enumerate(system.basis) if f.atom != centre] if centre is not None else list(range(N))
     cols = {}
-    if centre is not None:
+    diatomic = centre is None and len(system.atoms) == 2
+    if diatomic:
+        # Each side lists one atom's valence orbitals (s, then the p set), at its on-site energy.
+        left_idx = [i for i, f in enumerate(system.basis) if f.atom == 0]
+        right_idx = [i for i, f in enumerate(system.basis) if f.atom == 1]
+        for side, idx, tag in (("left", left_idx, "L"), ("right", right_idx, "R")):
+            el = system.atoms[system.basis[idx[0]].atom].element
+            rows = []
+            for kind in ("s", "p"):
+                sub = [k for k, i in enumerate(idx) if system.basis[i].kind == kind]
+                if not sub:
+                    continue
+                v = np.zeros((len(idx), len(sub)))
+                v[sub, range(len(sub))] = 1.0
+                name = params.orbital_name.get((el, kind), kind) if params is not None else kind
+                rows.append({"energy_eV": float(H[idx[sub[0]], idx[sub[0]]]), "multiplicity": len(sub), "irrep": "—",
+                             "label": f"{el} {name}", "_v": v})
+            cols[side] = [{"id": f"{tag}{k}", **r} for k, r in enumerate(rows)]
+    elif centre is not None:
         cols["left"] = [{"id": f"L{k}", "energy_eV": e, "multiplicity": m, "irrep": l,
                          "label": "/".join(sorted({system.basis[left_idx[i]].label for i in np.flatnonzero(abs(v).sum(axis=1) > 1e-9)})),
                          "_v": v} for k, (e, m, l, v) in enumerate(_fragment_levels(H, left_idx, P, N))]
@@ -83,10 +102,14 @@ def diagram_spec(system, H, result, groups, H_now=None):
     for side in cols:
         for frag in cols[side]:
             frag.pop("_v")
-    spec = {"columns": (["left", "centre", "right"] if centre is not None else ["right", "centre"]),
-            "column_titles": ({"left": f"{system.atoms[centre].element} orbitals", "centre": "Molecular orbitals",
-                               "right": "Ligand group orbitals"} if centre is not None else
-                              {"right": "Atomic orbitals", "centre": "Molecular orbitals"}),
+    if diatomic:
+        titles = {"left": f"{system.atoms[0].element} (atom 1)", "centre": "Molecular orbitals", "right": f"{system.atoms[1].element} (atom 2)"}
+    elif centre is not None:
+        titles = {"left": f"{system.atoms[centre].element} orbitals", "centre": "Molecular orbitals", "right": "Ligand group orbitals"}
+    else:
+        titles = {"right": "Atomic orbitals", "centre": "Molecular orbitals"}
+    spec = {"columns": (["left", "centre", "right"] if (centre is not None or diatomic) else ["right", "centre"]),
+            "column_titles": titles,
             "left": cols.get("left", []), "right": cols["right"], "centre": mos, "lines": lines,
             "axis_label": AXIS_LABEL, "electrons": system.electrons}
     if H_now is not None:
