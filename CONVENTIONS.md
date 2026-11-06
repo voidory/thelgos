@@ -1,0 +1,321 @@
+# CONVENTIONS.md — LGO Method Explorer
+
+**Version: 1.2 — REVIEW CANDIDATE; NOT FROZEN OR OWNER-APPROVED**  
+**Owner / change authority: the project owner**  
+**Date: 2026-11-07, Singapore**  
+**Release 1 blockers: CrystOD archive/real checker integration; missing B2, C2, O2, F2 and CO geometry/oracle/regression fixtures; browser engine/slider/ledger/Watch acceptance tests.**
+
+## Review and evidence record
+
+v1.0 was AI-prepared and owner-reviewed. Its “AI-checked” status preceded the numerical review that found the water-ordering problem, the SF6 construction-stage degeneracy and malformed Markdown. It did not certify numerical correctness. v1.1 corrected those problems, but its hardcoded-data audit and character-matched D2h PASS were insufficient. In particular, raw MolSym 1.3.1 associates x with B2u and y with B3u in the generated D2h matrices; the prior comparison concealed that swap. The old D2h PASS is retracted.
+
+The attached v1.2 TODO records Claude's independent hand review of the physics, for the owner. This revision records the agent's executed engineering corrections; it does not turn that earlier review into owner approval of this new bundle. v1.1 was unavailable as a local file in this turn; this candidate reconstructs the accepted contract from the conversation and the original attachments, with explicit retained/removed content below.
+
+New evidence: offline MolSym generation, geometry-first class mapping, explicit D2h label repair, data-file-driven Hamiltonians and oracle substitution, committed spectrum guards, a corrupt-pair negative test, schema validation, reproducibility via temporary regeneration and diffs, exact-value snapping, open-shell warnings, and a complete hash-locked checker environment. Twelve current fixtures execute, including neutral H3. Raw group-source snapshots and install evidence are packaged. No claim of new blind derivation: this is a regression audit of previously reviewed analytic results.
+
+**Tech stack:** `CPython 3.12.7 + NumPy 2.0.2 engine; Pyodide 0.27.7 in a Web Worker; vanilla ES2022 + HTML/CSS/SVG + WebGL2 frontend; static hosting; no backend.`
+
+Pin evidence: [Pyodide package list](https://pyodide.org/en/0.27.7/usage/packages-in-pyodide.html), [changelog](https://pyodide.org/en/0.27.7/project/changelog.html), [distribution lock](https://cdn.jsdelivr.net/pyodide/v0.27.7/full/pyodide-lock.json), checked 2026-11-07. The lock reports Python 3.12.7 and NumPy 2.0.2. This audit's host is **CPython 3.12.8** with NumPy 2.0.2: report that actual runtime, rather than claiming it is the production 3.12.7/browser test. Browser tests remain open.
+
+## 1. Units, signs and angular factors
+
+Use eV, Å, degrees at input and radians internally. On-sites are approximate isolated-orbital energies on an approximate vacuum reference; molecular eigenvalues are model results, not measured ionisation energies. The basis is orthonormal; overlap is the identity. For each stored pair a<b, the direction vector points from a to b. Compute that pair block once and set the reverse block to its transpose. Do not reconstruct a reverse block with an unreversed direction vector. Stabilising in-phase s–s hopping is negative; directional-orbital contact phases include AO signs, not just coefficients.
+
+Reference: [Slater & Koster, Phys. Rev. 94, 1498 (1954)](https://doi.org/10.1103/PhysRev.94.1498). The +z-bond table is authoritative. Markdown bars are escaped inside code spans.
+
+| Matrix element (+z bond) | Value |
+|---|---|
+| `<s_a\|H\|s_b>` | \(V_{ss\sigma}\) |
+| `<s_a\|H\|p_z,b>` | \(+V_{sp\sigma}\) |
+| `<p_z,a\|H\|s_b>` | \(-V_{sp\sigma}\) |
+| `<p_z,a\|H\|p_z,b>` | \(V_{pp\sigma}\) |
+| `<p_x,a\|H\|p_x,b>`, likewise y | \(V_{pp\pi}\) |
+| `<s_a\|H\|d_z2,b>`, reverse types | \(V_{sd\sigma}\) |
+| `<p_z,a\|H\|d_z2,b>` | \(+V_{pd\sigma}\) |
+| `<d_z2,a\|H\|p_z,b>` | \(-V_{pd\sigma}\) |
+| `<p_x,a\|H\|d_xz,b>`, likewise y/yz | \(+V_{pd\pi}\) |
+| `<d_xz,a\|H\|p_x,b>`, likewise yz/y | \(-V_{pd\pi}\) |
+
+Test-only reference: [pysktb 0.5.6](https://pypi.org/project/pysktb/0.5.6/), `pysktb._params.get_hop_int`. Map its `s,px,py,pz,dxy,dyz,dxz,dx2-y2,dz2,S` order by indices `[0,1,2,3,8,6,5,7,4]`. Independently expressed vector/tensor contractions agree for 124 deterministic directions; reversal-transpose parity also passes. s/p, s–d and p–d checked; d–d not checked. This reference is not an application dependency.
+
+## 2. Axes, numbering and geometries
+
+Generate exact symmetric positions from unit directions, not rounded coordinate tables.
+
+| Case | Positions and atom order |
+|---|---|
+| Diatomic | z axis; atom 1 at −R/2, atom 2 at +R/2 |
+| H2O | O=1 at origin, yz plane, z bisector; H2 on +y, H3 on −y, both +z |
+| CH4 | C=1; H2–5 directions (1,1,1),(1,−1,−1),(−1,1,−1),(−1,−1,1), each divided by √3 |
+| BH3 | B=1; H2–4 in xy at 0°,120°,240° from +x |
+| SF6 | S=1; F2–7 at +x,−x,+y,−y,+z,−z |
+| Six H Oh | Same six directions, no centre; H1–6 |
+| Cyclic H3 | xy plane, centroid origin; H1–3 at 0°,120°,240° |
+| Allyl | yz plane, C2 at origin, C1 on +y and C3 on −y, both +z; π=px |
+| Benzene, later release | xy plane; atoms k=1–6 at R(cos((k−1)π/3),sin((k−1)π/3),0). Atoms lie on ±x. C2-prime axes pass through opposite atoms (0°,60°,120°); C2-double-prime pass through opposite bond midpoints (30°,90°,150°). B3 default, awaiting the owner. |
+
+| Fixture | Pinned geometry | Source / qualification |
+|---|---|---|
+| H2O | O–H 0.958 Å; HOH 104.4776° | Retained [NIST input](https://cccbdb.nist.gov/expgeom2x.asp?casno=7732185) |
+| CH4 | C–H 1.087 Å | Retained [NIST input](https://cccbdb.nist.gov/exp2x.asp?casno=74828) |
+| BH3 | B–H 1.190 Å | [NIST r0 input](https://cccbdb.nist.gov/exp2x.asp?casno=13283313&charge=0), not re |
+| SF6 | S–F 1.561 Å | Retained [NIST input](https://cccbdb.nist.gov/exp2x.asp?casno=2551624) |
+| H2 | H–H 1.000 Å | Schematic test geometry, not equilibrium |
+| H3+/neutral H3 | Edge 1.000 Å; radius 1/√3 Å | Schematic test geometry |
+| Six H Oh | Radius 1.000 Å | Schematic test geometry |
+| Four H Td | Radius 1.087 Å; edge R√(8/3) | CH4 ligand-only diagnostic |
+| Allyl π | C–C 1.400 Å; angle 120° | Idealised fixture |
+
+Water positions are \((0,\pm R\sin(\theta/2),R\cos(\theta/2))\). The same formula defines C1/C3 for allyl. Geometry overrides live in presets, not duplicated checker constants.
+
+B2, C2, O2, F2 and CO are **in Release 1 scope but their source-backed equilibrium distances, explicit oracle blocks and executed regression rows are still missing**. N2 remains excluded pending B4. Do not interpret the H2 D2h subgroup as its exact point group: the exact linear homonuclear symmetry is D-infinity-h; D2h is the finite label-checking subgroup.
+
+## 3. Orbital phases and local frames
+
+Positive real normalisation constants multiply s=1; px=x, py=y, pz=z; dz2=2z²−x²−y²; dxz=xz; dyz=yz; dx2-y2=x²−y²; dxy=xy. These explicit signs override ambiguous phase-name shorthand.
+
+\[
+\mathbf f_d=\left((3n^2-1)/2,\sqrt3ln,\sqrt3mn,
+\sqrt3(l^2-m^2)/2,\sqrt3lm\right),\qquad\sum_\mu f_{d,\mu}^2=1.
+\]
+
+Distinguish effective s-type donors from actual inward p sigma functions. For outward radial unit u, inward p sigma is −u·p; use actual p angular channels. To define local π axes, choose the Cartesian axis e least parallel to u (ties x,y,z), project/normalise it to v perpendicular to u, then w=u×v. Functions are v·p and w·p. Allyl uses common global px. Frame-chart changes are basis transformations, not physical jumps.
+
+## 4. Colours and basis order
+
+Red=positive amplitude, blue=negative. Lobe colour includes AO phase and MO coefficient. Fix-and-flip makes the lowest-numbered member positive. Contact lines use neither colour: solid stabilising, dashed destabilising. Basis order: atom index, then `s,px,py,pz,dz2,dxz,dyz,dx2-y2,dxy`; reduced/local donor functions are explicitly declared. Isolated eigenvector phase makes its first above-threshold coefficient positive. Display thresholds do not truncate computation. Degenerate spaces are compared by projectors, not individual solver vectors.
+
+## 5. Group-data provenance and axis repair
+
+Generator: [MolSym 1.3.1](https://github.com/NASymmetry/MolSym), `molsym.symtext.general_irrep_mats.pg_to_symels`. Independent reference: [Bilbao POINT](https://cryst.ehu.es/rep/point.html); fresh pages fetched 2026-11-07 and packaged as `evidence/bilbao_*.html`. Generation and all baseline checks are offline thereafter.
+
+**Geometry first:** for each Bilbao column construct a Cartesian target operation from the rotation axis/angle or mirror normal. Find the generated conjugacy class containing that matrix. Only then compare characters in that class. Never choose a class by matching character values or its library display label. Every target matrix and matched operation index is saved in `checks/bilbao_*.json` and group metadata.
+
+For D2h the target order is E,C2z,C2y,C2x,i,mz,my,mx; mirror subscripts are normals. Raw library data fail this mapping with maximum character difference 2. Repair the **irrep names**, not geometry: swap MolSym B2g↔B3g and B2u↔B3u, and normalise A1g/A1u to Ag/Au. `library_label_map` is explicit in the file. Corrected assertions: **x=B3u, y=B2u, z=B1u**. C2v assertions: x=B1,y=B2,z=A1. D3h explicitly contains C2 about +x. Thus the earlier raw D2h PASS is not repeated.
+
+For the hexagonal table setting, record the chosen Cartesian alignment: Bilbao's 2_120 family maps to C2-prime through +x; 2_100 maps to the perpendicular C2-double-prime family in D6h. This is the fixed setting transformation used here, not a swap chosen to fit characters. The table's improper classes follow the corresponding geometric operations. The target matrices in JSON are authoritative. Benzene's atom/bond families are separately asserted against coordinates; no automatic renaming from character resemblance is allowed.
+
+| Coverage | Supplied files | Status |
+|---|---|---|
+| Release 1 | Oh,Td,D3h,C2v,D2h | Geometry-mapped Bilbao comparison passes; D2h includes documented label repair |
+| Later crystallographic | D4h,D2d,C2h,D6h | Geometry-mapped comparison passes; D6h uses the stated setting and B3 default |
+| Release 4 | D8h | Not crystallographic; closure and character orthogonality only, no Bilbao coverage claim |
+
+JSON contains operation matrices, generating indices, multiplication tables, conjugacy classes, characters and irrep dimensions. Snap exact values to binary representations of 0,±1,±1/2,±√2/2,±√3/2, etc., including ±√2 character values. Assert maximum snapping residual <1e−12 and record it for matrices and characters. Do not merely round near-zero trigonometric artifacts into long decimal approximations.
+
+Offline reproduction: `python scripts/generate_groups.py --out /tmp/regenerated`. Fresh retrieval: `python scripts/fetch_bilbao.py --out /tmp/bilbao`, then `python scripts/generate_groups.py --evidence /tmp/bilbao --out /tmp/regenerated`. Fresh results are candidates for review, not silent replacements of committed evidence.
+
+## 6. Aliases and construction schedule
+
+Keep `canonical_id` separate from source-backed `lecture_alias`. MO numbering is valence-only, ascending energy. Pairs are ordered by lowest atom index, bonding before antibonding. Exact lecture LGO numbering still needs the slides.
+
+Canonical SALCs:
+
+- Water H2,H3: L+=(1,1)/√2; L−=(1,−1)/√2.
+- CH4 H2–5: a1=(1,1,1,1)/2; Lx=(1,1,−1,−1)/2; Ly=(1,−1,1,−1)/2; Lz=(1,−1,−1,1)/2.
+- Oh +x,−x,+y,−y,+z,−z: a1g=(1,1,1,1,1,1)/√6; Lx=(1,−1,0,0,0,0)/√2; Ly=(0,0,1,−1,0,0)/√2; Lz=(0,0,0,0,1,−1)/√2; eg1=(−1,−1,−1,−1,2,2)/√12; eg2=(1,1,−1,−1,0,0)/2.
+
+B5 default, not owner approval: skip a construction stage whose newly enabled coupling block is identically zero; show **“No ligand–ligand coupling in this model.”** Do not secretly turn on H–H edges for ligand stages while displaying the H–H-off molecular spectrum. SF6 retains its nonzero combine stage. Visual K is the number of effective stages after filtering, not an unconditionally retained combinatorial pair count. This is a convention awaiting UI implementation/testing.
+
+## 7. Electron counting and warnings
+
+Neutral-atom counting over the included basis for molecules; named oxidation-state counting for advanced complexes. Save the counting convention and occupations with every result. Counts: H2=2; water=8; CH4=8; BH3=6; SF6 reduced sigma basis=12; allyl cation/radical/anion=2/3/4; H3+/H3/H3−=2/3/4. Omitted SF6 F orbitals do not silently contribute electrons to the reduced basis.
+
+Any level of degeneracy d>1 occupied by n with 0<n<2d triggers **occupation_not_unique**, **Jahn_Teller_warning**, and **spin_state_not_determined**. This conservative warning policy flags the limits of the one-electron model; it is not a proof of a particular spin ground state or distortion (especially for linear diatomics). Distinguish explicit Hund filling from equal-occupation ensembles. Tested warning fixtures: neutral H3 e-prime¹, six-H t1u⁴, four-H t2². B2 and O2 real-molecule warning fixtures remain a release gate.
+
+## 8. Bond orders and contact ledger
+
+Counting bond order is (bonding−antibonding electron count)/2, shared over the declared equivalent-bond set; nonbonding electrons count zero. Default counting is not an observable.
+
+\[
+P_{\mu\nu}=\sum_i n_i C_{\mu i}C_{\nu i},\quad
+p_{ab}=P_{ab},\quad W_{AB}=\sum_{\mu\in A,\nu\in B}P_{\mu\nu}^{2}.
+\]
+
+Use named Coulson p for one orbital per atom and Wiberg W for multiple orbitals. Report assumed sigma bonds separately for π-only calculations. Do not force these definitions to agree.
+
+The contact ledger counts each unordered real-basis off-diagonal pair once with contribution 2 c_mu c_nu H_mu,nu, plus all diagonal c_mu² H_mu,mu terms. Its total is the eigenvalue for a normalised eigenvector. A raw contact weight c_mu c_nu t is half that unordered-pair energy contribution; label the distinction explicitly. See restored contractual Appendix A.7; browser ledger implementation remains untested.
+
+## 9. Parameter and preset contract
+
+### 9.1 On-sites
+
+`params/onsite.csv`: `element,orbital,energy_eV,source`. Composite table: [Harrison secondary transcription](https://github.com/jarvist/HarrisonSolidStateTable.jl/blob/master/src/SolidStateTable.jl) for B,C,O,S; [teaching supplement](https://chem.libretexts.org/Bookshelves/Inorganic_Chemistry/Supplemental_Modules_and_Websites_(Inorganic_Chemistry)/Advanced_Inorganic_Chemistry_(Wikibook)/01%3A_Chapters/1.07%3A_Diatomic_Molecular_Orbitals) for H,F. The transcription explicitly warns its values are not well checked; do not call this a complete primary-source table. Local source snapshot is packaged.
+
+| Element | s / eV | p / eV |
+|---|---:|---:|
+| H (n=1) | −13.61 | absent |
+| B (n=2) | −12.54 | −6.64 |
+| C (n=2) | −17.52 | −8.97 |
+| O (n=2) | −29.14 | −14.13 |
+| F (n=2) | −40.17 | −18.65 |
+| S (n=3) | −20.80 | −10.27 |
+
+All p directions share the p on-site. No main-group d parameters. Source snapshot confirms N term magnitudes 23.04/11.47 eV, but **nitrogen is not added** without the B4 scope decision.
+
+### 9.2 pairs.csv columns and lookup
+
+`element_a,element_b,channel,eta,K_eV_A2,value_eV,units,distance_law,s_carrier,scale,provenance_kind,source,override_reason`
+
+- `element_a,element_b`: unordered element pair; duplicates per channel are errors.
+- `channel`: `ss_sigma`, `sp_sigma`, `pp_sigma`, `pp_pi` in Release 1. sp direction signs are handled geometrically, not by duplicating reversed rows.
+- `eta,K_eV_A2`: dimensionless coefficient and 7.62 eV Å² conversion for `harrison_inverse_square`.
+- `value_eV`: numeric fixed value for `fixed`; blank for inverse-square. `off` is an explicit zero, not missing data.
+- `units`: `eV`.
+- `distance_law`: enum `harrison_inverse_square`, `fixed`, `off`.
+- `s_carrier`: `H` if hydrogen triggers the scale; otherwise `none`. This is a **scale carrier**, not a claim that the s orbital belongs to hydrogen.
+- `scale`: 0.6 for H-containing pair blocks, otherwise 1. Apply once per block including H–H, never once per H atom.
+- `provenance_kind`: enum `harrison`, `harrison_extrapolated_H`, `pedagogical_override`, `lecture_decoupling`.
+- `source`: mandatory source URL or named decision provenance.
+- `override_reason`: mandatory for an override; H rows explicitly record extrapolation and pedagogical scaling.
+
+Precedence: **preset matrix-element override → element-pair/channel row → explicit channel default → error**. Defaults live in `params/channel_defaults.json`; the supplied default list is empty. A no-match lookup must raise an error, never silently return zero. Missing orbital channels are not requested; absence is not a fit to zero. Reverse-pair Hermiticity follows §1.
+
+For `harrison_inverse_square`, V=scale×eta×K/d². Coefficients remain ss=−1.40, sp=+1.84, pp sigma=+3.24, pp pi=−0.81. **All H-containing couplings extrapolate this scheme beyond the Harrison table's H coverage.** The 0.6 factor is a declared pedagogical correction, not a published coefficient or measured fit. The strict ordering constraints give 0.4914651002<sH<0.8938796155. the owner's B2 decision remains pending; 0.6 is the requested default. The audit reads the CSV rather than these prose numbers.
+
+Neighbour lists are explicit: H2O/CH4/BH3 central-H on, H–H off; SF6 central-F and all F–F on; ligand-only H diagnostics have their declared edges on. No distance cutoff silently re-enables absent edges.
+
+### 9.3 presets.json schema
+
+`params/presets.schema.json` is JSON Schema Draft 2020-12; validate before calculation. Top-level `schema_version` and `presets` are mandatory. Each preset requires `id`, `edge_policy` (`edges_on`, `edges_off`), `coupling_overrides`, `hydrogen_scale`, `geometry_overrides`, and `provenance_tag`; optional `note`. Unknown fields are rejected. Coupling overrides identify both element/orbital endpoints, `value_eV` and a provenance enum. Geometry overrides include bond length/radius/angle with range checks. Checks also reject a missing edge policy and a row/preset hydrogen-scale conflict. Array IDs must be unique.
+
+| Lecture preset | Values / meaning |
+|---|---|
+| H2O | O 2s–H forced exactly zero; H scale 0.6; H–H off; O–H 0.958 Å, angle 104.4776° |
+| SF6 | Equal to model; actual inward F p basis; cis −3.166242667913 eV, trans −2.532994134331 eV at S–F 1.561 Å |
+| Six H Oh | Radius 1 Å; H scale 0.6; cis −3.200400 eV, trans −1.600200 eV |
+
+The SF6 table numbers are consequences of the row law and preset geometry, not duplicate mutable fixed overrides. With cis distance √2R and trans 2R, inward-p contraction gives tc=(Vpppi−Vppsigma)/2 and tt=−Vppsigma. The combine-two-axes symmetric-pair block has diagonal epsilon_F+tt and off-diagonal 2tc. Its split is 4|tc|=12.664970671653 eV. The v1.0 cis-zero/trans−5 override stays removed. No slide-exact calibration or aliases are asserted without slides.
+
+`checks/unscaled_reference_couplings.csv` is generated from actual rows with H scaling cancelled. Includes O–H sp=15.277130068296 eV at 0.958 Å, O–H ss, C–H/B–H ss and sp, H2/H3, six-H cis/trans, four-H edge and allyl pp_pi. Uses `d_angstrom` and full channel names.
+
+## 10. Tolerances, locks and reproducibility
+
+Float64. Hamiltonian symmetry ≤1e−12 eV; eigen-residual norm ≤1e−10 eV; orthonormality maximum-entry error ≤1e−10; ledger error ≤1e−10 eV. Clean irrep weight >0.999. Degeneracy clustering uses a total-span tolerance of 1e−8 max(1 eV, ||H||2), never chained near-equalities. Current small fixtures use an absolute 1e−8 eV clustering threshold (stricter than that bound); do not mistake this baseline helper for the application's full clustering implementation.
+
+`requirements-checker.lock` is a complete 50-distribution hash-pinned graph for CPython 3.12/Linux x86_64. Install with `python -m pip install --require-hashes -r requirements-checker.lock`. A clean environment was installed from hash-verified wheels and `pip check` passed. `evidence/hash_install.txt` records it. Bootstrap pip is tooling, not an application/checker dependency row. Tests run on host Python 3.12.8, not falsely labelled 3.12.7. Hash-locked means distribution integrity/reproducibility in this target environment, not support for every platform.
+
+`make check-baseline` generates groups and checks into a temporary directory, runs `diff -r` against both committed directories, then `sha256sum -c SHA256SUMS`; any mismatch is a failure. It never overwrites committed groups/checks. Python bytecode writing is disabled; an additional tree-hash comparison checks nonmutation. The parameter mutation uses a temporary CSV copy; spectra are compared to committed numerical snapshots in `evidence/reference_spectra.json`, so changing the same data used by both assembly and analytic substitution cannot create a false pass.
+
+The committed spectrum snapshot preserves the reviewed numbers; it was reconstructed from the analytic results, not an independent experimental dataset. Numeric source data are not “simulated measurements”. Every committed file except SHA256SUMS itself is hashed. Store the exact UTF-8 convention-file SHA-256 with every result; no self-referential embedded digest.
+
+## 11. CrystOD and release gates
+
+CrystOD must come from the owner's **original supplied zip**. Default extended-Hückel route only, no PySCF. No zip is accessible in the current thread, so version/archive name/archive hash are **unavailable**, installation and real comparisons **not run**. These are blocking unknowns, not placeholders that an agent may fill by guessing.
+
+`compare_crystod.py` computes `checks/crystod_manifest.json`; it does not read a trusted PASS flag. It hashes original archive bytes, extracts an embedded version, and invokes an explicitly supplied adapter with geometry/basis/edges/electron count only. The adapter must run the actual archive's default EHT route; expected oracle eigenvalues/order are not sent. Each result must record full point group, finite-subgroup irrep mapping, orthogonal axis map, basis description/differences, and independently justified level identities. The script compares point group, shared-irrep degeneracy, mapped labels and qualitative order within each shared irrep. Numerical energies are used only to rank levels; no energy values, compositions or bond orders are compared. Distinguish exact H2 D-infinity-h from its D2h subgroup.
+
+**Appendix A wins over CrystOD.** Log disagreements for the owner, never change oracles to match the external checker. No common irrep, ambiguous level identities, missing metadata or incomplete required cases block the comparison. Different basis sizes are recorded rather than silently called agreement.
+
+The adapter protocol is implemented and unit-tested with explicitly mock inputs, but **no native CrystOD adapter can be claimed integrated or executed until the archive/API is inspected**. This is the narrowed outstanding part of A4/C1. The current script exits BLOCKED for the missing zip; `make check` consequently fails for the right reason. Filling a manifest manually cannot make it pass because the manifest is recomputed in a temporary directory. This is a provenance gate, not tamper-proof attestation of arbitrary user-written adapters.
+
+Release 1 remains blocked by **all** of:
+
+- C1: original archive identity, tested real default-EHT adapter and executed qualitative comparisons.
+- C2: source-backed B2,C2,O2,F2,CO geometries, explicit blocks and regression rows, plus B2/O2 spin/occupation warnings. N2 only if the owner includes it.
+- C4: Pyodide 0.27.7 browser endpoint/slider, counting-ledger and Watch-mode acceptance tests; CPython Hamiltonian checks do not satisfy these.
+- Owner approval B6 after review; defaults B2/B3/B5 remain choices awaiting the owner rather than inferred consent.
+
+Slides/aliases are nonblocking. Later d-channel parameters remain outside Release 1. Spec-document edits in tier D are reserved for the reviewer after approval, not silently applied here.
+
+## 12. Change log and retained content
+
+| Version | Date | Change |
+|---|---|---|
+| 0.1 | 2026-11-07 | Original skeleton |
+| 0.2 / 1.0 | 2026-11-07 | First pass and owner review; AI-check label preceded numerical audit |
+| 1.1 | 2026-11-07 | H scale 0.6; SF6 lecture=model; Markdown repair; group/angular/stack evidence; incomplete CrystOD gate; reconstructed rather than bytewise-edited legacy file |
+| 1.2 | 2026-11-07 | A1 geometry-first mappings and D2h g/u label repair with Cartesian assertions; A2 file-driven data and corrupt-pair negative test; A3 temp regeneration/diffs/hashes; A4 computed CrystOD manifest/protocol and explicit real-adapter blocker; A5 restore column contract and define replacement A.7 with legacy-text limitation below; A6 typed pair fields and error-on-missing lookup; A7 preset schema; A8 exact snapping/residuals; A9 neutral-H3 and diagnostic warnings; A10 complete hashed lock/clean install; A11 full unscaled-coupling table; A12 benzene default and geometry assertions; A13 header/review includes CrystOD, diatomic and browser blockers. Owner approval pending. |
+
+**A5 disposition:** the pairs.csv column specification is restored in §9.2. Exact legacy Appendix A.7 text was not present in the accessible attachments or earlier inline answer; it is not silently reconstructed as a quotation. The unknown legacy A.7 is **removed as an unrecoverable legacy section**, because its original content cannot be verified; it is replaced by the explicitly newly authored ledger/limit/invariance contract below. If the owner supplies the original, review whether it contains additional obligations before freezing. No claim that its exact old content has been recovered.
+
+## Appendix A. Analytic oracles
+
+### A.1 Small blocks
+
+\[
+D(a,b;g)=\begin{pmatrix}a&g\\g&b\end{pmatrix},\quad
+E_\pm=(a+b)/2\pm\sqrt{((a-b)/2)^2+g^2}.
+\]
+
+\[
+A(a,b,c;g,h)=\begin{pmatrix}a&0&g\\0&b&h\\g&h&c\end{pmatrix},
+\]
+
+with characteristic polynomial (E−a)(E−b)(E−c)−g²(E−b)−h²(E−a). Do not reduce a three-level block to bright/dark two-level form without the required central degeneracy or a vanishing coupling.
+
+### A.2 Generic s-donor sigma blocks
+
+Ligand–ligand edges off. v values are the effective channels. d rows are later-release analytic contracts, not executed advanced-complex fixtures.
+
+| Block | Matrix/energy | Copies |
+|---|---|---:|
+| Oh a1g | D(eps_s,eps_L;√6 vss) | 1 |
+| Oh t1u | D(eps_p,eps_L;−√2 vsp) | 3 |
+| Oh eg | D(eps_d,eps_L;√3 vsd) | 2 |
+| Oh t2g | eps_d | 3 |
+| Td a1 | D(eps_s,eps_L;2 vss) | 1 |
+| Td t2 | A(eps_p,eps_d,eps_L;−2vsp/√3,2vsd/√3) | 3 |
+| Td e | eps_d | 2 |
+| D4h a1g | A(eps_s,eps_d,eps_L;2vss,−vsd) | 1 |
+| D4h b1g | D(eps_d,eps_L;√3vsd) | 1 |
+| D4h eu | D(eps_p,eps_L;−√2vsp) | 2 |
+| D4h b2g,eg | eps_d | 1+2 |
+| D4h a2u | eps_p | 1 |
+
+Td Lx couples px and dyz, cyclically. D4h ligand order +x,−x,+y,−y; a1g all-plus/2, b1g=(1,1,−1,−1)/2; eu axis differences. Signs change with SALC phase, eigenvalues do not.
+
+### A.3 Release 1 molecular blocks
+
+H–H off in H2O,CH4,BH3; H factors included in v.
+
+| Case | Block |
+|---|---|
+| H2 | eps_H+t and eps_H−t, t<0 |
+| CH4 a1 | D(eps_Cs,eps_H;2vss) |
+| CH4 t2 | D(eps_Cp,eps_H;−2vsp/√3), three copies |
+| BH3 a1-prime | D(eps_Bs,eps_H;√3vss) |
+| BH3 e-prime | D(eps_Bp,eps_H;−√(3/2)vsp), two copies |
+| BH3 a2-double-prime | eps_Bp, central pz |
+| H2O a1 | A(eps_Os,eps_Op,eps_H;√2vss,−√2vsp cos(theta/2)) |
+| H2O b2 | D(eps_Op,eps_H;−√2vsp sin(theta/2)) |
+| H2O b1 | eps_Op, central px |
+
+Lecture water sets s–H=0 explicitly, not by symmetry. For actual inward F p donors in SF6, lambda_a=eps_F+4tc+tt; lambda_t=eps_F−tt; lambda_e=eps_F−2tc+tt. a1g is D(eps_Ss,lambda_a;−√6 Vsp_sigma); t1u is D(eps_Sp,lambda_t;−√2 Vpp_sigma), three copies; eg is lambda_e, two copies, fluorine-only. No sulfur d functions.
+
+### A.4 Ligand-only and pi spectra
+
+Four H Td: eps_H+3t (a1), eps_H−t (t2, three). Six H Oh: eps_H+4tc+tt (a1g), eps_H−tt (t1u, three), eps_H−2tc+tt (eg, two). Cyclic H3: eps_H+2t (a1-prime), eps_H−t (e-prime, two). Allyl: eps_C+√2t (b1), eps_C (a2), eps_C−√2t (b1), t<0; vectors (1,√2,1)/2, (1,0,−1)/√2, (1,−√2,1)/2.
+
+Six-H order a1g<t1u<eg requires 2tc+tt<0 and tt>tc. Spectral trace equals the sum of on-sites. Neutral H3 has the same one-electron spectrum as H3+ but a different filling and warnings.
+
+### A.5 Bond-order oracles
+
+Allyl cation: counting 1/2 per C–C, Coulson 1/√2. H3+: counting 1/3 per H–H, Coulson 2/3. BH3,CH4,lecture water: counting 1 per bond under the stated occupations. SF6: counting 2/3 per S–F if four bonding and two ligand-only MOs are doubly occupied. Wiberg values depend on mixing and on-sites; do not set them equal to counting values. pz being BH3 LUMO requires the actual parameter ordering, not symmetry alone.
+
+### A.6 Diatomic release gate
+
+**Not yet supplied or tested:** B2,C2,O2,F2,CO explicit per-case block oracles and NIST re geometry entries. Required homonuclear D2h finite-subgroup labels use x=B3u,y=B2u,z=B1u. Include s/pz sigma mixing; px/py pi partners; CO uses C2v. Required qualitative reference ordering: B2,C2 pi_u below sigma_g(2p); O2,F2 sigma_g(2p) below pi_u. If the adopted law disagrees, record an Orbital-ordering fidelity warning rather than tune parameters. B2/O2 need partial-occupation and spin warnings. CO requires counting bond order 3 and a carbon-weighted sigma HOMO check. This paragraph is a gate definition, not the missing explicit block derivation or a passing result.
+
+### A.7 Replacement ledger, limit and invariance obligations
+
+This is newly authored replacement content, not a recovered legacy A.7. For normalised real c, diagonal sum plus unordered pair terms 2c_mu c_nu H_mu,nu equals c-transpose H c. Verify this along slider endpoints and every displayed ledger state. Zero coupling returns isolated on-sites; MO count equals basis size. Global eigenvector sign cannot change physical outputs; rotations within a degenerate space preserve energy and summed composition/projector. With water theta→180°, the a1 pz coupling vanishes and b2 reaches magnitude √2vsp. Smooth bending must preserve continuous subspaces even where individual eigenvectors are not unique. Later d-mode weak-coupling splittings require separate advanced fixtures. The current candidate does not claim executed browser versions of any of these tests.
+
+## Appendix B. Regression energies and coverage
+
+Energies in eV; repeated levels have multiplicities shown. Values are model calculations, not measurements. Machine precision, occupations and warnings: `checks/release1_energies.csv` and `release1_validation.json`.
+
+| Fixture | Levels, lowest first |
+|---|---|
+| H2O lecture | a1(O2s) −29.140000; b2 −24.121514; a1 −21.812479; b1 −14.130000; a1 −5.927521; b2 −3.618486 |
+| H2O model | a1 −34.578720; b2 −24.121514; a1 −18.575721; b1 −14.130000; a1 −3.725558; b2 −3.618486 |
+| CH4 | a1 −26.574378; t2×3 −19.832263; a1 −4.555622; t2×3 −2.747737 |
+| BH3 | a1-prime −20.922163; e-prime×2 −18.192296; a2-double-prime −6.640000; a1-prime −5.227837; e-prime×2 −2.057704 |
+| SF6 model and lecture (two executions) | a1g −42.854946; t1u×3 −27.817482; eg×2 −14.850509; a1g −11.793019; t1u×3 +1.430476 |
+| H2 | Ag −20.010800; B1u −7.209200 (D2h subgroup) |
+| H3+ and neutral H3 (two executions) | a1-prime −26.411600; e-prime×2 −7.209200; neutral e-prime¹ warns |
+| Allyl cation π | b1 −13.423474; a2 −8.970000; b1 −4.516526 |
+| Six H Oh | a1g −28.011800; t1u×3 −12.009800 (4 electrons, warns); eg×2 −8.809400 |
+| Four H Td | a1 −19.704354; t2×3 −11.578549 (2 electrons, warns) |
+
+All 12 current fixtures satisfy file-driven analytic assembly, symmetry/projector labels and residual/orthonormality checks. This is **not all Release 1 coverage**: the five further diatomics, real CrystOD comparison and browser engine/UI gates are explicitly open. Later advanced d blocks, exact slide aliasing and spectral fits remain unclaimed.
