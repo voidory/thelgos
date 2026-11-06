@@ -1,12 +1,12 @@
 /* Design proposal (preview with ?design=proposal). Not the default look until approved. */
 :root {
   --bg: #f6f5f1; --fg: #1b1b19; --muted: #6d6b64; --rule: #e1ded6; --panel: #ffffff;
-  --accent: #0f766e; --accent-soft: #e3f1ef; --warn: #b45309;
+  --accent: #0f766e; --accent-soft: #e3f1ef; --on-accent: #ffffff; --warn: #b45309;
   --pos: #c8352b; --neg: #2a5db0; --mix: #3f3e3a; --allowed: #8a877e; --occ: #1b1b19;
 }
 @media (prefers-color-scheme: dark) {
   :root { --bg: #121211; --fg: #ecebe6; --muted: #a3a199; --rule: #2c2b28; --panel: #1b1b19;
-          --accent: #2dd4bf; --accent-soft: #123a36; --warn: #f59e0b; --pos: #ef6b5f; --neg: #6f9be6; --mix: #d6d4cc; --allowed: #77756d; --occ: #ecebe6; }
+          --accent: #2dd4bf; --accent-soft: #123a36; --on-accent: #0b1f1d; --warn: #f59e0b; --pos: #ef6b5f; --neg: #6f9be6; --mix: #d6d4cc; --allowed: #77756d; --occ: #ecebe6; }
 }
 body.proposal { font: 15px/1.5 "Inter", system-ui, -apple-system, "Segoe UI", sans-serif; font-feature-settings: "tnum" 1; }
 body.proposal header { max-width: none; display: flex; align-items: baseline; gap: 16px; padding: 10px 20px; border-bottom: 1px solid var(--rule); background: var(--panel); }
@@ -21,7 +21,7 @@ body.proposal .inspector { grid-area: inspector; background: var(--panel); borde
 body.proposal .rail h2 { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); margin: 14px 0 4px; }
 body.proposal .rail button.case { display: block; width: 100%; text-align: left; border: 0; background: none; padding: 5px 8px; border-radius: 6px; color: var(--fg); cursor: pointer; font: inherit; }
 body.proposal .rail button.case:hover { background: var(--accent-soft); }
-body.proposal .rail button.case[aria-current="true"] { background: var(--accent); color: #fff; }
+body.proposal .rail button.case[aria-current="true"] { background: var(--accent); color: var(--on-accent); }
 body.proposal .rail button.case small { color: inherit; opacity: 0.7; margin-left: 4px; }
 body.proposal label:has(#case) { display: none; }
 body.proposal svg#diagram { border-radius: 10px; }
@@ -32,8 +32,8 @@ body.proposal svg .axis { stroke: var(--rule); }
 body.proposal .timeline { display: grid; grid-template-columns: auto 1fr; gap: 10px; align-items: center; background: var(--panel); border: 1px solid var(--rule); border-radius: 10px; padding: 10px 12px; margin-bottom: 12px; }
 body.proposal .timeline .steps { display: flex; gap: 6px; flex-wrap: wrap; }
 body.proposal .timeline .step { border: 1px solid var(--rule); background: var(--bg); border-radius: 999px; padding: 3px 10px; font: inherit; font-size: 0.8rem; color: var(--fg); cursor: pointer; }
-body.proposal .timeline .step[aria-current="true"] { background: var(--accent); color: #fff; border-color: var(--accent); }
-body.proposal #watch { background: var(--accent); color: #fff; border: 0; border-radius: 999px; padding: 6px 14px; }
+body.proposal .timeline .step[aria-current="true"] { background: var(--accent); color: var(--on-accent); border-color: var(--accent); }
+body.proposal #watch { background: var(--accent); color: var(--on-accent); border: 0; border-radius: 999px; padding: 6px 14px; }
 body.proposal .slider { grid-template-columns: 1fr; margin: 0; }
 body.proposal .slider > label, body.proposal .slider #watch, body.proposal .ticks { display: none; }
 body.proposal .tabs { display: flex; gap: 2px; border-bottom: 1px solid var(--rule); margin: 0 -14px 10px; padding: 0 10px; overflow-x: auto; }
@@ -90,3 +90,10 @@ body.proposal .badge .kind { color: inherit; opacity: 0.8; }
 /* The hidden attribute must win over display rules such as svg { display: block }. */
 [hidden] { display: none !important; }
 input[type=range], input[type=checkbox] { accent-color: var(--accent); }
+
+/* Parameter-set toggle (model / lecture) for cases that have both presets. */
+.variant { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 0 0 8px; font-size: 0.85rem; }
+.variant .seg { display: inline-flex; border: 1px solid var(--rule); border-radius: 999px; overflow: hidden; }
+.variant .seg button { font: inherit; border: 0; background: var(--panel); color: var(--fg); padding: 3px 12px; cursor: pointer; }
+.variant .seg button[aria-checked="true"] { background: var(--accent); color: var(--on-accent); }
+.variant .note { color: var(--muted); }

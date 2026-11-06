@@ -24,9 +24,47 @@ def _family(s):
     return "Rings and chains"
 
 
+VARIANTS = ("model", "lecture")
+
+
+def _entry(name):
+    """'H2O lecture' -> ('H2O', 'lecture'); cases without parameter variants -> (name, None)."""
+    base, _, last = name.rpartition(" ")
+    return (base, last) if last in VARIANTS and base else (name, None)
+
+
+def _variant_note(params, preset, other):
+    """What the lecture preset changes relative to the model one, read from the presets themselves."""
+    a, b = params.presets[preset], params.presets[other]
+    keys = ("coupling_overrides", "edge_policy", "geometry_overrides", "hydrogen_scale")
+    if all(a.get(k) == b.get(k) for k in keys):
+        return "In this release the two presets have identical parameters, so the diagrams are the same."
+    bits = []
+    for o in (a if a["provenance_tag"] == "lecture" else b).get("coupling_overrides", []):
+        na = params.orbital_name.get((o["element_a"], o["orbital_a"]), o["orbital_a"])
+        nb = params.orbital_name.get((o["element_b"], o["orbital_b"]), o["orbital_b"])
+        what = "switched off" if o["value_eV"] == 0 else f"set to {o['value_eV']:g} eV"
+        bits.append(f"the {o['element_a']} {na}–{o['element_b']} {nb} coupling is {what}")
+    for k in ("edge_policy", "geometry_overrides", "hydrogen_scale"):
+        if a.get(k) != b.get(k):
+            bits.append(f"different {k.replace('_', ' ')}")
+    return "In the lecture version " + "; ".join(bits) + "."
+
+
 def case_list(params):
-    return [{"name": s.name, "preset": s.preset, "provenance_tag": params.presets[s.preset]["provenance_tag"],
-             "group": s.group, "electrons": s.electrons, "family": _family(s)} for s in cases.release1(params)]
+    out = []
+    systems = cases.release1(params)
+    presets = {s.name: s.preset for s in systems}
+    for s in systems:
+        entry, variant = _entry(s.name)
+        row = {"name": s.name, "preset": s.preset, "provenance_tag": params.presets[s.preset]["provenance_tag"],
+               "group": s.group, "electrons": s.electrons, "family": _family(s), "entry": entry, "variant": variant}
+        if variant:
+            other = f"{entry} {'lecture' if variant == 'model' else 'model'}"
+            if other in presets:
+                row["variant_note"] = _variant_note(params, s.preset, presets[other])
+        out.append(row)
+    return out
 
 
 def _system(params, name):

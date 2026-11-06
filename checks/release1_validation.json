@@ -169,6 +169,66 @@
         "model_open_shell": false,
         "reference_ground_state": "1Sigma"
       }
+    },
+    {
+      "bond_length_angstrom": 2.246,
+      "case": "Si2",
+      "counting_bond_order": 2.0,
+      "fidelity_warnings": [],
+      "group": "D2h",
+      "linear_labels": [
+        "sigma_g",
+        "sigma_u",
+        "sigma_g",
+        "pi_u",
+        "pi_g",
+        "sigma_u"
+      ],
+      "spin_state": {
+        "agrees": true,
+        "model_open_shell": true,
+        "reference_ground_state": "3Sigma_g"
+      }
+    },
+    {
+      "bond_length_angstrom": 1.8934,
+      "case": "P2",
+      "counting_bond_order": 3.0,
+      "fidelity_warnings": [],
+      "group": "D2h",
+      "linear_labels": [
+        "sigma_g",
+        "sigma_u",
+        "sigma_g",
+        "pi_u",
+        "pi_g",
+        "sigma_u"
+      ],
+      "spin_state": {
+        "agrees": true,
+        "model_open_shell": false,
+        "reference_ground_state": "1Sigma_g"
+      }
+    },
+    {
+      "bond_length_angstrom": 1.8892,
+      "case": "S2",
+      "counting_bond_order": 2.0,
+      "fidelity_warnings": [],
+      "group": "D2h",
+      "linear_labels": [
+        "sigma_g",
+        "sigma_u",
+        "sigma_g",
+        "pi_u",
+        "pi_g",
+        "sigma_u"
+      ],
+      "spin_state": {
+        "agrees": true,
+        "model_open_shell": true,
+        "reference_ground_state": "3Sigma_g"
+      }
     }
   ],
   "fixtures": [
@@ -1037,6 +1097,191 @@
       "residual_max_eV": 2.1288022339890742e-14,
       "status": "PASS",
       "warnings": []
+    },
+    {
+      "analytic_max_error_eV": 5.329070518200751e-15,
+      "case": "Si2",
+      "commutator_max_error_eV": 0.0,
+      "levels": [
+        {
+          "case": "Si2",
+          "electrons": 2,
+          "energy_eV": -17.03833782475258,
+          "irrep": "Ag",
+          "multiplicity": 1,
+          "warnings": ""
+        },
+        {
+          "case": "Si2",
+          "electrons": 2,
+          "energy_eV": -12.16801132252853,
+          "irrep": "B1u",
+          "multiplicity": 1,
+          "warnings": ""
+        },
+        {
+          "case": "Si2",
+          "electrons": 2,
+          "energy_eV": -10.040620021748452,
+          "irrep": "Ag",
+          "multiplicity": 1,
+          "warnings": ""
+        },
+        {
+          "case": "Si2",
+          "electrons": 2,
+          "energy_eV": -7.743546520617642,
+          "irrep": "B2u+B3u",
+          "multiplicity": 2,
+          "warnings": "occupation_not_unique;Jahn_Teller_warning;spin_state_not_determined"
+        },
+        {
+          "case": "Si2",
+          "electrons": 0,
+          "energy_eV": -5.296453479382363,
+          "irrep": "B2g+B3g",
+          "multiplicity": 2,
+          "warnings": ""
+        },
+        {
+          "case": "Si2",
+          "electrons": 0,
+          "energy_eV": -0.8930308309704409,
+          "irrep": "B1u",
+          "multiplicity": 1,
+          "warnings": ""
+        }
+      ],
+      "orthogonality_max_error": 5.551115123125783e-16,
+      "residual_max_eV": 4.7288387500880116e-15,
+      "status": "PASS",
+      "warnings": [
+        "Jahn_Teller_warning",
+        "occupation_not_unique",
+        "spin_state_not_determined"
+      ]
+    },
+    {
+      "analytic_max_error_eV": 5.329070518200751e-15,
+      "case": "P2",
+      "commutator_max_error_eV": 0.0,
+      "levels": [
+        {
+          "case": "P2",
+          "electrons": 2,
+          "energy_eV": -22.250435812094942,
+          "irrep": "Ag",
+          "multiplicity": 1,
+          "warnings": ""
+        },
+        {
+          "case": "P2",
+          "electrons": 2,
+          "energy_eV": -15.233427147743404,
+          "irrep": "B1u",
+          "multiplicity": 1,
+          "warnings": ""
+        },
+        {
+          "case": "P2",
+          "electrons": 2,
+          "energy_eV": -13.042091214539608,
+          "irrep": "Ag",
+          "multiplicity": 1,
+          "warnings": ""
+        },
+        {
+          "case": "P2",
+          "electrons": 4,
+          "energy_eV": -10.051691140425433,
+          "irrep": "B2u+B3u",
+          "multiplicity": 2,
+          "warnings": ""
+        },
+        {
+          "case": "P2",
+          "electrons": 0,
+          "energy_eV": -6.608308859574574,
+          "irrep": "B2g+B3g",
+          "multiplicity": 2,
+          "warnings": ""
+        },
+        {
+          "case": "P2",
+          "electrons": 0,
+          "energy_eV": -0.3340458256220513,
+          "irrep": "B1u",
+          "multiplicity": 1,
+          "warnings": ""
+        }
+      ],
+      "orthogonality_max_error": 4.440892098500626e-16,
+      "residual_max_eV": 6.2692284770830225e-15,
+      "status": "PASS",
+      "warnings": []
+    },
+    {
+      "analytic_max_error_eV": 3.552713678800501e-15,
+      "case": "S2",
+      "commutator_max_error_eV": 0.0,
+      "levels": [
+        {
+          "case": "S2",
+          "electrons": 2,
+          "energy_eV": -25.6192622660847,
+          "irrep": "Ag",
+          "multiplicity": 1,
+          "warnings": ""
+        },
+        {
+          "case": "S2",
+          "electrons": 2,
+          "energy_eV": -18.80941185350596,
+          "irrep": "B1u",
+          "multiplicity": 1,
+          "warnings": ""
+        },
+        {
+          "case": "S2",
+          "electrons": 2,
+          "energy_eV": -15.357165520795215,
+          "irrep": "Ag",
+          "multiplicity": 1,
+          "warnings": ""
+        },
+        {
+          "case": "S2",
+          "electrons": 4,
+          "energy_eV": -11.999354850726881,
+          "irrep": "B2u+B3u",
+          "multiplicity": 2,
+          "warnings": ""
+        },
+        {
+          "case": "S2",
+          "electrons": 2,
+          "energy_eV": -8.540645149273116,
+          "irrep": "B2g+B3g",
+          "multiplicity": 2,
+          "warnings": "occupation_not_unique;Jahn_Teller_warning;spin_state_not_determined"
+        },
+        {
+          "case": "S2",
+          "electrons": 0,
+          "energy_eV": -2.354160359614127,
+          "irrep": "B1u",
+          "multiplicity": 1,
+          "warnings": ""
+        }
+      ],
+      "orthogonality_max_error": 4.440892098500626e-16,
+      "residual_max_eV": 7.2409577932527e-15,
+      "status": "PASS",
+      "warnings": [
+        "Jahn_Teller_warning",
+        "occupation_not_unique",
+        "spin_state_not_determined"
+      ]
     }
   ],
   "missing_diatomics": [],

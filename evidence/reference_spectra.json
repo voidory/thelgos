@@ -389,6 +389,82 @@
       "multiplicity": 1
     }
   ],
+  "P2": [
+    {
+      "electrons": 2,
+      "energy_eV": -22.250435812094942,
+      "irrep": "Ag",
+      "multiplicity": 1
+    },
+    {
+      "electrons": 2,
+      "energy_eV": -15.233427147743404,
+      "irrep": "B1u",
+      "multiplicity": 1
+    },
+    {
+      "electrons": 2,
+      "energy_eV": -13.042091214539608,
+      "irrep": "Ag",
+      "multiplicity": 1
+    },
+    {
+      "electrons": 4,
+      "energy_eV": -10.051691140425433,
+      "irrep": "B2u+B3u",
+      "multiplicity": 2
+    },
+    {
+      "electrons": 0,
+      "energy_eV": -6.608308859574574,
+      "irrep": "B2g+B3g",
+      "multiplicity": 2
+    },
+    {
+      "electrons": 0,
+      "energy_eV": -0.3340458256220513,
+      "irrep": "B1u",
+      "multiplicity": 1
+    }
+  ],
+  "S2": [
+    {
+      "electrons": 2,
+      "energy_eV": -25.6192622660847,
+      "irrep": "Ag",
+      "multiplicity": 1
+    },
+    {
+      "electrons": 2,
+      "energy_eV": -18.80941185350596,
+      "irrep": "B1u",
+      "multiplicity": 1
+    },
+    {
+      "electrons": 2,
+      "energy_eV": -15.357165520795215,
+      "irrep": "Ag",
+      "multiplicity": 1
+    },
+    {
+      "electrons": 4,
+      "energy_eV": -11.999354850726881,
+      "irrep": "B2u+B3u",
+      "multiplicity": 2
+    },
+    {
+      "electrons": 2,
+      "energy_eV": -8.540645149273116,
+      "irrep": "B2g+B3g",
+      "multiplicity": 2
+    },
+    {
+      "electrons": 0,
+      "energy_eV": -2.354160359614127,
+      "irrep": "B1u",
+      "multiplicity": 1
+    }
+  ],
   "SF6 lecture": [
     {
       "electrons": 2,
@@ -451,6 +527,44 @@
       "energy_eV": 1.430476228254875,
       "irrep": "T1u",
       "multiplicity": 3
+    }
+  ],
+  "Si2": [
+    {
+      "electrons": 2,
+      "energy_eV": -17.03833782475258,
+      "irrep": "Ag",
+      "multiplicity": 1
+    },
+    {
+      "electrons": 2,
+      "energy_eV": -12.16801132252853,
+      "irrep": "B1u",
+      "multiplicity": 1
+    },
+    {
+      "electrons": 2,
+      "energy_eV": -10.040620021748452,
+      "irrep": "Ag",
+      "multiplicity": 1
+    },
+    {
+      "electrons": 2,
+      "energy_eV": -7.743546520617642,
+      "irrep": "B2u+B3u",
+      "multiplicity": 2
+    },
+    {
+      "electrons": 0,
+      "energy_eV": -5.296453479382363,
+      "irrep": "B2g+B3g",
+      "multiplicity": 2
+    },
+    {
+      "electrons": 0,
+      "energy_eV": -0.8930308309704409,
+      "irrep": "B1u",
+      "multiplicity": 1
     }
   ],
   "allyl cation pi": [

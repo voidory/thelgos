@@ -77,8 +77,8 @@ class AnalyticOracles(unittest.TestCase):
         np.testing.assert_allclose(self.spectrum(cases.allyl(P)), sorted([ec + np.sqrt(2) * t, ec, ec - np.sqrt(2) * t]), atol=1e-10)
 
     def test_homonuclear_diatomic_blocks(self):
-        for name in ["B2", "C2", "N2", "O2", "F2"]:
-            el, R = name[0], P.presets[f"{name}_model"]["geometry_overrides"]["bond_length_angstrom"]
+        for name in ["B2", "C2", "N2", "O2", "F2", "Si2", "P2", "S2"]:
+            el, R = name[:-1], P.presets[f"{name}_model"]["geometry_overrides"]["bond_length_angstrom"]
             V = {ch: P.coupling(el, el, ch, R, f"{name}_model") for ch in ["ss_sigma", "sp_sigma", "pp_sigma", "pp_pi"]}
             es, ep = P.onsite_energy(el, "s"), P.onsite_energy(el, "p")
             want = sorted(E2(es + V["ss_sigma"], ep - V["pp_sigma"], -V["sp_sigma"]) + E2(es - V["ss_sigma"], ep + V["pp_sigma"], V["sp_sigma"])
@@ -93,7 +93,8 @@ class BondOrdersAndFrontier(unittest.TestCase):
     def test_counting_bond_orders(self):
         for s, want in [(cases.allyl(P), 0.5), (cases.ring_h(P, 2, "H3+"), 1 / 3), (cases.borane(P), 1.0),
                         (cases.methane(P), 1.0), (cases.water(P, "H2O_lecture"), 1.0), (cases.sf6(P), 2 / 3),
-                        (cases.diatomic(P, "CO"), 3.0), (cases.diatomic(P, "O2"), 2.0), (cases.diatomic(P, "F2"), 1.0)]:
+                        (cases.diatomic(P, "CO"), 3.0), (cases.diatomic(P, "O2"), 2.0), (cases.diatomic(P, "F2"), 1.0),
+                        (cases.diatomic(P, "Si2"), 2.0), (cases.diatomic(P, "P2"), 3.0), (cases.diatomic(P, "S2"), 2.0)]:
             self.assertAlmostEqual(self.bo(s)["counting"]["per_bond"], want, delta=1e-12, msg=s.name)
 
     def test_coulson_bond_orders(self):
@@ -249,7 +250,7 @@ class DiagramSpec(unittest.TestCase):
     def test_diatomic_textbook_layout(self):
         """Atom 1 | MOs | atom 2; each MO's atomic weights over both sides sum to one."""
         from lgo_engine import app_api
-        for name in ["H2", "B2", "C2", "N2", "O2", "F2", "CO"]:
+        for name in ["H2", "B2", "C2", "N2", "O2", "F2", "CO", "Si2", "P2", "S2"]:
             d = app_api.view(P, G, name)["diagram"]
             self.assertEqual(d["columns"], ["left", "centre", "right"], name)
             self.assertEqual(sum(x["multiplicity"] for x in d["left"] + d["right"]), sum(x["multiplicity"] for x in d["centre"]), name)
@@ -257,6 +258,8 @@ class DiagramSpec(unittest.TestCase):
         self.assertEqual([x["label"] for x in d["left"]], ["C 2s", "C 2p"])
         self.assertEqual([x["label"] for x in d["right"]], ["O 2s", "O 2p"])
         self.assertEqual((d["column_titles"]["left"], d["column_titles"]["right"]), ("C (atom 1)", "O (atom 2)"))
+        d = app_api.view(P, G, "Si2")["diagram"]
+        self.assertEqual([x["label"] for x in d["left"]], ["Si 3s", "Si 3p"])
 
     def test_ch4_lgos_are_symmetry_adapted(self):
         from lgo_engine import app_api

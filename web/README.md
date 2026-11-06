@@ -41,7 +41,8 @@ The approved layout (case rail, construction timeline, tabbed inspector) is the 
 - the slider and its four SF6 stages, and the CH4 B5 skip note;
 - L2 one-to-one ledger rows and structure lines, L3 badges, F5.1 tooltips, P6 zero tallies, P3 why-jump for SF6 eg (checkpoint 3 of 4);
 - JSON export, re-import and rejection of an invalid file (failing field named); a share link opened in a new page; the 3D view painting;
-- the reading panel: N2's ordering disagreement and CO's note on its starred HOMO;
+- the reading panel: N2's ordering disagreement and CO's note on its starred HOMO; Si2 keeps its element symbol in the column titles and compares spin only;
+- the rail lists H2O and SF6 once each; the model/lecture toggle switches presets, is remembered, and hides for single-preset cases;
 - Watch mode plays through; step jumps glide, and with reduced motion they do not;
 - the selected level's sketch card sits clear of bars and labels;
 - accessibility: every level is a named button and is listed in the screen-reader table; the inspector tabs answer to the arrow keys; Enter selects a focused level and keeps focus on it;

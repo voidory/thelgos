@@ -296,6 +296,54 @@
       "id": "N2_model",
       "note": "r_e from NIST CCCBDB (evidence/cccbdb_N2.html), primary reference Huber-Herzberg 1979. Included by owner decision B4 (DECISIONS.md).",
       "provenance_tag": "model"
+    },
+    {
+      "coupling_overrides": [],
+      "edge_policy": {
+        "edges_off": [],
+        "edges_on": [
+          "all"
+        ]
+      },
+      "geometry_overrides": {
+        "bond_length_angstrom": 2.246
+      },
+      "hydrogen_scale": 0.6,
+      "id": "Si2_model",
+      "note": "r_e from NIST CCCBDB (evidence/cccbdb_Si2.html), primary reference Huber-Herzberg 1979. Period-3 diatomic added at the owner's request (DECISIONS.md M5). Defaults pending owner approval; no slide calibration claim.",
+      "provenance_tag": "model"
+    },
+    {
+      "coupling_overrides": [],
+      "edge_policy": {
+        "edges_off": [],
+        "edges_on": [
+          "all"
+        ]
+      },
+      "geometry_overrides": {
+        "bond_length_angstrom": 1.8934
+      },
+      "hydrogen_scale": 0.6,
+      "id": "P2_model",
+      "note": "r_e from NIST CCCBDB (evidence/cccbdb_P2.html), primary reference Huber-Herzberg 1979. Period-3 diatomic added at the owner's request (DECISIONS.md M5). Defaults pending owner approval; no slide calibration claim.",
+      "provenance_tag": "model"
+    },
+    {
+      "coupling_overrides": [],
+      "edge_policy": {
+        "edges_off": [],
+        "edges_on": [
+          "all"
+        ]
+      },
+      "geometry_overrides": {
+        "bond_length_angstrom": 1.8892
+      },
+      "hydrogen_scale": 0.6,
+      "id": "S2_model",
+      "note": "r_e from NIST CCCBDB (evidence/cccbdb_S2.html), primary reference Huber-Herzberg 1979. Period-3 diatomic added at the owner's request (DECISIONS.md M5). Defaults pending owner approval; no slide calibration claim.",
+      "provenance_tag": "model"
     }
   ],
   "schema_version": "1.2"

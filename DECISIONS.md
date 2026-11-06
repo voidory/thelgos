@@ -135,6 +135,31 @@ Skipping with a note says exactly what the model assumes.
 
 **Why.** `SF6_lecture` and `sixH_lecture` are tagged "lecture" but no slide has been checked against them. Renaming the ids would ripple through checks and evidence for a labelling issue. Instead, held spec edit D1 removes the claim that SF6 has a separate lecture simplification, and no exported label will claim slide fidelity until the slides are checked.
 
+## M5. Period-3 diatomics: which ones, and from which source (owner request; details delegated)
+
+**Owner request (2026-11-06).** Add the period-3 diatomics.
+
+**Decision.** Add Si2, P2 and S2 now. Al2 and Cl2 wait.
+
+**Why.**
+- *Source for Si, P and S.* The Harrison transcription (`evidence/harrison.txt`, lines 93–95) has Si, P and S, the same source as S already. So Si2, P2 and S2 need no new source. Geometries and ground states come from the NIST CCCBDB pages, snapshotted in `evidence/cccbdb_{Si2,P2,S2}.html` (r_e from Huber & Herzberg 1979).
+- *Al and Cl are missing.* The transcription has no Al or Cl. The teaching table used for H and F would cover them, but chem.libretexts.org is blocked from this environment, and the primary paper behind it (Mann, Meek & Allen, J. Am. Chem. Soc. 2000, 122, 2780) is behind a bot check. I would not type in values from memory. Al2 and Cl2 go in as soon as a snapshot of either source can be packaged.
+- *Not added.* Na2, Mg2 and Ar2 are not standard MO-diagram examples, and Mg2 and Ar2 are only van der Waals bound.
+- *No orbital-ordering reference.* None is asserted for period 3: CONVENTIONS A.6 sources only period 2, and I have no sourced period-3 ordering in hand. Only the ground-state spin is compared, and all three agree with CCCBDB (Si2 ³Σg, P2 ¹Σg, S2 ³Σg).
+- *What the model gives.* σg(3p) below πu in all three, with Si2 ending in a half-filled πu (triplet).
+
+**Knock-on.**
+- `checks/crystod_manifest.json` now lists the three new cases among those the deferred CrystOD comparison must cover (it is derived from the fixture list).
+- Checker patch K18 (CHECKER-CHANGES.md).
+
+## M6. One entry per molecule with a model/lecture toggle (owner decision)
+
+**Owner decision (2026-11-06).** H2O and SF6 appear once each, with a toggle.
+
+**How.**
+- Only the app's case list merges them. The engine, checks, evidence, share links and exports keep the two fixture names ("H2O model", "H2O lecture"), so nothing frozen changes.
+- The toggle states what the lecture preset changes, worked out from the presets: for H2O, the O 2s–H 1s coupling is switched off. For SF6 it says the two presets are identical (see M4), rather than implying a difference that does not exist.
+
 ## B6. Sign-off (owner only)
 
 Not delegated. On 2026-11-06 the owner gave standing permission for Claude to apply the drafted changes. They are now in `CONVENTIONS.md` v1.3 and the spec, and the drafts in `drafts/` remain as the record. Applying them is not sign-off: v1.3 stays "not frozen" until the owner reviews it.

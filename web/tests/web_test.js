@@ -32,8 +32,26 @@ const check = (name, ok, detail = "") => { results.push({ name, ok, detail }); c
     check("runtime is Python 3.12.7 + NumPy 2.0.2", /Python 3\.12\.7 · NumPy 2\.0\.2/.test(footer), footer);
 
     const names = await page.$$eval("#case option", (os) => os.map((o) => o.value));
-    const rail = await page.$$eval(".rail button.case", (bs) => bs.map((b) => b.dataset.case));
-    check("case rail lists every case, grouped by family", rail.length === names.length && (await page.$$eval(".rail h2", (h) => h.length)) === 4, `${rail.length} buttons`);
+    const rail = await page.$$eval(".rail button.case", (bs) => bs.map((b) => b.dataset.entry));
+    const entries = [...new Set(names.map((n) => n.replace(/ (model|lecture)$/, "")))];
+    check("case rail lists every entry once (model/lecture merged), grouped by family",
+          JSON.stringify(rail.slice().sort()) === JSON.stringify(entries.sort()) && rail.length === names.length - 2 && (await page.$$eval(".rail h2", (h) => h.length)) === 4, `${rail.length} buttons for ${names.length} fixtures`);
+    // Toggle: H2O switches between its presets in place; cases without variants hide it.
+    await page.$eval('.rail button.case[data-entry="H2O"]', (b) => b.click());
+    await page.waitForFunction(() => document.body.dataset.rendered === "H2O model|1|");
+    await page.$eval('#variant [data-variant="lecture"]', (b) => b.click());
+    await page.waitForFunction(() => document.body.dataset.rendered === "H2O lecture|1|");
+    const vnote = await page.textContent("#variant-note");
+    await page.$eval('.rail button.case[data-entry="SF6"]', (b) => b.click());
+    await page.waitForFunction(() => document.body.dataset.rendered === "SF6 lecture|1|");
+    await page.$eval('.rail button.case[data-entry="N2"]', (b) => b.click());
+    await page.waitForFunction(() => document.body.dataset.rendered === "N2|1|");
+    const vHidden = await page.$eval("#variant", (v) => v.hidden);
+    check("model/lecture toggle switches presets, is remembered, and hides for single-preset cases",
+          vnote.includes("O 2s–H 1s coupling is switched off") && vHidden, vnote);
+    await page.$eval('.rail button.case[data-entry="SF6"]', (b) => b.click());
+    await page.$eval('#variant [data-variant="model"]', (b) => b.click());
+    await page.waitForFunction(() => document.body.dataset.rendered === "SF6 model|1|");
     const fonts = await page.evaluate(async () => { await document.fonts.ready; return document.fonts.check('17px "STIX Two Text"'); });
     check("diagram labels use STIX Two Text", fonts);
     check("all reference fixtures offered", JSON.stringify([...names].sort()) === JSON.stringify(Object.keys(REF).sort()), `${names.length} cases`);
@@ -114,6 +132,11 @@ const check = (name, ok, detail = "") => { results.push({ name, ok, detail }); c
     await page.waitForFunction(() => document.body.dataset.rendered === "N2|1|");
     const verdicts = await page.$$eval("#comparisons li", (ls) => ls.map((l) => l.dataset.agrees + ":" + l.textContent.split(":")[0]));
     check("N2 panel: ordering disagrees, spin agrees", JSON.stringify(verdicts) === JSON.stringify(["0:Orbital ordering", "1:Ground-state spin"]), verdicts.join(", "));
+    await pick(page, "Si2");
+    await page.waitForFunction(() => document.body.dataset.rendered === "Si2|1|");
+    const siTitles = await page.$$eval("#diagram .col-title", (t) => t.map((x) => x.textContent));
+    const siSpin = await page.$$eval("#comparisons li", (ls) => ls.map((l) => l.dataset.agrees + ":" + l.textContent.split(":")[0]));
+    check("Si2: element symbol kept in column titles; spin compared, no ordering claim", /^Si \(/.test(siTitles[0]) && JSON.stringify(siSpin) === JSON.stringify(["1:Ground-state spin"]), `${siTitles.join(" | ")}; ${siSpin}`);
     await pick(page, "CO");
     await page.waitForFunction(() => document.body.dataset.rendered === "CO|1|");
     const coNote = await page.textContent("#notes");

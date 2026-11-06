@@ -116,6 +116,12 @@ function levelTable(view) {
   box.replaceChildren(t);
 }
 
+// Column titles are set in capitals, except a leading element symbol ("Si (atom 1)" -> "Si (ATOM 1)", not "SI").
+function capsTitle(t) {
+  const m = t.match(/^([A-Z][a-z]?)(\s.*)$/);
+  return m ? m[1] + m[2].toUpperCase() : t.toUpperCase();
+}
+
 function draw(view) {
   const svg = $("diagram");
   // Keep keyboard focus on the same level across redraws (selecting a level redraws the diagram).
@@ -152,7 +158,7 @@ function draw(view) {
   else svg.append(el("text", { x: 12, y: (top + H - bottom) / 2, transform: `rotate(-90 12 ${(top + H - bottom) / 2})`, "text-anchor": "middle", class: "axis-title" }, "E / eV (model)"));
   const short = { "Molecular orbitals": "MOs", "Ligand group orbitals": "LGOs" };
   for (const c of d.columns) svg.append(el("text", { x: cx[c], y: 24, "text-anchor": "middle", class: "col-title" },
-                                           compact ? (short[d.column_titles[c]] || d.column_titles[c].replace(" orbitals", "")) : d.column_titles[c].toUpperCase()));
+                                           compact ? (short[d.column_titles[c]] || d.column_titles[c].replace(" orbitals", "")) : capsTitle(d.column_titles[c])));
 
   const pos = {};
   const labels = { left: [], right: [], centre: [] };
@@ -849,10 +855,14 @@ function proposalSetup(cases) {
   for (const f of fams) {
     const h = document.createElement("h2"); h.textContent = f; rail.append(h);
     const list = document.createElement("div"); list.className = "list";
+    // One button per entry: "H2O" stands for both its model and lecture presets, chosen with the toggle.
+    const seen = new Set();
     for (const c of cases.filter((c) => c.family === f)) {
-      const b = document.createElement("button"); b.className = "case"; b.type = "button"; b.dataset.case = c.name;
-      b.innerHTML = `${c.name}<small>${c.group}</small>`;
-      b.addEventListener("click", () => { $("case").value = c.name; $("case").dispatchEvent(new Event("change")); });
+      if (seen.has(c.entry)) continue;
+      seen.add(c.entry);
+      const b = document.createElement("button"); b.className = "case"; b.type = "button"; b.dataset.entry = c.entry;
+      b.innerHTML = `${c.entry}<small>${c.group}</small>`;
+      b.addEventListener("click", () => pickEntry(c.entry));
       list.append(b);
     }
     rail.append(list);
@@ -864,7 +874,7 @@ function proposalSetup(cases) {
   const left = document.createElement("div"); left.append(play);
   const right = document.createElement("div"); right.append(steps, document.querySelector(".slider"));
   tl.append(left, right);
-  document.querySelector(".diagram").prepend(tl, $("narration"), $("badges"), $("rule-detail"), document.querySelector(".toggles"));
+  document.querySelector(".diagram").prepend(variantSetup(), tl, $("narration"), $("badges"), $("rule-detail"), document.querySelector(".toggles"));
   // Inspector as tabs, one per h2 section.
   const insp = document.querySelector(".inspector");
   const kids = [...insp.children]; const tabs = document.createElement("div"); tabs.className = "tabs"; tabs.setAttribute("role", "tablist");
@@ -895,8 +905,52 @@ function proposalSetup(cases) {
   });
   choose(0, false);
 }
+// Model / lecture toggle. The remembered choice carries over between entries that have both.
+function caseInfo(name) { return (state.cases || []).find((c) => c.name === name); }
+function pickEntry(entry, variant) {
+  const opts = state.cases.filter((c) => c.entry === entry);
+  const want = variant || state.variant || "model";
+  const c = opts.find((o) => o.variant === want) || opts[0];
+  $("case").value = c.name; $("case").dispatchEvent(new Event("change"));
+}
+function variantSetup() {
+  const box = document.createElement("div"); box.className = "variant"; box.id = "variant"; box.hidden = true;
+  const lab = document.createElement("span"); lab.id = "variant-label"; lab.textContent = "Parameters";
+  const seg = document.createElement("div"); seg.className = "seg"; seg.setAttribute("role", "radiogroup"); seg.setAttribute("aria-labelledby", lab.id);
+  const names = { model: "Model", lecture: "Lecture" };
+  const buttons = Object.keys(names).map((v, i, all) => {
+    const b = document.createElement("button"); b.type = "button"; b.setAttribute("role", "radio"); b.dataset.variant = v; b.textContent = names[v];
+    b.title = v === "model" ? "Every coupling from the parameter table" : "The simplifications used on the lecture slides";
+    b.addEventListener("click", () => { state.variant = v; pickEntry(caseInfo(state.case).entry, v); });
+    b.addEventListener("keydown", (e) => {
+      const k = { ArrowRight: 1, ArrowDown: 1, ArrowLeft: -1, ArrowUp: -1 }[e.key];
+      if (!k) return;
+      e.preventDefault(); const n = all[(i + k + all.length) % all.length]; buttons.find((x) => x.dataset.variant === n).click();
+    });
+    seg.append(b); return b;
+  });
+  const note = document.createElement("span"); note.className = "note"; note.id = "variant-note";
+  box.append(lab, seg, note);
+  return box;
+}
+function variantUpdate(view) {
+  const box = $("variant"); if (!box) return;
+  const c = caseInfo(view.case);
+  box.hidden = !(c && c.variant);
+  if (!c || !c.variant) return;
+  for (const b of box.querySelectorAll("button")) {
+    const on = b.dataset.variant === c.variant;
+    b.setAttribute("aria-checked", on); b.tabIndex = on ? 0 : -1;
+  }
+  $("variant-note").textContent = c.variant_note || "";
+  const focusIn = box.contains(document.activeElement);
+  if (focusIn) box.querySelector('[aria-checked="true"]').focus();
+}
+
 function proposalUpdate(view) {
-  for (const b of document.querySelectorAll(".rail button.case")) b.setAttribute("aria-current", b.dataset.case === view.case);
+  const cur = caseInfo(view.case);
+  for (const b of document.querySelectorAll(".rail button.case")) b.setAttribute("aria-current", !!cur && b.dataset.entry === cur.entry);
+  variantUpdate(view);
   const steps = $("steps"); if (!steps) return;
   const sc = view.schedule, K = sc.stages.length;
   const names = { within_set: "Fix one, flip partner", combine: "Combine equal-energy sets", between_sets: "Put the central atom back" };
@@ -916,6 +970,7 @@ function proposalUpdate(view) {
     state.info = info;
     $("footer").textContent = `Pyodide · Python ${info.python} · NumPy ${info.numpy} · first load ${(info.load_ms / 1000).toFixed(1)} s`;
     const cases = await call("cases");
+    state.cases = cases;
     const sel = $("case");
     for (const c of cases) sel.append(new Option(`${c.name} (${c.group})`, c.name));
     if (proposal) proposalSetup(cases);

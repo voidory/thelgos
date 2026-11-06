@@ -135,6 +135,13 @@ Each entry in `levels` needs `irrep`, `energy`, `multiplicity`, `canonical_level
 
 **K17. CONVENTIONS v1.3 and the spec edits applied** under the owner's standing permission (2026-11-06). The text follows `drafts/CONVENTIONS-diatomics-draft.md` and `drafts/spec-edits-pending-signoff.md` D1–D13. These changes touch only documents. Computed output changes in one place: `checks/markdown_validation.json` counts 11 rectangular tables, up from 10, because A.6 is now a table. The sign table is still 11 rows of 2 cells.
 
+**K18. Period-3 diatomics Si2, P2, S2** (owner request; DECISIONS.md M5). `scripts/check_release1.py` sha256 `b3b7f8e96c797fc9f4e5ef6efffa71da0cf85c88e37b81b5a501f37faf19364c` → `705e58a8a4dc2b8003909387f2cf1e3298deddb673ccbc59ae7a12a418442bec`.
+- *Script changes.* The diatomic loop gains Si2, P2 and S2, with the same independent analytic blocks as K14. `REF_STATE` gains their CCCBDB ground states (Si2 ³Σg, P2 ¹Σg, S2 ³Σg). No `REF_ORDER` entry is added, because no period-3 ordering reference is sourced.
+- *Data.* `params/onsite.csv` gains Si and P rows, and `params/pairs.csv` gains Si–Si and P–P rows, all from the Harrison transcription already packaged. S–S rows already existed. `params/presets.json` gains `Si2_model`, `P2_model` and `S2_model`.
+- *Reference spectra.* Three entries added to `evidence/reference_spectra.json`. They were taken from a run with the reference check off, after the analytic-block assertions had passed (the same practice as K14). The 18 existing entries are unchanged.
+- *Regenerated `checks/`.* These differ only by the additions: `release1_energies.csv`, `release1_validation.json`, `crystod_cases.json`, `crystod_manifest.json` (required cases) and `preset_schema_validation.json` (17 → 20 valid presets). `groups/` is unchanged.
+- *Results.* All three agree with CCCBDB on spin. The model puts σg(3p) below πu.
+
 ## Verification
 
 **Environment.** `requirements-checker.lock` was installed with `--require-hashes` into `.venv` (CPython 3.12.3), and `pip check` passed. This is not the README's 3.12.8 host and not the production 3.12.7.
@@ -176,4 +183,4 @@ The stand-in parameter files are mine, not the owner's. This shows the scripts a
 ## Required follow-ups
 
 1. ~~Run the baseline and regenerate the patch-affected `checks/` files~~ — done in patch 4.
-2. **For the owner:** if accepted, fold the K4 descriptor rule, the K7 threshold, the K8 order criterion and the K11 blocking/review split into CONVENTIONS §11. Only he may edit that file.
+2. **For the owner:** if accepted, fold the K4 descriptor rule, the K7 threshold, the K8 order criterion and the K11 blocking/review split into CONVENTIONS §11. Only the owner may edit that file.

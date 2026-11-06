@@ -141,7 +141,11 @@ def run(data,out,groups,check_reference=True):
  REF_ORDER={'B2':'pi_u_below_sigma_g_2p','C2':'pi_u_below_sigma_g_2p','N2':'pi_u_below_sigma_g_2p','O2':'sigma_g_2p_below_pi_u','F2':'sigma_g_2p_below_pi_u'}
  # Ground states as listed by NIST CCCBDB (same evidence pages): an open shell is expected exactly when the reference is not a singlet.
  REF_STATE={'B2':('3Sigma_g',3),'C2':('1Sigma_g+',1),'N2':('1Sigma_g',1),'O2':('3Sigma_g',3),'F2':('1Sigma_g',1),'CO':('1Sigma',1)}
- for name,a,b,ne in [('B2','B','B',6),('C2','C','C',8),('N2','N','N',10),('O2','O','O',12),('F2','F','F',14),('CO','C','O',10)]:
+ # [K18] Period-3 homonuclear diatomics Si2, P2, S2 (owner request; DECISIONS.md M5). Same analytic blocks; on-sites from the same Harrison
+ # transcription as S (evidence/harrison.txt lines 93-95). Ground states from the CCCBDB snapshots; no reference ordering is asserted
+ # (none is sourced in CONVENTIONS A.6 for period 3), so only the spin-state comparison applies.
+ REF_STATE.update({'Si2':('3Sigma_g',3),'P2':('1Sigma_g',1),'S2':('3Sigma_g',3)})
+ for name,a,b,ne in [('B2','B','B',6),('C2','C','C',8),('N2','N','N',10),('O2','O','O',12),('F2','F','F',14),('CO','C','O',10),('Si2','Si','Si',8),('P2','P','P',10),('S2','S','S',12)]:
   preset=f'{name}_model';R=P.presets[preset]['geometry_overrides']['bond_length_angstrom']
   atoms=[(a,np.array([0,0,-R/2])),(b,np.array([0,0,R/2]))];basis=[(i,v) for i in range(2) for v in [None]+list(np.eye(3))]
   Vss,Vsp,Vps,Vpp=[P.get(a,b,ch,R,preset) for ch in ['ss_sigma','sp_sigma','pp_sigma','pp_pi']]

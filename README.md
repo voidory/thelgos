@@ -23,7 +23,7 @@ make check-baseline
 make check
 ```
 
-Expected: baseline passes. `make check` then runs the engine tests and passes; the CrystOD comparison is deferred by owner decision B1 (DECISIONS.md) and runs as `make check-release`, which fails with the explicit missing-CrystOD reason until the original archive and a real adapter are supplied. Diatomic coverage is in place (CHECKER-CHANGES.md K14, K16). Actual browser/UI release tests are separate and have not been run.
+Expected: baseline passes. `make check` then runs the engine tests and passes; the CrystOD comparison is deferred by owner decision B1 (DECISIONS.md) and runs as `make check-release`, which fails with the explicit missing-CrystOD reason until the original archive and a real adapter are supplied. Diatomic coverage is in place (CHECKER-CHANGES.md K14, K16, K18). Actual browser/UI release tests are separate and have not been run.
 
 *Post-v1.2 note:* this README describes the v1.2 package. Changes since then are recorded in CHECKER-CHANGES.md and DECISIONS.md.
 

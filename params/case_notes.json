@@ -9,8 +9,8 @@
     {"title": "Couplings to hydrogen", "text": "Harrison's coupling formula was never fitted to hydrogen. Couplings involving H are scaled by 0.6 so that the textbook level orderings come out right (DECISIONS.md B2). Treat those orderings as built in, not as independent evidence."}
   ],
   "cases": {
-    "H2O lecture": [{"title": "Lecture simplification", "text": "As in the lecture, O 2s is not allowed to mix with the hydrogens, so it stays nonbonding. Switch to 'H2O model' to see what changes when it is allowed to mix: the lowest level drops and gains H character."}],
-    "H2O model": [{"title": "Compare with the lecture", "text": "Here O 2s is allowed to mix with the hydrogens. 'H2O lecture' shows the slide's simplification, with O 2s nonbonding."}],
+    "H2O lecture": [{"title": "Lecture simplification", "text": "As in the lecture, O 2s is not allowed to mix with the hydrogens, so it stays nonbonding. Switch the Parameters toggle to Model to see what changes when it is allowed to mix: the lowest level drops and gains H character."}],
+    "H2O model": [{"title": "Compare with the lecture", "text": "Here O 2s is allowed to mix with the hydrogens. The Lecture setting of the Parameters toggle shows the slide's simplification, with O 2s nonbonding."}],
     "CH4": [{"title": "No H–H coupling", "text": "The model has no coupling between hydrogens, so the hydrogen combinations (a1 and t2) start at the same energy and the pairing stages of the construction are skipped."}],
     "BH3": [{"title": "The empty p orbital", "text": "B 2pz has no partner among the hydrogen combinations, so it stays nonbonding and empty. It is the LUMO: the Lewis-acid orbital."}],
     "SF6 model": [{"title": "Fluorine–fluorine contacts", "text": "Neighbouring fluorines (2.21 Å apart) and opposite fluorines (3.12 Å) both couple. The neighbouring contacts are what separate the eg combination from a1g. No sulfur d orbitals are used."}],
@@ -20,6 +20,9 @@
     "four H Td": [{"title": "Teaching construction", "text": "CH4's four hydrogens without the carbon, with H–H coupling on, to show the a1 and t2 combinations and their split. Two electrons partly fill t2."}],
     "O2": [{"title": "Two unpaired electrons", "text": "The last two electrons go into the πg* pair, one in each, as Hund's rule draws it. This matches O2's triplet ground state, but the one-electron model itself does not decide spin."}],
     "CO": [{"title": "The highest occupied level", "text": "The HOMO is a σ level sitting mostly on carbon (98 %). Textbooks usually call it nonbonding, a carbon lone pair. In this model its contacts are very slightly destabilising (+0.43 eV), so it is drawn with a star. Both describe the same orbital."}],
-    "allyl cation pi": [{"title": "Node on the middle carbon", "text": "The middle π level has zero coefficient on C2, so it is exactly nonbonding: the LUMO of the cation."}]
+    "allyl cation pi": [{"title": "Node on the middle carbon", "text": "The middle π level has zero coefficient on C2, so it is exactly nonbonding: the LUMO of the cation."}],
+    "Si2": [{"title": "Period 3: what is compared", "text": "Only the ground-state spin is compared with experiment here (NIST CCCBDB). No orbital-ordering reference for period-3 diatomics is in the curated data yet, so the σg/πu order shown is the model's own. Only valence 3s and 3p orbitals are included; there are no 3d orbitals in this model."}],
+    "P2": [{"title": "Period 3: what is compared", "text": "Only the ground-state spin is compared with experiment here (NIST CCCBDB). No orbital-ordering reference for period-3 diatomics is in the curated data yet, so the σg/πu order shown is the model's own. Only valence 3s and 3p orbitals are included; there are no 3d orbitals in this model."}],
+    "S2": [{"title": "Period 3: what is compared", "text": "Only the ground-state spin is compared with experiment here (NIST CCCBDB). No orbital-ordering reference for period-3 diatomics is in the curated data yet, so the σg/πu order shown is the model's own. Only valence 3s and 3p orbitals are included; there are no 3d orbitals in this model."}]
   }
 }
