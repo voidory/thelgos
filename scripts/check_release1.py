@@ -15,6 +15,13 @@ def cistrans(p,q):
 def expect_labels(name,levels,want):
  got=[x['irrep'] for x in levels]
  if got!=want:raise AssertionError(f'{name}: irrep sequence {got} != Appendix B {want}')
+# [K14] Linear molecules run in a finite subgroup, where a pi pair spans two irreps (B2u+B3u in D2h, B1+B2 in C2v).
+# Degenerate sets are then labelled by their exact irrep decomposition, and mapped to Dinfh/Cinfv names.
+LINEAR_LABELS={'D2h':{'Ag':'sigma_g','B1u':'sigma_u','B2u+B3u':'pi_u','B2g+B3g':'pi_g'},'C2v':{'A1':'sigma','B1+B2':'pi'}}
+def decompose(V,projectors,name):
+ n={l:float(np.trace(V.T@pr@V)) for l,pr in projectors.items()};parts=sorted(l for l,x in n.items() if x>.5)
+ if any(abs(n[l]-round(n[l]))>1e-3 for l in n) or abs(sum(n.values())-V.shape[1])>1e-6:raise AssertionError((name,'non-integer irrep decomposition',n))
+ return '+'.join(parts)
 # [K4] Level descriptor shared with the CrystOD comparison (see compare_crystod.py and CHECKER-CHANGES.md).
 DESCRIPTOR_RULE=('character: sign of the bond energy sum 2*sum c_i c_j H_ij over central-ligand pairs (central topology) '
  'or all inter-atomic pairs (otherwise), averaged over the degenerate set; |x|<=1e-6 eV is nonbonding. '
@@ -33,7 +40,7 @@ def descriptors(H,c,basis,level_ix,topology,tol=1e-6):
 
 def run(data,out,groups,check_reference=True):
  P=Parameters(data);reports=[];rows=[];refs={};cases=[]
- def test(name,group,atoms,basis,preset,ne,expected,topology='all'):
+ def test(name,group,atoms,basis,preset,ne,expected,topology='all',linear=False):
   p=P.presets[preset];N=len(basis);H=np.zeros((N,N));edges=[]
   for i,(a,v) in enumerate(basis):H[i,i]=P.onsite(atoms[a][0],'s' if v is None else 'p')
   for a in range(len(atoms)):
@@ -71,7 +78,9 @@ def run(data,out,groups,check_reference=True):
   comm=float(max(np.max(abs(H@D-D@H)) for D in ops));assert comm<1e-10
   k=0;left=ne;levels=[];allwarnings=[];level_ix=[]
   while k<N:
-   ix=np.flatnonzero(abs(e-e[k])<1e-8);ix=ix[ix>=k];level_ix.append(ix);V=c[:,ix];weights={l:float(np.trace(V.T@pr@V)/len(ix)) for l,pr in projectors.items()};l=max(weights,key=weights.get);assert weights[l]>.999,(name,weights)
+   ix=np.flatnonzero(abs(e-e[k])<1e-8);ix=ix[ix>=k];level_ix.append(ix);V=c[:,ix];weights={l:float(np.trace(V.T@pr@V)/len(ix)) for l,pr in projectors.items()};l=max(weights,key=weights.get)
+   if linear and weights[l]<=.999:l=decompose(V,projectors,name)
+   assert weights.get(l,1.)>.999 or '+' in l,(name,weights)
    d=len(ix);n=min(left,2*d);left-=n;warnings=warn_shell(d,n);allwarnings.extend(warnings)
    row=dict(case=name,irrep=l,energy_eV=float(e[k]),multiplicity=d,electrons=n,warnings=';'.join(warnings));rows.append(row);levels.append(row);k=int(ix[-1])+1
   assert left==0
@@ -123,6 +132,47 @@ def run(data,out,groups,check_reference=True):
   else:t=P.get('H','H','ss_sigma',np.sqrt(8/3)*R,preset);exp=[eh+3*t]+[eh-t]*3
   lig=test(name,group,[('H',R*u) for u in dirs],[(i,None) for i in range(len(dirs))],preset,ne,exp,topology='cistrans' if group=='Oh' else 'all');assert 'occupation_not_unique' in reports[-1]['warnings']
   expect_labels(name,lig[3],['A1g','T1u','Eg'] if group=='Oh' else ['A1','T2'])
+ # [K14] Release 1 diatomics (gate C2). Geometry: NIST CCCBDB r_e (evidence/cccbdb_*.html); atom 1 at -R/2, atom 2 at +R/2 on z.
+ # Explicit analytic blocks, independent of P.block: homonuclear D2h sigma_g D(es+Vss, ep-Vpps; -Vsp), sigma_u D(es-Vss, ep+Vpps; Vsp),
+ # pi_u ep+Vppp (x2), pi_g ep-Vppp (x2). CO (C2v): 4x4 sigma block [sC,zC,sO,zO] and pi D(epC, epO; Vppp) (x2).
+ # Reference orderings (CONVENTIONS A.6): B2, C2 pi_u below sigma_g(2p); O2, F2 sigma_g(2p) below pi_u. A disagreement is recorded as an
+ # Orbital-ordering fidelity warning, never tuned away.
+ diatomic_reports=[]
+ REF_ORDER={'B2':'pi_u_below_sigma_g_2p','C2':'pi_u_below_sigma_g_2p','O2':'sigma_g_2p_below_pi_u','F2':'sigma_g_2p_below_pi_u'}
+ # Ground states as listed by NIST CCCBDB (same evidence pages): an open shell is expected exactly when the reference is not a singlet.
+ REF_STATE={'B2':('3Sigma_g',3),'C2':('1Sigma_g+',1),'O2':('3Sigma_g',3),'F2':('1Sigma_g',1),'CO':('1Sigma',1)}
+ for name,a,b,ne in [('B2','B','B',6),('C2','C','C',8),('O2','O','O',12),('F2','F','F',14),('CO','C','O',10)]:
+  preset=f'{name}_model';R=P.presets[preset]['geometry_overrides']['bond_length_angstrom']
+  atoms=[(a,np.array([0,0,-R/2])),(b,np.array([0,0,R/2]))];basis=[(i,v) for i in range(2) for v in [None]+list(np.eye(3))]
+  Vss,Vsp,Vps,Vpp=[P.get(a,b,ch,R,preset) for ch in ['ss_sigma','sp_sigma','pp_sigma','pp_pi']]
+  if a==b:
+   es,ep=P.onsite(a,'s'),P.onsite(a,'p');group='D2h'
+   exp=E2(es+Vss,ep-Vps,-Vsp)+E2(es-Vss,ep+Vps,Vsp)+[ep+Vpp]*2+[ep-Vpp]*2
+  else:
+   group='C2v';ea,pa,eb,pb=P.onsite(a,'s'),P.onsite(a,'p'),P.onsite(b,'s'),P.onsite(b,'p')
+   sig=np.array([[ea,0,Vss,Vsp],[0,pa,-Vsp,Vps],[Vss,-Vsp,eb,0],[Vsp,Vps,0,pb]])
+   exp=np.linalg.eigvalsh(sig).tolist()+E2(pa,pb,Vpp)*2
+  e,c,H,lv=test(name,group,atoms,basis,preset,ne,exp,topology='all',linear=True)
+  lin=[LINEAR_LABELS[group][x['irrep']] for x in lv]
+  if group=='D2h':assert sorted(set(x['irrep'] for x in lv))==['Ag','B1u','B2g+B3g','B2u+B3u'],(name,lv)
+  else:assert sorted(set(x['irrep'] for x in lv))==['A1','B1+B2'],(name,lv)
+  desc=cases[-1]['levels'];occ=[k for k,x in enumerate(lv) if x['electrons']]
+  bonding=sum(x['electrons'] for x,d in zip(lv,desc) if d['descriptor']['character']=='bonding');anti=sum(x['electrons'] for x,d in zip(lv,desc) if d['descriptor']['character']=='antibonding')
+  rep={'case':name,'group':group,'bond_length_angstrom':R,'linear_labels':lin,'counting_bond_order':(bonding-anti)/2,'fidelity_warnings':[]}
+  if name in REF_ORDER:
+   sg=[x['energy_eV'] for x,l in zip(lv,lin) if l=='sigma_g'];pu=[x['energy_eV'] for x,l in zip(lv,lin) if l=='pi_u'][0]
+   model='pi_u_below_sigma_g_2p' if pu<max(sg) else 'sigma_g_2p_below_pi_u'
+   rep['orbital_ordering']={'reference':REF_ORDER[name],'model':model,'sigma_g_2p_taken_as':'higher of the two sigma_g levels','agrees':model==REF_ORDER[name]}
+   if model!=REF_ORDER[name]:rep['fidelity_warnings'].append('orbital_ordering_disagrees_with_reference')
+  st,mult=REF_STATE[name];open_shell=bool(reports[-1]['warnings'])
+  rep['spin_state']={'reference_ground_state':st,'model_open_shell':open_shell,'agrees':open_shell==(mult>1)}
+  if open_shell!=(mult>1):rep['fidelity_warnings'].append('spin_state_disagrees_with_reference')
+  if name=='O2':assert 'occupation_not_unique' in reports[-1]['warnings'] and lin[occ[-1]]=='pi_g',('O2 must end in a partly filled pi_g',lv)
+  if name=='CO':
+   h=occ[-1];v=c[:,[i for i in range(len(e)) if abs(e[i]-lv[h]['energy_eV'])<1e-8]];wC=float((v[:4]**2).sum()/v.shape[1])
+   assert lin[h]=='sigma' and wC>.5 and rep['counting_bond_order']==3,('CO HOMO / bond order',lin[h],wC,rep['counting_bond_order'])
+   rep['HOMO_carbon_weight']=wC
+  diatomic_reports.append(rep)
  # Missing parameter lookups must error, not become zeros.
  try:P.get('N','N','pp_pi',1.,'H2_fixture')
  except ValueError:pass
@@ -139,7 +189,7 @@ def run(data,out,groups,check_reference=True):
    for r,b in zip(levels,baseline[name]):
     assert r['irrep']==b['irrep'] and r['multiplicity']==b['multiplicity'] and r['electrons']==b['electrons'],name
     assert abs(r['energy_eV']-b['energy_eV'])<1e-9,(name,'committed reference changed',r,b)
- write_json(out/'checks'/'release1_validation.json',{'fixtures':reports,'SF6_combine_block_eV':stage.tolist(),'SF6_combine_split_eV':float(np.ptp(np.linalg.eigvalsh(stage))),'status':'PASS_CURRENT_FIXTURES_ONLY','reference_checked':check_reference,'warning_policy':'degenerate partially filled shell triggers occupation/JT/spin warning, not an assertion of an actual distorted ground state','missing_diatomics':['B2','C2','O2','F2','CO']})
+ write_json(out/'checks'/'release1_validation.json',{'fixtures':reports,'SF6_combine_block_eV':stage.tolist(),'SF6_combine_split_eV':float(np.ptp(np.linalg.eigvalsh(stage))),'status':'PASS_CURRENT_FIXTURES_ONLY','reference_checked':check_reference,'warning_policy':'degenerate partially filled shell triggers occupation/JT/spin warning, not an assertion of an actual distorted ground state','diatomics':diatomic_reports,'missing_diatomics':[],'excluded_pending_decision':['N2 (B4)']})
  write_json(out/'checks'/'crystod_cases.json',cases)
  out.joinpath('checks').mkdir(exist_ok=True,parents=True)
  with (out/'checks'/'release1_energies.csv').open('w',newline='') as f:w=csv.DictWriter(f,fieldnames=list(rows[0]));w.writeheader();w.writerows(rows)

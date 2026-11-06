@@ -200,6 +200,86 @@
       "id": "allyl_pi",
       "note": "Defaults pending owner approval; no slide calibration claim.",
       "provenance_tag": "model"
+    },
+    {
+      "coupling_overrides": [],
+      "edge_policy": {
+        "edges_off": [],
+        "edges_on": [
+          "all"
+        ]
+      },
+      "geometry_overrides": {
+        "bond_length_angstrom": 1.59
+      },
+      "hydrogen_scale": 0.6,
+      "id": "B2_model",
+      "note": "r_e from NIST CCCBDB (evidence/cccbdb_B2.html), primary reference Gurvich. Defaults pending owner approval; no slide calibration claim.",
+      "provenance_tag": "model"
+    },
+    {
+      "coupling_overrides": [],
+      "edge_policy": {
+        "edges_off": [],
+        "edges_on": [
+          "all"
+        ]
+      },
+      "geometry_overrides": {
+        "bond_length_angstrom": 1.2425
+      },
+      "hydrogen_scale": 0.6,
+      "id": "C2_model",
+      "note": "r_e from NIST CCCBDB (evidence/cccbdb_C2.html), primary reference Huber-Herzberg 1979. Defaults pending owner approval; no slide calibration claim.",
+      "provenance_tag": "model"
+    },
+    {
+      "coupling_overrides": [],
+      "edge_policy": {
+        "edges_off": [],
+        "edges_on": [
+          "all"
+        ]
+      },
+      "geometry_overrides": {
+        "bond_length_angstrom": 1.2075
+      },
+      "hydrogen_scale": 0.6,
+      "id": "O2_model",
+      "note": "r_e from NIST CCCBDB (evidence/cccbdb_O2.html), primary reference Huber-Herzberg 1979. Defaults pending owner approval; no slide calibration claim.",
+      "provenance_tag": "model"
+    },
+    {
+      "coupling_overrides": [],
+      "edge_policy": {
+        "edges_off": [],
+        "edges_on": [
+          "all"
+        ]
+      },
+      "geometry_overrides": {
+        "bond_length_angstrom": 1.4119
+      },
+      "hydrogen_scale": 0.6,
+      "id": "F2_model",
+      "note": "r_e from NIST CCCBDB (evidence/cccbdb_F2.html), primary reference Huber-Herzberg 1979. Defaults pending owner approval; no slide calibration claim.",
+      "provenance_tag": "model"
+    },
+    {
+      "coupling_overrides": [],
+      "edge_policy": {
+        "edges_off": [],
+        "edges_on": [
+          "all"
+        ]
+      },
+      "geometry_overrides": {
+        "bond_length_angstrom": 1.1282
+      },
+      "hydrogen_scale": 0.6,
+      "id": "CO_model",
+      "note": "r_e from NIST CCCBDB (evidence/cccbdb_CO.html), primary reference NIST diatomic. Defaults pending owner approval; no slide calibration claim.",
+      "provenance_tag": "model"
     }
   ],
   "schema_version": "1.2"

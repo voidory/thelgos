@@ -1,4 +1,42 @@
 {
+  "B2": [
+    {
+      "electrons": 2,
+      "energy_eV": -22.13156853825498,
+      "irrep": "Ag",
+      "multiplicity": 1
+    },
+    {
+      "electrons": 2,
+      "energy_eV": -11.033954186320784,
+      "irrep": "Ag",
+      "multiplicity": 1
+    },
+    {
+      "electrons": 2,
+      "energy_eV": -10.566590032745989,
+      "irrep": "B1u",
+      "multiplicity": 1
+    },
+    {
+      "electrons": 0,
+      "energy_eV": -9.081438234247065,
+      "irrep": "B2u+B3u",
+      "multiplicity": 2
+    },
+    {
+      "electrons": 0,
+      "energy_eV": -4.198561765752938,
+      "irrep": "B2g+B3g",
+      "multiplicity": 2
+    },
+    {
+      "electrons": 0,
+      "energy_eV": 5.372112757321756,
+      "irrep": "B1u",
+      "multiplicity": 1
+    }
+  ],
   "BH3": [
     {
       "electrons": 2,
@@ -31,6 +69,44 @@
       "multiplicity": 2
     }
   ],
+  "C2": [
+    {
+      "electrons": 2,
+      "energy_eV": -33.78204068283793,
+      "irrep": "Ag",
+      "multiplicity": 1
+    },
+    {
+      "electrons": 2,
+      "energy_eV": -15.61031510176911,
+      "irrep": "Ag",
+      "multiplicity": 1
+    },
+    {
+      "electrons": 2,
+      "energy_eV": -14.450983511594712,
+      "irrep": "B1u",
+      "multiplicity": 1
+    },
+    {
+      "electrons": 2,
+      "energy_eV": -12.968040557226669,
+      "irrep": "B2u+B3u",
+      "multiplicity": 2
+    },
+    {
+      "electrons": 0,
+      "energy_eV": -4.971959442773345,
+      "irrep": "B2g+B3g",
+      "multiplicity": 2
+    },
+    {
+      "electrons": 0,
+      "energy_eV": 10.863339296201767,
+      "irrep": "B1u",
+      "multiplicity": 1
+    }
+  ],
   "CH4": [
     {
       "electrons": 2,
@@ -55,6 +131,82 @@
       "energy_eV": -2.747737253656929,
       "irrep": "T2",
       "multiplicity": 3
+    }
+  ],
+  "CO": [
+    {
+      "electrons": 2,
+      "energy_eV": -42.99024697761363,
+      "irrep": "A1",
+      "multiplicity": 1
+    },
+    {
+      "electrons": 2,
+      "energy_eV": -24.07901948696066,
+      "irrep": "A1",
+      "multiplicity": 1
+    },
+    {
+      "electrons": 4,
+      "energy_eV": -17.042803646145202,
+      "irrep": "B1+B2",
+      "multiplicity": 2
+    },
+    {
+      "electrons": 2,
+      "energy_eV": -15.182633522432663,
+      "irrep": "A1",
+      "multiplicity": 1
+    },
+    {
+      "electrons": 0,
+      "energy_eV": -6.057196353854816,
+      "irrep": "B1+B2",
+      "multiplicity": 2
+    },
+    {
+      "electrons": 0,
+      "energy_eV": 12.491899987006931,
+      "irrep": "A1",
+      "multiplicity": 1
+    }
+  ],
+  "F2": [
+    {
+      "electrons": 2,
+      "energy_eV": -48.37443205636758,
+      "irrep": "Ag",
+      "multiplicity": 1
+    },
+    {
+      "electrons": 2,
+      "energy_eV": -36.456980007634044,
+      "irrep": "B1u",
+      "multiplicity": 1
+    },
+    {
+      "electrons": 2,
+      "energy_eV": -28.181951640532404,
+      "irrep": "Ag",
+      "multiplicity": 1
+    },
+    {
+      "electrons": 4,
+      "energy_eV": -21.746222153984693,
+      "irrep": "B2u+B3u",
+      "multiplicity": 2
+    },
+    {
+      "electrons": 4,
+      "energy_eV": -15.5537778460153,
+      "irrep": "B2g+B3g",
+      "multiplicity": 2
+    },
+    {
+      "electrons": 0,
+      "energy_eV": -4.626636295465968,
+      "irrep": "B1u",
+      "multiplicity": 1
     }
   ],
   "H2": [
@@ -159,6 +311,44 @@
       "energy_eV": -7.2092000000000045,
       "irrep": "E'",
       "multiplicity": 2
+    }
+  ],
+  "O2": [
+    {
+      "electrons": 2,
+      "energy_eV": -43.74676441359396,
+      "irrep": "Ag",
+      "multiplicity": 1
+    },
+    {
+      "electrons": 2,
+      "energy_eV": -25.133433134684246,
+      "irrep": "B1u",
+      "multiplicity": 1
+    },
+    {
+      "electrons": 2,
+      "energy_eV": -23.772505804890415,
+      "irrep": "Ag",
+      "multiplicity": 1
+    },
+    {
+      "electrons": 4,
+      "energy_eV": -18.363170016588874,
+      "irrep": "B2u+B3u",
+      "multiplicity": 2
+    },
+    {
+      "electrons": 2,
+      "energy_eV": -9.89682998341114,
+      "irrep": "B2g+B3g",
+      "multiplicity": 2
+    },
+    {
+      "electrons": 0,
+      "energy_eV": 6.1127033531686115,
+      "irrep": "B1u",
+      "multiplicity": 1
     }
   ],
   "SF6 lecture": [

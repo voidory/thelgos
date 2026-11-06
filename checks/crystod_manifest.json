@@ -18,7 +18,7 @@
     "order_mismatch": "logged for the owner, nonblocking (spec section 12)"
   },
   "comparisons": [],
-  "diatomic_gate": "B2,C2,O2,F2,CO missing; N2 scope undecided",
+  "diatomic_gate": "B2,C2,O2,F2,CO fixtures present (K14); N2 scope undecided",
   "engine_UI_gate": "separate, not exercised by this script",
   "precedence": "Appendix A oracles win; discrepancies recorded for the owner",
   "prohibited": [

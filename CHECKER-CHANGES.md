@@ -100,6 +100,18 @@ Each entry in `levels` needs `irrep`, `energy`, `multiplicity`, `canonical_level
 
 *History rewrite (patch 5, owner-approved):* the branch history was then rewritten with `git filter-repo` so that no commit's files or messages contain the name, and force-pushed; every commit ID changed, and the IDs quoted in this file were updated. Consequence for provenance: the "v1.2 SHA-256" column above records the bytes as originally uploaded. For `scripts/compare_crystod.py` and `checks/crystod_manifest.json`, whose originals contained the name, the redacted copies now in git history no longer hash to those values; all other v1.2 originals in history are unchanged byte-for-byte. The unredacted originals are not in the public repository.
 
+### Diatomic fixtures (patch 6)
+
+**K14. Release 1 diatomics B2, C2, O2, F2 and CO (gate C2).**
+- *Geometry:* r_e from NIST CCCBDB, snapshots committed as `evidence/cccbdb_{B2,C2,O2,F2,CO}.html` (fetched 2026-11-06). B2 1.5900 Å (Gurvich), C2 1.2425, O2 1.2075, F2 1.4119 Å (Huber & Herzberg 1979), CO 1.1282 Å (NIST diatomic). Added as presets `B2_model` … `CO_model` in `params/presets.json`, edges `all`, provenance `model`.
+- *Oracles:* `check_release1.py` checks each spectrum against explicit blocks written independently of `Parameters.block` (homonuclear σg/σu 2×2, πu/πg; CO 4×4 σ and 2×2 π). The blocks are set out for the owner in `drafts/CONVENTIONS-diatomics-draft.md`.
+- *Labels:* in D2h/C2v a π pair spans two irreps, which the v1.2 one-irrep-per-level rule rejects. For linear fixtures only (`linear=True`), a degenerate set is now labelled by its exact integer irrep decomposition (`B2u+B3u`) and mapped to σg/σu/πu/πg or σ/π by a fixed lookup. Non-linear fixtures keep the strict rule. Each fixture also asserts its full set of irrep types.
+- *Assertions:* O2 ends in a partly filled πg with the occupation warnings; CO has a σ HOMO with carbon weight > 0.5 (0.977) and counting bond order 3.
+- *Fidelity findings, recorded and not asserted:* reference orderings from CONVENTIONS A.6 and ground states from the CCCBDB pages are compared with the model. B2 and C2 disagree on both orbital ordering (σg(2p) below πu) and spin state (B2 closed shell versus ³Σg; C2 open πu versus ¹Σg⁺). O2, F2 and CO agree. The results are in `checks/release1_validation.json` under `diatomics`.
+- *Reference spectra:* five entries added to `evidence/reference_spectra.json`, taken from the run after its analytic-block check passed (the same practice the v1.2 snapshot records). The twelve existing entries are unchanged.
+- *Outputs:* `release1_energies.csv`, `release1_validation.json` and `crystod_cases.json` gain the five fixtures, and the old twelve are byte-identical as a prefix and subset. `preset_schema_validation.json` counts 16 presets. `crystod_manifest.json` updates its `diatomic_gate` text. `compare_crystod.py` de-duplicates `required_cases`, now that the diatomics are real cases.
+- *Not done:* N2 (owner decision B4). CONVENTIONS §2, A.6 and Appendix B are not edited; proposed text is in the draft.
+
 ## Verification
 
 **Environment.** `requirements-checker.lock` was installed with `--require-hashes` into `.venv` (CPython 3.12.3), and `pip check` passed. This is not the README's 3.12.8 host and not the production 3.12.7.
