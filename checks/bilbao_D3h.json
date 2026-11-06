@@ -1,0 +1,216 @@
+{
+  "class_mapping": [
+    {
+      "bilbao_column": "1",
+      "operation_indices": [
+        0
+      ],
+      "representative_symbol": "E",
+      "target_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "bilbao_column": "m",
+      "operation_indices": [
+        6
+      ],
+      "representative_symbol": "sigma_h",
+      "target_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          -1.0
+        ]
+      ]
+    },
+    {
+      "bilbao_column": "3",
+      "operation_indices": [
+        1,
+        2
+      ],
+      "representative_symbol": "C_3",
+      "target_matrix": [
+        [
+          -0.5,
+          -0.8660254037844386,
+          0.0
+        ],
+        [
+          0.8660254037844386,
+          -0.5,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "bilbao_column": "-6",
+      "operation_indices": [
+        7,
+        8
+      ],
+      "representative_symbol": "S_3",
+      "target_matrix": [
+        [
+          -0.5,
+          0.8660254037844386,
+          0.0
+        ],
+        [
+          -0.8660254037844386,
+          -0.5,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          -1.0
+        ]
+      ]
+    },
+    {
+      "bilbao_column": "2120",
+      "operation_indices": [
+        3,
+        4,
+        5
+      ],
+      "representative_symbol": "C_2'(0)",
+      "target_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          -1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          -1.0
+        ]
+      ]
+    },
+    {
+      "bilbao_column": "m100",
+      "operation_indices": [
+        9,
+        10,
+        11
+      ],
+      "representative_symbol": "sigma_v(0)",
+      "target_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          -1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    }
+  ],
+  "comparison": {
+    "bilbao_max_error": 0.0,
+    "bilbao_status": "PASS_GEOMETRY_MAPPED",
+    "closure_max_error": 1.1102230246251565e-16,
+    "group": "D3h",
+    "order": 12,
+    "orthogonality_max_error": 0.0,
+    "raw_library_max_error": 0.0,
+    "snap_character_max_residual": 8.881784197001252e-16,
+    "snap_matrix_max_residual": 3.3306690738754696e-16
+  },
+  "group": "D3h",
+  "source_characters": {
+    "A1'": [
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "A1''": [
+      1.0,
+      -1.0,
+      1.0,
+      -1.0,
+      1.0,
+      -1.0
+    ],
+    "A2'": [
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      -1.0,
+      -1.0
+    ],
+    "A2''": [
+      1.0,
+      -1.0,
+      1.0,
+      -1.0,
+      -1.0,
+      1.0
+    ],
+    "E'": [
+      2.0,
+      2.0,
+      -1.0,
+      -1.0,
+      0.0,
+      0.0
+    ],
+    "E''": [
+      2.0,
+      -2.0,
+      -1.0,
+      1.0,
+      0.0,
+      0.0
+    ]
+  }
+}
