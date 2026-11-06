@@ -122,6 +122,27 @@ const check = (name, ok, detail = "") => { results.push({ name, ok, detail }); c
     await page.waitForFunction(() => document.body.dataset.rendered === "CH4|1|");
     const narr = await page.textContent("#narration");
     check("CH4 shows B5 skip note", narr.includes("No ligand–ligand coupling in this model."), narr.slice(0, 120));
+    // Accessibility: named level buttons, a text table of levels, keyboard tabs.
+    const a11y = await page.evaluate(() => ({
+      hits: document.querySelectorAll("#diagram [data-mo]").length,
+      named: [...document.querySelectorAll("#diagram [data-mo]")].filter((h) => h.getAttribute("role") === "button" && h.getAttribute("aria-label")).length,
+      rows: document.querySelectorAll("#levels-sr tbody tr").length,
+      homo: document.querySelector("#levels-sr").textContent.includes("(HOMO)") }));
+    check("a11y: every level is a named button and listed in the text table", a11y.hits > 0 && a11y.named === a11y.hits && a11y.rows === a11y.hits && a11y.homo, JSON.stringify(a11y));
+    await page.focus(".tabs [role=tab][aria-selected=true]");
+    await page.keyboard.press("ArrowRight");
+    const tabState = await page.evaluate(() => { const t = document.activeElement; const p = document.getElementById(t.getAttribute("aria-controls"));
+      return { sel: t.getAttribute("aria-selected"), idx: t.id, shown: p && !p.hidden, others: [...document.querySelectorAll(".tabs [role=tab]")].filter((x) => x.tabIndex === 0).length }; });
+    check("a11y: arrow keys move between inspector tabs (roving tabindex)", tabState.sel === "true" && tabState.idx === "tab-1" && tabState.shown && tabState.others === 1, JSON.stringify(tabState));
+    await page.keyboard.press("Home");
+    await page.focus("#diagram [data-mo]");
+    await page.keyboard.press("Enter");
+    await page.waitForFunction(() => document.body.dataset.rendered === "CH4|1|0");
+    const kept = await page.evaluate(() => document.activeElement.dataset.mo);
+    check("a11y: Enter on a focused level selects it and focus stays on it", kept === "0", `focused data-mo=${kept}`);
+    await page.$eval("#s", (s) => { s.value = 1; s.dispatchEvent(new Event("input")); });
+    await page.waitForFunction(() => document.body.dataset.rendered === "CH4|1|");
+
     // Glide: a step jump passes through intermediate s values; with reduced motion it does not.
     const glideSeen = async () => {
       await page.evaluate(() => { window.__seen = []; window.__obs = new MutationObserver(() => window.__seen.push(document.body.dataset.rendered));

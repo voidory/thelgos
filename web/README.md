@@ -20,7 +20,7 @@ The approved layout (case rail, construction timeline, tabbed inspector) is the 
 | L3 | Rule badges (R1–R10) on each construction stage, the ledger, matching and bond order; tapping one shows the rule, its meaning in the model and its badge |
 | P3 | Why-jump: "Show where this level appeared" moves the slider to the checkpoint at which the selected level first reached its final energy, with that moment's ledger and structure |
 | P6 | Matching table: ⟨central orbital\|H\|LGO⟩ tallies; zero means no interaction, and the zero pattern follows the irreps |
-| F3.7 | 3D view (WebGL2): atoms and the selected orbital's lobes; drag to rotate |
+| F3.7 | 3D view (WebGL2): atoms and the selected orbital's lobes (p functions on an atom merged into one oriented lobe); opens in the 2D sketch's orientation; drag to rotate |
 | F5.1–F5.6 | Provenance tooltips; generated explanation; SVG, PNG and JSON export; JSON import with validation; share links (compressed config in the URL fragment, nothing stored on a server) |
 | L1 | Contact ledger for the selected level: every on-site and contact row, phase, contact weight, energy contribution, running total. The total equals the eigenvalue |
 | P1–P2 | Construction slider over H(s), with stage ticks and narration, and B5 notes for skipped stages |
@@ -42,11 +42,13 @@ The approved layout (case rail, construction timeline, tabbed inspector) is the 
 - L2 one-to-one ledger rows and structure lines, L3 badges, F5.1 tooltips, P6 zero tallies, P3 why-jump for SF6 eg (checkpoint 3 of 4);
 - JSON export, re-import and rejection of an invalid file (failing field named); a share link opened in a new page; the 3D view painting;
 - the reading panel: N2's ordering disagreement and CO's note on its starred HOMO;
-- Watch mode plays through;
+- Watch mode plays through; step jumps glide, and with reduced motion they do not;
+- the selected level's sketch card sits clear of bars and labels;
+- accessibility: every level is a named button and is listed in the screen-reader table; the inspector tabs answer to the arrow keys; Enter selects a focused level and keeps focus on it;
 - there is no horizontal scroll at 360 px, and no page errors.
 
 `make check` does not run these, because they need the network.
 
 ## Not built yet
 
-The Release 2+ features (L4–L5, P4–P5, Practice and Exam modes, D1–D10), and the design pass. The 3D view draws p lobes as axis-aligned ellipsoids, which is exact for the Cartesian and axial directions used in Release 1 but not for arbitrary directions.
+The Release 2+ features (L4–L5, P4–P5, Practice and Exam modes, D1–D10), and from the design pass: highlighting ledger contacts in the 3D view, and pinning the timeline on phones.

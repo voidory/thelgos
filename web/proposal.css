@@ -2,7 +2,7 @@
 :root {
   --bg: #f6f5f1; --fg: #1b1b19; --muted: #6d6b64; --rule: #e1ded6; --panel: #ffffff;
   --accent: #0f766e; --accent-soft: #e3f1ef; --warn: #b45309;
-  --pos: #c8352b; --neg: #2a5db0; --mix: #3f3e3a; --allowed: #9a978e; --occ: #1b1b19;
+  --pos: #c8352b; --neg: #2a5db0; --mix: #3f3e3a; --allowed: #8a877e; --occ: #1b1b19;
 }
 @media (prefers-color-scheme: dark) {
   :root { --bg: #121211; --fg: #ecebe6; --muted: #a3a199; --rule: #2c2b28; --panel: #1b1b19;
@@ -79,3 +79,11 @@ body.proposal .badge .kind { color: inherit; opacity: 0.8; }
 #diagram .sketch-card { fill: var(--panel); stroke: var(--rule); stroke-width: 1; filter: drop-shadow(0 1px 2px rgba(0,0,0,0.08)); }
 #diagram .sketch-leader { stroke: var(--accent); stroke-width: 1; stroke-dasharray: 2 2; }
 #diagram .sketch .atom { fill: var(--panel); stroke: var(--muted); stroke-width: 0.8; }
+
+/* Accessibility: visible keyboard focus everywhere; screen-reader-only text. */
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+#diagram .mo-hit:focus { outline: none; }
+#diagram .mo-hit:focus-visible { fill: var(--accent-soft); fill-opacity: 0.6; stroke: var(--accent); stroke-width: 1.5; }
+.tabpanel:focus-visible { outline-offset: -2px; }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+@media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; transition: none !important; animation: none !important; } }

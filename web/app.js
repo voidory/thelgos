@@ -83,8 +83,43 @@ function harpoon(x, y, up) {
   return el("path", { d, class: "electron" });
 }
 
+// Plain-text name of a level for screen readers ("1t1u*, −27.80 eV, 6 electrons, HOMO").
+function levelName(lv, k, atEnd, view) {
+  const lab = atEnd ? labelParts(lv).map(([t]) => t).join("") : `Level ${k + 1}`;
+  const bits = [lab || `Level ${k + 1}`, `${fmt(lv.energy_eV, 2)} eV`];
+  if (atEnd && lv.electrons !== undefined) bits.push(`${lv.electrons} electron${lv.electrons === 1 ? "" : "s"}`);
+  if (atEnd && k === view.result.frontier.HOMO) bits.push("HOMO");
+  if (atEnd && k === view.result.frontier.LUMO) bits.push("LUMO");
+  if (lv.multiplicity > 1) bits.push(`${lv.multiplicity}-fold degenerate`);
+  return bits.join(", ");
+}
+
+// Text alternative to the diagram: every level in a table, read by screen readers, hidden on screen.
+function levelTable(view) {
+  const box = $("levels-sr");
+  if (!box) return;
+  const atEnd = view.schedule.s >= 1;
+  const list = atEnd ? view.diagram.centre : view.diagram.slider_levels;
+  const t = document.createElement("table");
+  t.innerHTML = `<caption>Molecular-orbital levels of ${view.case}${atEnd ? "" : ` at construction point s = ${view.schedule.s.toFixed(2)}`}, highest first</caption>
+    <thead><tr><th scope="col">Level</th><th scope="col">Energy / eV</th><th scope="col">Degeneracy</th><th scope="col">Electrons</th></tr></thead>`;
+  const tb = document.createElement("tbody");
+  list.map((lv, k) => [lv, k]).sort((a, b) => b[0].energy_eV - a[0].energy_eV).forEach(([lv, k]) => {
+    const tr = document.createElement("tr");
+    for (const v of [levelName(lv, k, atEnd, view).split(", ")[0] + (atEnd && k === view.result.frontier.HOMO ? " (HOMO)" : atEnd && k === view.result.frontier.LUMO ? " (LUMO)" : ""),
+                     fmt(lv.energy_eV, 3), String(lv.multiplicity), lv.electrons === undefined ? "–" : String(lv.electrons)]) {
+      const td = document.createElement("td"); td.textContent = v; tr.append(td);
+    }
+    tb.append(tr);
+  });
+  t.append(tb);
+  box.replaceChildren(t);
+}
+
 function draw(view) {
   const svg = $("diagram");
+  // Keep keyboard focus on the same level across redraws (selecting a level redraws the diagram).
+  const fe = document.activeElement, refocus = fe && svg.contains(fe) && fe.classList.contains("mo-hit") ? fe.dataset.mo ?? fe.dataset.sliderLevel : null;
   svg.replaceChildren();
   const d = view.diagram;
   const atEnd = view.schedule.s >= 1;
@@ -156,6 +191,7 @@ function draw(view) {
         if (isMO) {
           g.append(el("title", {}, `${view.provenance.level_energy} ${atEnd ? view.provenance.level_label : ""} E = ${fmt(lv.energy_eV, 3)} eV`.trim()));
           const hit = el("rect", { x: x0 - 4, y: yy - 9, width: x1 - x0 + 8, height: 18, class: "mo-hit", tabindex: 0,
+                                   role: "button", "aria-pressed": state.level === k, "aria-label": levelName(lv, k, atEnd, view),
                                    [atEnd ? "data-mo" : "data-slider-level"]: k, "data-energy": lv.energy_eV });
           hit.addEventListener("click", () => select(k));
           hit.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") select(k); });
@@ -233,6 +269,7 @@ function draw(view) {
   // Smaller in the compact geometry; left out when no spot is free of bars and labels.
   const pk = atEnd ? `M${state.level}` : `S${state.level}`;
   if (view.structure && state.level !== null && pos[pk]) sketchCard(svg, view.structure, pos[pk], { W, H, top, bottom, AX, size: compact ? 84 : 108 });
+  if (refocus != null) { const h = svg.querySelector(`[data-mo="${refocus}"], [data-slider-level="${refocus}"]`); if (h) h.focus({ preventScroll: true }); }
 }
 
 function sketchCard(svg, S, p, { W, H, top, bottom, AX, size }) {
@@ -401,7 +438,7 @@ async function refresh() {
   const view = await call("view", { case: state.case, s: state.s, level: state.level });
   if (mine !== latest) return state.view;  // a newer request superseded this one
   state.view = view;
-  draw(view); narrate(view); ledger(view); bonds(view); banner(view); about(view);
+  draw(view); levelTable(view); narrate(view); ledger(view); bonds(view); banner(view); about(view);
   structure(view); matching(view); slotBadges(view);
   if (proposal) proposalUpdate(view);
   if ($("t-3d").checked) view3d.render(view);
@@ -497,11 +534,32 @@ function hot(row, on) {
 // ---- Structure view (L2): atoms, orbital lobes coloured by phase, contact lines. ----
 // Orbital drawing shared by the structure view and the in-diagram sketch: lobes coloured by phase
 // (red positive, blue negative), sized by |coefficient|, with p lobes along their projected direction.
+// The p functions on one atom add as a vector: c_x p_x + c_y p_y + c_z p_z is a single p orbital along
+// (c_x, c_y, c_z), with size |c|. Drawing them as separate crossed dumbbells would show a shape the
+// orbital does not have, so the drawings merge them per atom. Display only; the ledger keeps the basis.
+function displayLobes(S) {
+  const out = [], byAtom = new Map();
+  for (const l of S.lobes) {
+    if (l.kind !== "p") { out.push(l); continue; }
+    const a = byAtom.get(l.atom) || { atom: l.atom, kind: "p", v3: [0, 0, 0], v2: [0, 0] };
+    l.dir3d.forEach((d, i) => { a.v3[i] += l.coefficient * d; });
+    l.dir2d.forEach((d, i) => { a.v2[i] += l.coefficient * d; });
+    byAtom.set(l.atom, a);
+  }
+  for (const a of byAtom.values()) {
+    const n = Math.hypot(...a.v3);
+    if (n < 1e-6) continue;
+    out.push({ atom: a.atom, kind: "p", coefficient: n, dir3d: a.v3.map((v) => v / n), dir2d: a.v2.map((v) => v / n) });
+  }
+  return out;
+}
+
 function drawOrbital(parent, S, X, Y, scale, labels) {
-  const maxc = Math.max(...S.lobes.map((l) => Math.abs(l.coefficient)), 1e-9);
+  const lobes = displayLobes(S);
+  const maxc = Math.max(...lobes.map((l) => Math.abs(l.coefficient)), 1e-9);
   const order = S.atoms.slice().sort((a, b) => a.depth - b.depth);
   for (const a of order) {
-    for (const l of S.lobes.filter((l) => l.atom === a.index)) {
+    for (const l of lobes.filter((l) => l.atom === a.index)) {
       const r = (8 + 30 * Math.abs(l.coefficient) / maxc) * scale;
       const x = X(a.x), y = Y(a.y);
       if (l.kind === "s") {
@@ -675,10 +733,11 @@ const status = (t) => { $("export-status").textContent = t; };
 
 // ---- 3D viewer (F3.7): WebGL2, atoms and the selected orbital's lobes; drag to rotate. ----
 const view3d = (() => {
-  let gl, prog, sphere, rot = [0.5, -0.4], lastView = null, buf = {};
+  let gl, prog, sphere, rot = [0, 0], lastView = null, lastCase = null, buf = {};
   const VS = `#version 300 es
-  in vec3 p; uniform mat4 M; uniform mat4 P; uniform vec3 c; uniform vec3 s; out vec3 n; out vec3 col;
-  void main(){ vec4 w = M * vec4(p * s + c, 1.0); n = normalize(mat3(M) * (p / s)); col = vec3(0); gl_Position = P * w; }`;
+  in vec3 p; uniform mat4 M; uniform mat4 P; uniform vec3 c; uniform vec3 s; uniform mat3 R; out vec3 n; out vec3 col;
+  // R orients the ellipsoid: its first column is the lobe's long axis, in engine coordinates.
+  void main(){ vec4 w = M * vec4(R * (p * s) + c, 1.0); n = normalize(mat3(M) * (R * (p / s))); col = vec3(0); gl_Position = P * w; }`;
   const FS = `#version 300 es
   precision mediump float; in vec3 n; uniform vec4 k; out vec4 o;
   void main(){ float d = max(dot(normalize(n), normalize(vec3(0.4,0.6,1.0))), 0.0); o = vec4(k.rgb * (0.35 + 0.65*d), k.a); }`;
@@ -730,35 +789,48 @@ const view3d = (() => {
     gl.enable(gl.DEPTH_TEST); gl.useProgram(prog);
     if (!S) return;
     const ext = Math.max(...S.atoms.map((a) => Math.hypot(...a.xyz)), 1) + 1.2;
+    // Open in the same orientation as the 2D structure sketch (the engine's view_rotation: rows are
+    // screen x, screen y and depth towards the viewer); dragging rotates from there. Reset per case.
+    if (view.case !== lastCase) { lastCase = view.case; rot = [0, 0]; }
     const [ay, ax] = rot, cy = Math.cos(ay), sy = Math.sin(ay), cx = Math.cos(ax), sx = Math.sin(ax);
     const Ry = new Float32Array([cy, 0, -sy, 0, 0, 1, 0, 0, sy, 0, cy, 0, 0, 0, 0, 1]);
     const Rx = new Float32Array([1, 0, 0, 0, 0, cx, sx, 0, 0, -sx, cx, 0, 0, 0, 0, 1]);
-    // Engine coordinates have z up; map z to screen y.
-    const Up = new Float32Array([1, 0, 0, 0, 0, 0, -1, 0, 0, 1, 0, 0, 0, 0, 0, 1]);
+    const V = S.view_rotation;
+    const Up = new Float32Array([V[0][0], V[1][0], V[2][0], 0, V[0][1], V[1][1], V[2][1], 0, V[0][2], V[1][2], V[2][2], 0, 0, 0, 0, 1]);
     const M = matMul(Rx, matMul(Ry, Up));
     const a = canvas.width / canvas.height, sc = 1 / ext;
     const P = new Float32Array([sc / a, 0, 0, 0, 0, sc, 0, 0, 0, 0, -sc * 0.5, 0, 0, 0, 0, 1]);
     gl.uniformMatrix4fv(gl.getUniformLocation(prog, "M"), false, M);
     gl.uniformMatrix4fv(gl.getUniformLocation(prog, "P"), false, P);
-    const draw = (c, s, col) => {
+    const I3 = new Float32Array([1, 0, 0, 0, 1, 0, 0, 0, 1]);
+    // Orthonormal frame whose first axis is d (column-major, as WebGL expects).
+    const frame = (d) => {
+      const n = Math.hypot(...d) || 1, e1 = d.map((v) => v / n);
+      const a = Math.abs(e1[0]) < 0.9 ? [1, 0, 0] : [0, 1, 0];
+      const cr = (u, v) => [u[1] * v[2] - u[2] * v[1], u[2] * v[0] - u[0] * v[2], u[0] * v[1] - u[1] * v[0]];
+      let e2 = cr(e1, a); const m = Math.hypot(...e2); e2 = e2.map((v) => v / m);
+      return new Float32Array([...e1, ...e2, ...cr(e1, e2)]);
+    };
+    const draw = (c, s, col, R = I3) => {
+      gl.uniformMatrix3fv(gl.getUniformLocation(prog, "R"), false, R);
       gl.uniform3fv(gl.getUniformLocation(prog, "c"), c); gl.uniform3fv(gl.getUniformLocation(prog, "s"), s);
       gl.uniform4fv(gl.getUniformLocation(prog, "k"), col);
       gl.drawElements(gl.TRIANGLES, sphere.idx.length, gl.UNSIGNED_SHORT, 0);
     };
     const pos = rgb(css("--pos")), neg = rgb(css("--neg")), atom = rgb(css("--muted"));
-    const maxc = Math.max(...S.lobes.map((l) => Math.abs(l.coefficient)), 1e-9);
+    const lobes = displayLobes(S);
+    const maxc = Math.max(...lobes.map((l) => Math.abs(l.coefficient)), 1e-9);
     for (const at of S.atoms) draw(at.xyz, [0.18, 0.18, 0.18], [...atom, 1]);
-    for (const l of S.lobes) {
-      const at = S.atoms[l.atom].xyz, r = 0.18 + 0.55 * Math.abs(l.coefficient) / maxc;
+    for (const l of lobes) {
+      const at = S.atoms[l.atom].xyz, r = 0.12 + 0.42 * Math.abs(l.coefficient) / maxc;
       if (l.kind === "s") { draw(at, [r, r, r], [...(l.coefficient > 0 ? pos : neg), 1]); continue; }
-      const d = l.dir3d;
+      const R = frame(l.dir3d), d = R.slice(0, 3);
       for (const sgn of [1, -1]) {
         const positive = (sgn > 0) === (l.coefficient > 0);
         const c = at.map((v, i) => v + sgn * d[i] * r);
-        // Ellipsoid elongated along d: scale is axis-aligned, so use a sphere of radius r along the
-        // dominant axis. Adequate for the Cartesian and axial directions used in Release 1.
-        const s = [0, 1, 2].map((i) => (Math.abs(d[i]) > 0.5 ? r : r * 0.55));
-        draw(c, s, [...(positive ? pos : neg), 1]);
+        // Prolate ellipsoid along the lobe direction, whatever that direction is (ligand p orbitals
+        // in a symmetry-adapted combination need not lie along a Cartesian axis).
+        draw(c, [r, r * 0.55, r * 0.55], [...(positive ? pos : neg), 1], R);
       }
     }
   }
@@ -802,12 +874,26 @@ function proposalSetup(cases) {
     if (cur) cur.append(k);
   }
   insp.replaceChildren(tabs, ...panels.map((p) => p[1]));
+  // WAI-ARIA tabs: arrow keys, Home and End move between tabs; only the selected tab is in the Tab order.
+  tabs.setAttribute("aria-label", "Inspector sections");
+  const choose = (i, focus) => panels.forEach(([, p], j) => {
+    const t = tabs.children[j];
+    p.hidden = j !== i; t.setAttribute("aria-selected", j === i); t.tabIndex = j === i ? 0 : -1;
+    if (j === i && focus) t.focus();
+  });
   panels.forEach(([name, panel], i) => {
     const b = document.createElement("button"); b.type = "button"; b.setAttribute("role", "tab"); b.textContent = name;
-    b.addEventListener("click", () => panels.forEach(([, p], j) => { p.hidden = j !== i; tabs.children[j].setAttribute("aria-selected", j === i); }));
+    b.id = `tab-${i}`; panel.id = `tabpanel-${i}`;
+    b.setAttribute("aria-controls", panel.id); panel.setAttribute("aria-labelledby", b.id); panel.tabIndex = 0;
+    b.addEventListener("click", () => choose(i, false));
+    b.addEventListener("keydown", (e) => {
+      const n = panels.length, k = { ArrowRight: i + 1, ArrowLeft: i - 1 + n, Home: 0, End: n - 1 }[e.key];
+      if (k === undefined) return;
+      e.preventDefault(); choose(k % n, true);
+    });
     tabs.append(b);
   });
-  tabs.children[0].click();
+  choose(0, false);
 }
 function proposalUpdate(view) {
   for (const b of document.querySelectorAll(".rail button.case")) b.setAttribute("aria-current", b.dataset.case === view.case);

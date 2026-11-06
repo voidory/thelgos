@@ -26,14 +26,22 @@
 - Tabbed inspector.
 - Calmer palette, tabular numerals, rounded cards, thicker level strokes.
 
-## Still to do in the design pass, if you approve the direction
+## Design pass: status
 
-1. **Label placement:** close-lying levels (O2's σg and σu*, CO's σ* and π) currently overlap. Add simple collision avoidance in the right-hand label gutter.
-2. **Orbital thumbnails:** a small lobe sketch next to each MO, coloured by phase, so the diagram reads like the lecture's drawings. The data already exists in the structure spec.
-3. **Phone diagram:** taller aspect and larger type on small screens, with the timeline pinned while scrolling.
-4. **Slider animation:** levels glide between plateaus instead of redrawing.
-5. **3D view:** proper ellipsoids along arbitrary directions, and highlighting the item selected in the diagram.
-6. **Accessibility pass:** focus styles, keyboard access for every control, and contrast checks in both light and dark modes.
+1. **Label placement:** done (pixel-proximity rows and gutter collision avoidance).
+2. **Orbital sketch:** done, as a single card for the *selected* level rather than a thumbnail on every MO. Thumbnails on all levels crowd the diagram (SF6 has 10 levels; the cards would overlap the correlation lines). The card goes in the emptiest free spot near its level and is left out when none exists.
+3. **Phone diagram:** done (compact geometry). The timeline is not pinned while scrolling.
+4. **Glide:** done for step jumps and "why does it jump". Every frame is a real engine evaluation of H(s), not a screen interpolation, so the motion is the model's. Reduced-motion users get the jump.
+5. **3D view:** ellipsoids now follow any direction. The 3D view opens in the same orientation as the 2D sketch. *Not done:* highlighting ledger contacts in 3D (the 2D sketch does this).
+6. **Accessibility:** done.
+   - Focus rings everywhere.
+   - Every MO level is a named button (label, energy, electrons, HOMO/LUMO) and keeps focus across redraws.
+   - Screen readers get a text table of the levels.
+   - The inspector uses WAI-ARIA tabs (arrow keys, Home and End).
+   - Reduced-motion is respected.
+   - Contrast: every text token is at least 4.5:1 on the panel and the page background in both themes. The light theme's dashed "allowed" line was 2.9:1 and is now 3.6:1, above the 3:1 needed for graphics.
+
+**Correction made along the way:** the structure sketch and the 3D view drew each p function separately, so a level with p_x and p_y on one atom showed two crossed dumbbells. That is not the shape of the orbital. The p functions on one atom add as a vector, giving a single p orbital along (c_x, c_y, c_z) with size |c|, and the drawings now show that. The ledger and contact lines still list the basis functions separately.
 
 ## Questions for you
 
