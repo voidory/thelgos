@@ -147,7 +147,8 @@ The stand-in parameter files are mine, not the owner's. This shows the scripts a
 **Baseline run (patch 4).** All 68 `SHA256SUMS` entries verified once the full bundle had arrived. Then:
 1. *v1.2 as shipped.* A copy of the tree with the three uploaded scripts restored and the uploaded `SHA256SUMS`, run under CPython 3.12.8 in a fresh venv installed from `requirements-checker.lock` with `--require-hashes` (`pip check` clean): `make check-baseline` **PASS**; `make check` fails with exit 2, `Original supplied CrystOD zip unavailable`. This matches the README's stated expectation.
 2. *Patches 1–3 before regeneration.* Regenerated output differed from the committed `checks/` in exactly `crystod_cases.json`, `crystod_manifest.json` and `crystod_protocol_tests.json` (the predicted K4/K5–K11/K10 fields), plus `lock_validation.json` on 3.12.3 only. `groups/` and every other `checks/` file matched byte-for-byte.
-3. *After K12 and regeneration.* `make check-baseline` **PASS** under CPython 3.12.8 and under 3.12.3 (temporary regeneration, `diff -r groups/ checks/`, `sha256sum -c`, no mutation). `make check` fails with exit 2, `Original supplied CrystOD zip unavailable`, which is the correct blocked state. Not run: the production interpreter 3.12.7 or Pyodide.
+3. *After K12 and regeneration.* `make check-baseline` **PASS** under CPython 3.12.8 and under 3.12.3 (temporary regeneration, `diff -r groups/ checks/`, `sha256sum -c`, no mutation). `make check` fails with exit 2, `Original supplied CrystOD zip unavailable`, which is the correct blocked state. Not run at that point: the production interpreter 3.12.7 or Pyodide.
+4. *After K14 (patch 6).* `make check-baseline` **PASS** under CPython 3.12.8, 3.12.3 and 3.12.7 (the production pin; a fresh venv from the lock with `--require-hashes`, `pip check` clean). This is CPython 3.12.7 on Linux, not Pyodide; the browser gate C4 remains open.
 
 ## Required follow-ups
 
