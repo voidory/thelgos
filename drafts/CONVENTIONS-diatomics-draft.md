@@ -1,3 +1,5 @@
+> **Applied 2026-11-06** to `CONVENTIONS.md` v1.3 under the owner's standing permission. This draft is kept as the review record of what changed and why.
+
 # Draft for the owner: diatomic additions to CONVENTIONS.md (gate C2)
 
 **Status:** draft prepared by Claude for the owner to accept, edit or reject. Only the owner edits `CONVENTIONS.md`; nothing here is in force until copied there. The checker already runs these fixtures (`CHECKER-CHANGES.md` K14).

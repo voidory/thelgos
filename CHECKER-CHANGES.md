@@ -131,6 +131,10 @@ Each entry in `levels` needs `irrep`, `energy`, `multiplicity`, `canonical_level
 - *B1, CrystOD deferred:* `make check` runs `check-baseline` and `test-engine` and prints the deferral. The CrystOD step moved, unchanged, to `make check-release`. The README run instructions are updated to match.
 - *B2, B3, B5:* `params/decision_defaults.json` now records each decision's status and points to `DECISIONS.md`. No script reads this file, so no computed output changes.
 
+### Documents (patch 9)
+
+**K17. CONVENTIONS v1.3 and the spec edits applied** under the owner's standing permission (2026-11-06). The text follows `drafts/CONVENTIONS-diatomics-draft.md` and `drafts/spec-edits-pending-signoff.md` D1–D13. These changes touch only documents. Computed output changes in one place: `checks/markdown_validation.json` counts 11 rectangular tables, up from 10, because A.6 is now a table. The sign table is still 11 rows of 2 cells.
+
 ## Verification
 
 **Environment.** `requirements-checker.lock` was installed with `--require-hashes` into `.venv` (CPython 3.12.3), and `pip check` passed. This is not the README's 3.12.8 host and not the production 3.12.7.

@@ -1,3 +1,5 @@
+> **Applied 2026-11-06** (D1–D13) to the spec under the owner's standing permission. Kept as the review record.
+
 # Spec edits held until owner sign-off (B6)
 
 These edits to `spec/LGO_Method_Explorer_Functional_Specification.md` are ready to apply. They come from the v1.2 TODO tier D and from this session's review. They are held, not applied, because tier D is reserved until the owner signs off v1.2. Each item says where it comes from and what it depends on.

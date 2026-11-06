@@ -1,9 +1,11 @@
 # CONVENTIONS.md — LGO Method Explorer
 
-**Version: 1.2 — REVIEW CANDIDATE; NOT FROZEN OR OWNER-APPROVED**  
+**Version: 1.3 — APPLIED UNDER OWNER PERMISSION; NOT FROZEN (owner sign-off B6 pending)**  
 **Owner / change authority: the project owner**  
 **Date: 2026-11-07, Singapore**  
-**Release 1 blockers: CrystOD archive/real checker integration; missing B2, C2, O2, F2 and CO geometry/oracle/regression fixtures; browser engine/slider/ledger/Watch acceptance tests.**
+**Release 1 blockers: browser engine/slider/ledger/Watch acceptance tests (C4); owner sign-off (B6). CrystOD comparison deferred until the programme is finished (B1). Diatomic fixtures in place.**
+
+*v1.3 record:* the owner decided B1 and B4 and the ring orientation in B3, delegated B2, B3 (in-plane axis) and B5 to Claude, and gave standing permission (2026-11-06) for Claude to apply the drafted changes to this file. Every decision and its reasons are in `DECISIONS.md`. Checker changes are in `CHECKER-CHANGES.md` (K1–K16).
 
 ## Review and evidence record
 
@@ -52,7 +54,7 @@ Generate exact symmetric positions from unit directions, not rounded coordinate 
 | Six H Oh | Same six directions, no centre; H1–6 |
 | Cyclic H3 | xy plane, centroid origin; H1–3 at 0°,120°,240° |
 | Allyl | yz plane, C2 at origin, C1 on +y and C3 on −y, both +z; π=px |
-| Benzene, later release | xy plane; atoms k=1–6 at R(cos((k−1)π/3),sin((k−1)π/3),0). Atoms lie on ±x. C2-prime axes pass through opposite atoms (0°,60°,120°); C2-double-prime pass through opposite bond midpoints (30°,90°,150°). B3 default, awaiting the owner. |
+| Benzene, later release | xy plane; atoms k=1–6 at R(cos((k−1)π/3),sin((k−1)π/3),0). Atoms lie on ±x. C2-prime axes pass through opposite atoms (0°,60°,120°); C2-double-prime pass through opposite bond midpoints (30°,90°,150°). B3 decided: rings flat and parallel, above and below the metal, ring planes perpendicular to z (owner); one ring atom on +x (delegated). Same rule for the eight-membered rings in D8h. |
 
 | Fixture | Pinned geometry | Source / qualification |
 |---|---|---|
@@ -65,10 +67,16 @@ Generate exact symmetric positions from unit directions, not rounded coordinate 
 | Six H Oh | Radius 1.000 Å | Schematic test geometry |
 | Four H Td | Radius 1.087 Å; edge R√(8/3) | CH4 ligand-only diagnostic |
 | Allyl π | C–C 1.400 Å; angle 120° | Idealised fixture |
+| B2 | B–B 1.5900 Å | NIST CCCBDB r_e (Gurvich); `evidence/cccbdb_B2.html` |
+| C2 | C–C 1.2425 Å | NIST CCCBDB r_e (Huber & Herzberg 1979); `evidence/cccbdb_C2.html` |
+| N2 | N–N 1.0977 Å | NIST CCCBDB r_e (Huber & Herzberg 1979); `evidence/cccbdb_N2.html`; owner decision B4 |
+| O2 | O–O 1.2075 Å | NIST CCCBDB r_e (Huber & Herzberg 1979); `evidence/cccbdb_O2.html` |
+| F2 | F–F 1.4119 Å | NIST CCCBDB r_e (Huber & Herzberg 1979); `evidence/cccbdb_F2.html` |
+| CO | C–O 1.1282 Å; C atom 1 | NIST CCCBDB r_e (NIST diatomic); `evidence/cccbdb_CO.html` |
 
 Water positions are \((0,\pm R\sin(\theta/2),R\cos(\theta/2))\). The same formula defines C1/C3 for allyl. Geometry overrides live in presets, not duplicated checker constants.
 
-B2, C2, O2, F2 and CO are **in Release 1 scope but their source-backed equilibrium distances, explicit oracle blocks and executed regression rows are still missing**. N2 remains excluded pending B4. Do not interpret the H2 D2h subgroup as its exact point group: the exact linear homonuclear symmetry is D-infinity-h; D2h is the finite label-checking subgroup.
+The six diatomics B2, C2, N2, O2, F2 and CO are Release 1 fixtures with the geometries above (CCCBDB lists three decimals and the Cartesian distance to four; the four-decimal value is pinned). Do not interpret the H2 D2h subgroup as its exact point group: the exact linear homonuclear symmetry is D-infinity-h; D2h is the finite label-checking subgroup.
 
 ## 3. Orbital phases and local frames
 
@@ -115,13 +123,13 @@ Canonical SALCs:
 - CH4 H2–5: a1=(1,1,1,1)/2; Lx=(1,1,−1,−1)/2; Ly=(1,−1,1,−1)/2; Lz=(1,−1,−1,1)/2.
 - Oh +x,−x,+y,−y,+z,−z: a1g=(1,1,1,1,1,1)/√6; Lx=(1,−1,0,0,0,0)/√2; Ly=(0,0,1,−1,0,0)/√2; Lz=(0,0,0,0,1,−1)/√2; eg1=(−1,−1,−1,−1,2,2)/√12; eg2=(1,1,−1,−1,0,0)/2.
 
-B5 default, not owner approval: skip a construction stage whose newly enabled coupling block is identically zero; show **“No ligand–ligand coupling in this model.”** Do not secretly turn on H–H edges for ligand stages while displaying the H–H-off molecular spectrum. SF6 retains its nonzero combine stage. Visual K is the number of effective stages after filtering, not an unconditionally retained combinatorial pair count. This is a convention awaiting UI implementation/testing.
+B5 decided under delegation (DECISIONS.md): skip a construction stage whose newly enabled coupling block is identically zero; show **“No ligand–ligand coupling in this model.”** Do not secretly turn on H–H edges for ligand stages while displaying the H–H-off molecular spectrum. SF6 retains its nonzero combine stage. Visual K is the number of effective stages after filtering, not an unconditionally retained combinatorial pair count. This is a convention awaiting UI implementation/testing.
 
 ## 7. Electron counting and warnings
 
 Neutral-atom counting over the included basis for molecules; named oxidation-state counting for advanced complexes. Save the counting convention and occupations with every result. Counts: H2=2; water=8; CH4=8; BH3=6; SF6 reduced sigma basis=12; allyl cation/radical/anion=2/3/4; H3+/H3/H3−=2/3/4. Omitted SF6 F orbitals do not silently contribute electrons to the reduced basis.
 
-Any level of degeneracy d>1 occupied by n with 0<n<2d triggers **occupation_not_unique**, **Jahn_Teller_warning**, and **spin_state_not_determined**. This conservative warning policy flags the limits of the one-electron model; it is not a proof of a particular spin ground state or distortion (especially for linear diatomics). Distinguish explicit Hund filling from equal-occupation ensembles. Tested warning fixtures: neutral H3 e-prime¹, six-H t1u⁴, four-H t2². B2 and O2 real-molecule warning fixtures remain a release gate.
+Any level of degeneracy d>1 occupied by n with 0<n<2d triggers **occupation_not_unique**, **Jahn_Teller_warning**, and **spin_state_not_determined**. This conservative warning policy flags the limits of the one-electron model; it is not a proof of a particular spin ground state or distortion (especially for linear diatomics). Distinguish explicit Hund filling from equal-occupation ensembles. Tested warning fixtures: neutral H3 e-prime¹, six-H t1u⁴, four-H t2², and the real molecules O2 (πg²) and C2 (πu²). B2 does not fire it, because the model gives B2 a closed shell; that is reported as a Spin-state fidelity disagreement (A.6), not forced.
 
 ## 8. Bond orders and contact ledger
 
@@ -149,9 +157,10 @@ The contact ledger counts each unordered real-basis off-diagonal pair once with 
 | C (n=2) | −17.52 | −8.97 |
 | O (n=2) | −29.14 | −14.13 |
 | F (n=2) | −40.17 | −18.65 |
+| N (n=2) | −23.04 | −11.47 |
 | S (n=3) | −20.80 | −10.27 |
 
-All p directions share the p on-site. No main-group d parameters. Source snapshot confirms N term magnitudes 23.04/11.47 eV, but **nitrogen is not added** without the B4 scope decision.
+All p directions share the p on-site. No main-group d parameters. Nitrogen was added by owner decision B4 from the same transcription (`evidence/harrison.txt`, line 87).
 
 ### 9.2 pairs.csv columns and lookup
 
@@ -171,7 +180,7 @@ All p directions share the p on-site. No main-group d parameters. Source snapsho
 
 Precedence: **preset matrix-element override → element-pair/channel row → explicit channel default → error**. Defaults live in `params/channel_defaults.json`; the supplied default list is empty. A no-match lookup must raise an error, never silently return zero. Missing orbital channels are not requested; absence is not a fit to zero. Reverse-pair Hermiticity follows §1.
 
-For `harrison_inverse_square`, V=scale×eta×K/d². Coefficients remain ss=−1.40, sp=+1.84, pp sigma=+3.24, pp pi=−0.81. **All H-containing couplings extrapolate this scheme beyond the Harrison table's H coverage.** The 0.6 factor is a declared pedagogical correction, not a published coefficient or measured fit. The strict ordering constraints give 0.4914651002<sH<0.8938796155. The owner's B2 decision remains pending; 0.6 is the requested default. The audit reads the CSV rather than these prose numbers.
+For `harrison_inverse_square`, V=scale×eta×K/d². Coefficients remain ss=−1.40, sp=+1.84, pp sigma=+3.24, pp pi=−0.81: Harrison's 1980 book values as transcribed in `evidence/harrison.txt`. The same file lists a second set attributed to Shi & Papaconstantopoulos (2004), which is not used (DECISIONS.md M2). **All H-containing couplings extrapolate this scheme beyond the Harrison table's H coverage.** The 0.6 factor is a declared pedagogical correction, not a published coefficient or measured fit. The strict ordering constraints give 0.4914651002<sH<0.8938796155. B2 decided under delegation: 0.6 (DECISIONS.md). Because it was chosen to reproduce orderings, those orderings are not independent fidelity evidence. The audit reads the CSV rather than these prose numbers.
 
 Neighbour lists are explicit: H2O/CH4/BH3 central-H on, H–H off; SF6 central-F and all F–F on; ligand-only H diagnostics have their declared edges on. No distance cutoff silently re-enables absent edges.
 
@@ -209,12 +218,16 @@ CrystOD must come from the owner's **original supplied zip**. Default extended-H
 
 The adapter protocol is implemented and unit-tested with explicitly mock inputs, but **no native CrystOD adapter can be claimed integrated or executed until the archive/API is inspected**. This is the narrowed outstanding part of A4/C1. The current script exits BLOCKED for the missing zip; `make check` consequently fails for the right reason. Filling a manifest manually cannot make it pass because the manifest is recomputed in a temporary directory. This is a provenance gate, not tamper-proof attestation of arbitrary user-written adapters.
 
-Release 1 remains blocked by **all** of:
+**Comparison rules (from CHECKER-CHANGES K5–K11).** Each adapter level carries `contract_basis_weight` in [0,1] and a `descriptor` {character, dominant_fragment} computed from the checker's own eigenvectors by the K4 rule: character is the sign of 2Σc_i c_j H_ij over central–ligand pairs (all inter-atomic pairs when there is no central atom), averaged over the degenerate set, with |x| ≤ 1e−6 eV nonbonding; dominant_fragment is central when the central-atom weight exceeds 0.5. Levels with weight below 0.5 are excluded before counting. Within-irrep order is compared through descriptors, not adapter-chosen ids. Point-group, shared-count and degeneracy mismatches block (DISAGREEMENT_ORACLES_PREVAIL); descriptor-order differences are logged for the owner without failing (ORDER_REVIEW_FOR_OWNER). Linear molecules take D∞h/C∞v from geometry.
 
-- C1: original archive identity, tested real default-EHT adapter and executed qualitative comparisons.
-- C2: source-backed B2,C2,O2,F2,CO geometries, explicit blocks and regression rows, plus B2/O2 spin/occupation warnings. N2 only if the owner includes it.
+**Deferral (B1).** The CrystOD comparison is deferred until the programme is finished. `make check` runs the baseline and engine tests; the gate above runs as `make check-release` and stays BLOCKED until the original archive and a real adapter are supplied.
+
+Release 1 remains blocked by:
+
+- C1 (deferred by B1): original archive identity, tested real default-EHT adapter and executed qualitative comparisons.
+- C2: closed. Source-backed B2, C2, N2, O2, F2 and CO geometries, explicit blocks (A.6) and regression rows (Appendix B) are in place.
 - C4: Pyodide 0.27.7 browser endpoint/slider, counting-ledger and Watch-mode acceptance tests; CPython Hamiltonian checks do not satisfy these.
-- Owner approval B6 after review; defaults B2/B3/B5 remain choices awaiting the owner rather than inferred consent.
+- Owner sign-off B6. B2, B3 (in-plane axis) and B5 are decided under delegation and documented for review, not inferred consent.
 
 Slides/aliases are nonblocking. Later d-channel parameters remain outside Release 1. Spec-document edits in tier D are reserved for the reviewer after approval, not silently applied here.
 
@@ -226,6 +239,7 @@ Slides/aliases are nonblocking. Later d-channel parameters remain outside Releas
 | 0.2 / 1.0 | 2026-11-07 | First pass and owner review; AI-check label preceded numerical audit |
 | 1.1 | 2026-11-07 | H scale 0.6; SF6 lecture=model; Markdown repair; group/angular/stack evidence; incomplete CrystOD gate; reconstructed rather than bytewise-edited legacy file |
 | 1.2 | 2026-11-07 | A1 geometry-first mappings and D2h g/u label repair with Cartesian assertions; A2 file-driven data and corrupt-pair negative test; A3 temp regeneration/diffs/hashes; A4 computed CrystOD manifest/protocol and explicit real-adapter blocker; A5 restore column contract and define replacement A.7 with legacy-text limitation below; A6 typed pair fields and error-on-missing lookup; A7 preset schema; A8 exact snapping/residuals; A9 neutral-H3 and diagnostic warnings; A10 complete hashed lock/clean install; A11 full unscaled-coupling table; A12 benzene default and geometry assertions; A13 header/review includes CrystOD, diatomic and browser blockers. Owner approval pending. |
+| 1.3 | 2026-11-06 | Applied by Claude under the owner's standing permission. Owner decisions B1 (CrystOD deferred), B4 (N2 in), B3 orientation; delegated B2 (0.6), B3 in-plane axis, B5 (skip zero stages), M1–M4 (DECISIONS.md). Nitrogen on-sites and pairs; six diatomic geometries, A.6 blocks, Appendix B rows; CrystOD comparison rules K5–K11 written into §11; coefficient-set provenance in §9.2. Not frozen: owner sign-off B6 pending. |
 
 **A5 disposition:** the pairs.csv column specification is restored in §9.2. Exact legacy Appendix A.7 text was not present in the accessible attachments or earlier inline answer; it is not silently reconstructed as a quotation. The unknown legacy A.7 is **removed as an unrecoverable legacy section**, because its original content cannot be verified; it is replaced by the explicitly newly authored ledger/limit/invariance contract below. If the owner supplies the original, review whether it contains additional obligations before freezing. No claim that its exact old content has been recovered.
 
@@ -291,11 +305,24 @@ Six-H order a1g<t1u<eg requires 2tc+tt<0 and tt>tc. Spectral trace equals the su
 
 ### A.5 Bond-order oracles
 
-Allyl cation: counting 1/2 per C–C, Coulson 1/√2. H3+: counting 1/3 per H–H, Coulson 2/3. BH3,CH4,lecture water: counting 1 per bond under the stated occupations. SF6: counting 2/3 per S–F if four bonding and two ligand-only MOs are doubly occupied. Wiberg values depend on mixing and on-sites; do not set them equal to counting values. pz being BH3 LUMO requires the actual parameter ordering, not symmetry alone.
+Allyl cation: counting 1/2 per C–C, Coulson 1/√2. H3+: counting 1/3 per H–H, Coulson 2/3. BH3,CH4,lecture water: counting 1 per bond under the stated occupations. Diatomics, counting: B2 1, C2 2, N2 3, O2 2, F2 1, CO 3. SF6: counting 2/3 per S–F if four bonding and two ligand-only MOs are doubly occupied. Wiberg values depend on mixing and on-sites; do not set them equal to counting values. pz being BH3 LUMO requires the actual parameter ordering, not symmetry alone.
 
-### A.6 Diatomic release gate
+### A.6 Diatomic blocks
 
-**Not yet supplied or tested:** B2,C2,O2,F2,CO explicit per-case block oracles and NIST re geometry entries. Required homonuclear D2h finite-subgroup labels use x=B3u,y=B2u,z=B1u. Include s/pz sigma mixing; px/py pi partners; CO uses C2v. Required qualitative reference ordering: B2,C2 pi_u below sigma_g(2p); O2,F2 sigma_g(2p) below pi_u. If the adopted law disagrees, record an Orbital-ordering fidelity warning rather than tune parameters. B2/O2 need partial-occupation and spin warnings. CO requires counting bond order 3 and a carbon-weighted sigma HOMO check. This paragraph is a gate definition, not the missing explicit block derivation or a passing result.
+Bond along z; atom 1 at −R/2, atom 2 at +R/2; basis s, px, py, pz on each atom; all channels from `pairs.csv` at R; no H scale. Homonuclear D2h finite subgroup (x=B3u, y=B2u, z=B1u):
+
+| D∞h | D2h | Block | Copies |
+|---|---|---|---:|
+| σg | Ag | D(eps_s+V_sss, eps_p−V_pps; −V_sps) | 1 |
+| σu | B1u | D(eps_s−V_sss, eps_p+V_pps; +V_sps) | 1 |
+| πu | B2u+B3u | eps_p+V_ppp | 2 |
+| πg | B2g+B3g | eps_p−V_ppp | 2 |
+
+CO (C2v, C atom 1): σ (A1) is the 4×4 block in (s_C, pz_C, s_O, pz_O) with rows (eps_sC, 0, V_sss, V_sps), (0, eps_pC, −V_sps, V_pps), (V_sss, −V_sps, eps_sO, 0), (V_sps, V_pps, 0, eps_pO); π (B1+B2) is D(eps_pC, eps_pO; V_ppp), two copies. In the finite subgroup a π pair spans two irreps, so degenerate sets are labelled by their exact irrep decomposition and mapped to D∞h/C∞v names by a fixed lookup.
+
+Reference orderings: B2, C2, N2 πu below σg(2p); O2, F2 σg(2p) below πu, with σg(2p) the higher of the two σg levels. Reference ground states from the CCCBDB pages: B2 ³Σg, C2 ¹Σg⁺, N2 ¹Σg, O2 ³Σg, F2 ¹Σg, CO ¹Σ. A disagreement is recorded as an Orbital-ordering or Spin-state fidelity warning, never tuned away. Asserted: O2 ends in a partly filled πg with the warnings; CO has counting bond order 3 and a σ HOMO with carbon weight above 0.5.
+
+Result under the current scheme (DECISIONS.md M1): B2, C2 and N2 disagree on ordering; B2 and C2 also on spin state; O2, F2 and CO agree.
 
 ### A.7 Replacement ledger, limit and invariance obligations
 
@@ -317,5 +344,11 @@ Energies in eV; repeated levels have multiplicities shown. Values are model calc
 | Allyl cation π | b1 −13.423474; a2 −8.970000; b1 −4.516526 |
 | Six H Oh | a1g −28.011800; t1u×3 −12.009800 (4 electrons, warns); eg×2 −8.809400 |
 | Four H Td | a1 −19.704354; t2×3 −11.578549 (2 electrons, warns) |
+| B2 | σg −22.131569; σg −11.033954; σu −10.566590; πu×2 −9.081438; πg×2 −4.198562; σu +5.372113 |
+| C2 | σg −33.782041; σg −15.610315; σu −14.450984; πu×2 −12.968041 (2 electrons, warns); πg×2 −4.971959; σu +10.863339 |
+| N2 | σg −43.562631; σg −20.290444; σu −19.015983; πu×2 −16.592390; πg×2 −6.347610; σu +13.849058 |
+| O2 | σg −43.746764; σu −25.133433; σg −23.772506; πu×2 −18.363170; πg×2 −9.896830 (2 electrons, warns); σu +6.112703 |
+| F2 | σg −48.374432; σu −36.456980; σg −28.181952; πu×2 −21.746222; πg×2 −15.553778; σu −4.626636 |
+| CO | σ −42.990247; σ −24.079019; π×2 −17.042804; σ −15.182634 (HOMO, C weight 0.977); π×2 −6.057196; σ +12.491900 |
 
-All 12 current fixtures satisfy file-driven analytic assembly, symmetry/projector labels and residual/orthonormality checks. This is **not all Release 1 coverage**: the five further diatomics, real CrystOD comparison and browser engine/UI gates are explicitly open. Later advanced d blocks, exact slide aliasing and spectral fits remain unclaimed.
+All 18 current fixtures satisfy file-driven analytic assembly, symmetry/projector labels and residual/orthonormality checks. Still open: real CrystOD comparison (deferred, B1) and browser engine/UI gates (C4). Later advanced d blocks, exact slide aliasing and spectral fits remain unclaimed.

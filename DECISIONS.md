@@ -137,4 +137,4 @@ Skipping with a note says exactly what the model assumes.
 
 ## B6. Sign-off (owner only)
 
-Not delegated, and not something Claude can do. When you are ready, the drafts in `drafts/` show exactly what would change in CONVENTIONS.md and the spec.
+Not delegated. On 2026-11-06 the owner gave standing permission for Claude to apply the drafted changes. They are now in `CONVENTIONS.md` v1.3 and the spec, and the drafts in `drafts/` remain as the record. Applying them is not sign-off: v1.3 stays "not frozen" until the owner reviews it.
