@@ -933,7 +933,7 @@ function proposalUpdate(view) {
     $("ex-json").addEventListener("click", exportJSON);
     $("ex-link").addEventListener("click", shareLink);
     $("im-json").addEventListener("change", async (e) => { const f = e.target.files[0]; if (f) await importJSON(await f.text()); e.target.value = ""; });
-    $("t-3d").addEventListener("change", () => { $("view3d").hidden = !$("t-3d").checked; $("structure").hidden = $("t-3d").checked; if ($("t-3d").checked) view3d.render(state.view); });
+    $("t-3d").addEventListener("change", () => { $("view3d").hidden = !$("t-3d").checked; $("structure").toggleAttribute("hidden", $("t-3d").checked); if ($("t-3d").checked) view3d.render(state.view); });
     window.lgo = { exportJSON, importJSON, shareLink, state };
     let rz; window.addEventListener("resize", () => { clearTimeout(rz); rz = setTimeout(() => state.view && draw(state.view), 150); });
     $("watch").addEventListener("click", watch);

@@ -87,3 +87,6 @@ body.proposal .badge .kind { color: inherit; opacity: 0.8; }
 .tabpanel:focus-visible { outline-offset: -2px; }
 .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
 @media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; transition: none !important; animation: none !important; } }
+/* The hidden attribute must win over display rules such as svg { display: block }. */
+[hidden] { display: none !important; }
+input[type=range], input[type=checkbox] { accent-color: var(--accent); }

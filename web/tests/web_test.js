@@ -95,6 +95,8 @@ const check = (name, ok, detail = "") => { results.push({ name, ok, detail }); c
     const painted = await page.$eval("#view3d", (c) => { const g = c.getContext("webgl2"); const px = new Uint8Array(4 * 50 * 50);
       g.readPixels(c.width / 2 - 25, c.height / 2 - 25, 50, 50, g.RGBA, g.UNSIGNED_BYTE, px); return new Set(Array.from(px)).size; });
     check("F3.7: 3D view renders the selected orbital", painted > 4, `${painted} distinct byte values`);
+    const both = await page.evaluate(() => [getComputedStyle(document.querySelector("#structure")).display, getComputedStyle(document.querySelector("#view3d")).display]);
+    check("3D view replaces the 2D sketch while on", both[0] === "none" && both[1] !== "none", both.join(" / "));
     if (shots) await page.screenshot({ path: path.join(shots, "inspector-3d.png"), fullPage: true });
     await page.uncheck("#t-3d");
     await page.$eval("#s", (s) => { s.value = 1; s.dispatchEvent(new Event("input")); });
