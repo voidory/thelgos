@@ -1,0 +1,384 @@
+{
+  "class_mapping": [
+    {
+      "bilbao_column": "1",
+      "operation_indices": [
+        0
+      ],
+      "representative_symbol": "E",
+      "target_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "bilbao_column": "2",
+      "operation_indices": [
+        2
+      ],
+      "representative_symbol": "C_2",
+      "target_matrix": [
+        [
+          -1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          -1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "bilbao_column": "4",
+      "operation_indices": [
+        1,
+        3
+      ],
+      "representative_symbol": "C_4",
+      "target_matrix": [
+        [
+          0.0,
+          -1.0,
+          0.0
+        ],
+        [
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "bilbao_column": "2100",
+      "operation_indices": [
+        4,
+        6
+      ],
+      "representative_symbol": "C_2'(0)",
+      "target_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          -1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          -1.0
+        ]
+      ]
+    },
+    {
+      "bilbao_column": "21-10",
+      "operation_indices": [
+        5,
+        7
+      ],
+      "representative_symbol": "C_2''(0)",
+      "target_matrix": [
+        [
+          0.0,
+          -1.0,
+          0.0
+        ],
+        [
+          -1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          -1.0
+        ]
+      ]
+    },
+    {
+      "bilbao_column": "-1",
+      "operation_indices": [
+        8
+      ],
+      "representative_symbol": "i",
+      "target_matrix": [
+        [
+          -1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          -1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          -1.0
+        ]
+      ]
+    },
+    {
+      "bilbao_column": "mz",
+      "operation_indices": [
+        10
+      ],
+      "representative_symbol": "sigma_h",
+      "target_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          -1.0
+        ]
+      ]
+    },
+    {
+      "bilbao_column": "-4",
+      "operation_indices": [
+        9,
+        11
+      ],
+      "representative_symbol": "S_4^3",
+      "target_matrix": [
+        [
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          -1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          -1.0
+        ]
+      ]
+    },
+    {
+      "bilbao_column": "m100",
+      "operation_indices": [
+        12,
+        14
+      ],
+      "representative_symbol": "sigma_v(1)",
+      "target_matrix": [
+        [
+          -1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "bilbao_column": "m1-10",
+      "operation_indices": [
+        13,
+        15
+      ],
+      "representative_symbol": "sigma_d(1)",
+      "target_matrix": [
+        [
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    }
+  ],
+  "comparison": {
+    "bilbao_max_error": 0.0,
+    "bilbao_status": "PASS_GEOMETRY_MAPPED",
+    "closure_max_error": 0.0,
+    "group": "D4h",
+    "order": 16,
+    "orthogonality_max_error": 0.0,
+    "raw_library_max_error": 0.0,
+    "snap_character_max_residual": 3.6739403974420594e-16,
+    "snap_matrix_max_residual": 1.8369701987210297e-16
+  },
+  "group": "D4h",
+  "source_characters": {
+    "A1g": [
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "A1u": [
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      -1.0,
+      -1.0,
+      -1.0,
+      -1.0,
+      -1.0
+    ],
+    "A2g": [
+      1.0,
+      1.0,
+      1.0,
+      -1.0,
+      -1.0,
+      1.0,
+      1.0,
+      1.0,
+      -1.0,
+      -1.0
+    ],
+    "A2u": [
+      1.0,
+      1.0,
+      1.0,
+      -1.0,
+      -1.0,
+      -1.0,
+      -1.0,
+      -1.0,
+      1.0,
+      1.0
+    ],
+    "B1g": [
+      1.0,
+      1.0,
+      -1.0,
+      1.0,
+      -1.0,
+      1.0,
+      1.0,
+      -1.0,
+      1.0,
+      -1.0
+    ],
+    "B1u": [
+      1.0,
+      1.0,
+      -1.0,
+      1.0,
+      -1.0,
+      -1.0,
+      -1.0,
+      1.0,
+      -1.0,
+      1.0
+    ],
+    "B2g": [
+      1.0,
+      1.0,
+      -1.0,
+      -1.0,
+      1.0,
+      1.0,
+      1.0,
+      -1.0,
+      -1.0,
+      1.0
+    ],
+    "B2u": [
+      1.0,
+      1.0,
+      -1.0,
+      -1.0,
+      1.0,
+      -1.0,
+      -1.0,
+      1.0,
+      1.0,
+      -1.0
+    ],
+    "Eg": [
+      2.0,
+      -2.0,
+      0.0,
+      0.0,
+      0.0,
+      2.0,
+      -2.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "Eu": [
+      2.0,
+      -2.0,
+      0.0,
+      0.0,
+      0.0,
+      -2.0,
+      2.0,
+      0.0,
+      0.0,
+      0.0
+    ]
+  }
+}
