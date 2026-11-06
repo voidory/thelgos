@@ -1,0 +1,11 @@
+{
+  "browser_execution": "NOT_RUN",
+  "checked_on": "2026-11-07",
+  "numpy": "2.0.2",
+  "package_page": "https://pyodide.org/en/0.27.7/usage/packages-in-pyodide.html",
+  "pyodide": "0.27.7",
+  "python": "3.12.7",
+  "snapshot_sha256": "9c45b916001a750f4102fc287494f3eab215909c7535c626a20db80fd6333e2c",
+  "source": "https://cdn.jsdelivr.net/pyodide/v0.27.7/full/pyodide-lock.json",
+  "status": "PASS_METADATA_ONLY"
+}

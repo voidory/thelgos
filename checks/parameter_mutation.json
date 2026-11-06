@@ -1,0 +1,7 @@
+{
+  "detected": true,
+  "mechanism": "reference spectrum mismatch",
+  "mutation": "O-H sp_sigma eta multiplied by 1.01 in temporary pairs.csv copy",
+  "status": "PASS",
+  "unchanged_committed_data": true
+}
