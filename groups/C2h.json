@@ -1,0 +1,281 @@
+{
+  "bilbao": {
+    "class_mapping": [
+      {
+        "bilbao_column": "1",
+        "operation_indices": [
+          0
+        ],
+        "representative_symbol": "E",
+        "target_matrix": [
+          [
+            1.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            1.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            1.0
+          ]
+        ]
+      },
+      {
+        "bilbao_column": "2",
+        "operation_indices": [
+          1
+        ],
+        "representative_symbol": "C_2",
+        "target_matrix": [
+          [
+            -1.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            -1.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            1.0
+          ]
+        ]
+      },
+      {
+        "bilbao_column": "-1",
+        "operation_indices": [
+          2
+        ],
+        "representative_symbol": "i",
+        "target_matrix": [
+          [
+            -1.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            -1.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            -1.0
+          ]
+        ]
+      },
+      {
+        "bilbao_column": "m",
+        "operation_indices": [
+          3
+        ],
+        "representative_symbol": "sigma_h",
+        "target_matrix": [
+          [
+            1.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            1.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            -1.0
+          ]
+        ]
+      }
+    ],
+    "snapshot_sha256": "f68caf511a7fd88d582669303562508c854cfbadcca156a0ef544e7bb3ecdb03",
+    "source": "https://cryst.ehu.es/cgi-bin/rep/programs/sam/point.py?sg=10&num=5"
+  },
+  "classes": [
+    [
+      0
+    ],
+    [
+      1
+    ],
+    [
+      2
+    ],
+    [
+      3
+    ]
+  ],
+  "generator": "MolSym 1.3.1",
+  "generator_indices": [
+    1,
+    2
+  ],
+  "group": "C2h",
+  "irreps": [
+    {
+      "characters": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "dimension": 1,
+      "label": "Ag"
+    },
+    {
+      "characters": [
+        1.0,
+        -1.0,
+        1.0,
+        -1.0
+      ],
+      "dimension": 1,
+      "label": "Bg"
+    },
+    {
+      "characters": [
+        1.0,
+        1.0,
+        -1.0,
+        -1.0
+      ],
+      "dimension": 1,
+      "label": "Au"
+    },
+    {
+      "characters": [
+        1.0,
+        -1.0,
+        -1.0,
+        1.0
+      ],
+      "dimension": 1,
+      "label": "Bu"
+    }
+  ],
+  "library_label_map": {
+    "Ag": "Ag",
+    "Au": "Au",
+    "Bg": "Bg",
+    "Bu": "Bu"
+  },
+  "multiplication_table": [
+    [
+      0,
+      1,
+      2,
+      3
+    ],
+    [
+      1,
+      0,
+      3,
+      2
+    ],
+    [
+      2,
+      3,
+      0,
+      1
+    ],
+    [
+      3,
+      2,
+      1,
+      0
+    ]
+  ],
+  "operations": [
+    {
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "symbol": "E"
+    },
+    {
+      "matrix": [
+        [
+          -1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          -1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "symbol": "C_2"
+    },
+    {
+      "matrix": [
+        [
+          -1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          -1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          -1.0
+        ]
+      ],
+      "symbol": "i"
+    },
+    {
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          -1.0
+        ]
+      ],
+      "symbol": "sigma_h"
+    }
+  ],
+  "schema_version": "1.2"
+}
