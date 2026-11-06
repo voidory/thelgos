@@ -122,6 +122,30 @@ const check = (name, ok, detail = "") => { results.push({ name, ok, detail }); c
     await page.waitForFunction(() => document.body.dataset.rendered === "CH4|1|");
     const narr = await page.textContent("#narration");
     check("CH4 shows B5 skip note", narr.includes("No ligand–ligand coupling in this model."), narr.slice(0, 120));
+    // Glide: a step jump passes through intermediate s values; with reduced motion it does not.
+    const glideSeen = async () => {
+      await page.evaluate(() => { window.__seen = []; window.__obs = new MutationObserver(() => window.__seen.push(document.body.dataset.rendered));
+        window.__obs.observe(document.body, { attributes: true, attributeFilter: ["data-rendered"] }); });
+      await page.$eval("#steps .step", (b) => b.click());
+      await page.waitForFunction(() => document.body.dataset.rendered === "CH4|0|");
+      const seen = await page.evaluate(() => { window.__obs.disconnect(); return window.__seen; });
+      await page.$eval("#s", (s) => { s.value = 1; s.dispatchEvent(new Event("input")); });
+      await page.waitForFunction(() => document.body.dataset.rendered === "CH4|1|");
+      return seen.filter((r) => !/\|(0|1)\|$/.test(r)).length;
+    };
+    const mid = await glideSeen();
+    check("step jump glides through intermediate frames", mid >= 2, `${mid} intermediate frames`);
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    const midR = await glideSeen();
+    check("reduced motion: step jump does not animate", midR === 0, `${midR} intermediate frames`);
+    await page.emulateMedia({ reducedMotion: null });
+    await page.$eval("[data-mo]", (h) => h.dispatchEvent(new Event("click")));
+    await page.waitForFunction(() => document.body.dataset.rendered === "CH4|1|0");
+    const card = await page.evaluate(() => { const r = document.querySelector("#diagram .sketch rect").getBBox();
+      const hits = [...document.querySelectorAll("#diagram text, #diagram line.level")].filter((e) => { const b = e.getBBox();
+        return b.x < r.x + r.width && b.x + b.width > r.x && b.y < r.y + r.height && b.y + b.height > r.y; });
+      return { lobes: document.querySelectorAll("#diagram .sketch ellipse, #diagram .sketch circle, #diagram .sketch path").length, hits: hits.length }; });
+    check("selected level gets a sketch card clear of bars and labels", card.lobes > 0 && card.hits === 0, JSON.stringify(card));
     await page.click("#watch");
     await page.waitForFunction(() => document.body.dataset.watchDone === "1", null, { timeout: 60000 });
     const after = await page.$eval("#s", (s) => Number(s.value));

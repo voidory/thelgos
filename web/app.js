@@ -227,6 +227,65 @@ function draw(view) {
       svg.append(richText(lb.parts, { x: lb.x, y: ly + 5, "text-anchor": lb.anchor, class: "orb-label" }));
     }
   }
+
+  // Sketch card for the selected level: the orbital drawn as in the lecture, placed in the emptiest
+  // spot near its level (fewest crossed correlation lines, no overlap with bars or labels).
+  // Smaller in the compact geometry; left out when no spot is free of bars and labels.
+  const pk = atEnd ? `M${state.level}` : `S${state.level}`;
+  if (view.structure && state.level !== null && pos[pk]) sketchCard(svg, view.structure, pos[pk], { W, H, top, bottom, AX, size: compact ? 84 : 108 });
+}
+
+function sketchCard(svg, S, p, { W, H, top, bottom, AX, size }) {
+  const m = 6;
+  const boxes = [], segs = [];
+  for (const t of svg.querySelectorAll("text")) { const b = t.getBBox(); boxes.push([b.x, b.y, b.x + b.width, b.y + b.height]); }
+  for (const l of svg.querySelectorAll("line.level")) boxes.push([+l.getAttribute("x1"), +l.getAttribute("y1") - 8, +l.getAttribute("x2"), +l.getAttribute("y1") + 8]);
+  for (const l of svg.querySelectorAll("line.mix, line.allowed")) segs.push(["x1", "y1", "x2", "y2"].map((k) => +l.getAttribute(k)));
+  const hitsSeg = (x0, y0, x1, y1, [ax, ay, bx, by]) => {
+    // Liang–Barsky clip of segment against the rectangle.
+    let t0 = 0, t1 = 1;
+    const dx = bx - ax, dy = by - ay;
+    for (const [pp, q] of [[-dx, ax - x0], [dx, x1 - ax], [-dy, ay - y0], [dy, y1 - ay]]) {
+      if (pp === 0) { if (q < 0) return false; continue; }
+      const r = q / pp;
+      if (pp < 0) { if (r > t1) return false; if (r > t0) t0 = r; } else { if (r < t0) return false; if (r < t1) t1 = r; }
+    }
+    return true;
+  };
+  let best = null;
+  for (let bx = AX + 10; bx <= W - size - 4; bx += 8) {
+    for (let by = top; by <= H - bottom - size; by += 8) {
+      const x0 = bx - m, y0 = by - m, x1 = bx + size + m, y1 = by + size + m;
+      let cost = 0;
+      for (const [a, b, c, d] of boxes) if (a < x1 && c > x0 && b < y1 && d > y0) cost += 100;
+      for (const sg of segs) if (hitsSeg(x0, y0, x1, y1, sg)) cost += 4;
+      const ex = bx + size < p.x0 ? p.x0 - (bx + size) : bx > p.x1 ? bx - p.x1 : 0;
+      const ey = by > p.y ? by - p.y : by + size < p.y ? p.y - by - size : 0;
+      cost += Math.hypot(ex, ey) / 25;
+      if (!best || cost < best.cost) best = { cost, bx, by };
+    }
+  }
+  if (best.cost >= 100) return;
+  const { bx, by } = best;
+  const xs = S.atoms.map((a) => a.x), ys = S.atoms.map((a) => a.y);
+  const span = Math.max(Math.max(...xs) - Math.min(...xs), Math.max(...ys) - Math.min(...ys), 1);
+  const k = (size - 40) / span, ccx = (Math.max(...xs) + Math.min(...xs)) / 2, ccy = (Math.max(...ys) + Math.min(...ys)) / 2;
+  const card = el("g", { class: "sketch", "data-sketch": state.level });
+  // Leader from the nearest point of the card to the nearest point just off the bar (not through its label).
+  const cxm = bx + size / 2, cym = by + size / 2;
+  const lx = Math.min(Math.max(cxm, p.x0), p.x1);
+  const ly = p.y + (cym > p.y ? 5 : -5), ex = lx;
+  const cxp = Math.min(Math.max(ex, bx), bx + size), cyp = Math.min(Math.max(ly, by), by + size);
+  card.append(el("line", { x1: cxp, y1: cyp, x2: ex, y2: ly, class: "sketch-leader" }));
+  card.append(el("rect", { x: bx, y: by, width: size, height: size, rx: 8, class: "sketch-card" }));
+  // Lobes are clipped to the card so large ones (SF6's ligand p lobes) do not spill over the diagram.
+  const clip = el("clipPath", { id: "sketch-clip" });
+  clip.append(el("rect", { x: bx, y: by, width: size, height: size, rx: 8 }));
+  card.append(clip);
+  const inner = el("g", { "clip-path": "url(#sketch-clip)" });
+  drawOrbital(inner, S, (x) => bx + size / 2 + (x - ccx) * k, (y) => by + size / 2 - (y - ccy) * k, 0.42 * size / 108, false);
+  card.append(inner);
+  svg.append(card);
 }
 
 function narrate(view) {
@@ -351,7 +410,35 @@ async function refresh() {
   return view;
 }
 
-function select(k) { state.level = k; refresh(); }
+function select(k) { glideToken++; state.level = k; refresh(); }
+
+// Glide: when jumping between construction steps (step buttons, "why does it jump"), the levels slide
+// to their new energies through intermediate s values instead of snapping, so the eye can follow each
+// level. Every frame is a real engine evaluation of H(s); nothing is interpolated on screen. Users who
+// ask for reduced motion get the jump.
+let glideToken = 0;
+async function glide(target, level = null, ms = 420) {
+  const mine = ++glideToken;
+  const from = state.s;
+  const reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if (!reduce && Math.abs(target - from) > 1e-9) {
+    state.level = null;
+    const t0 = performance.now();
+    for (;;) {
+      const u = Math.min(1, (performance.now() - t0) / ms);
+      if (u >= 1) break;
+      const e = u < 0.5 ? 2 * u * u : 1 - 2 * (1 - u) * (1 - u);  // ease in-out
+      state.s = from + (target - from) * e;
+      $("s").value = state.s;
+      await refresh();
+      if (mine !== glideToken) return null;
+      await new Promise((r) => requestAnimationFrame(r));
+    }
+  }
+  if (mine !== glideToken) return null;
+  state.s = target; state.level = level; $("s").value = target;
+  return refresh();
+}
 
 async function watch() {
   if (state.watching) { state.watching = false; return; }
@@ -408,6 +495,37 @@ function hot(row, on) {
 }
 
 // ---- Structure view (L2): atoms, orbital lobes coloured by phase, contact lines. ----
+// Orbital drawing shared by the structure view and the in-diagram sketch: lobes coloured by phase
+// (red positive, blue negative), sized by |coefficient|, with p lobes along their projected direction.
+function drawOrbital(parent, S, X, Y, scale, labels) {
+  const maxc = Math.max(...S.lobes.map((l) => Math.abs(l.coefficient)), 1e-9);
+  const order = S.atoms.slice().sort((a, b) => a.depth - b.depth);
+  for (const a of order) {
+    for (const l of S.lobes.filter((l) => l.atom === a.index)) {
+      const r = (8 + 30 * Math.abs(l.coefficient) / maxc) * scale;
+      const x = X(a.x), y = Y(a.y);
+      if (l.kind === "s") {
+        parent.append(el("circle", { cx: x, cy: y, r, class: l.coefficient > 0 ? "lobe-pos" : "lobe-neg" }));
+      } else {
+        const [dx, dy] = l.dir2d, n = Math.hypot(dx, dy);
+        if (n < 1e-6) {  // p orbital pointing at the viewer: draw it face-on
+          parent.append(el("circle", { cx: x, cy: y, r: r * 0.6, class: l.coefficient > 0 ? "lobe-pos" : "lobe-neg" }));
+          continue;
+        }
+        const ang = Math.atan2(-dy, dx) * 180 / Math.PI, len = r * Math.max(0.35, n);
+        for (const sgn of [1, -1]) {
+          const positive = (sgn > 0) === (l.coefficient > 0);
+          parent.append(el("ellipse", { cx: x + sgn * len * Math.cos(ang * Math.PI / 180), cy: y + sgn * len * Math.sin(ang * Math.PI / 180),
+                                     rx: len, ry: r * 0.42, transform: `rotate(${ang} ${x + sgn * len * Math.cos(ang * Math.PI / 180)} ${y + sgn * len * Math.sin(ang * Math.PI / 180)})`,
+                                     class: positive ? "lobe-pos" : "lobe-neg" }));
+        }
+      }
+    }
+    parent.append(el("circle", { cx: X(a.x), cy: Y(a.y), r: 9 * scale, class: "atom" }));
+    if (labels) parent.append(el("text", { x: X(a.x), y: Y(a.y) + 4, "text-anchor": "middle" }, a.element));
+  }
+}
+
 function structure(view) {
   const svg = $("structure");
   svg.replaceChildren();
@@ -440,32 +558,7 @@ function structure(view) {
     line.addEventListener("mouseleave", () => hot(c.ledger_row, false));
     svg.append(line);
   }
-  const maxc = Math.max(...S.lobes.map((l) => Math.abs(l.coefficient)), 1e-9);
-  const order = S.atoms.slice().sort((a, b) => a.depth - b.depth);
-  for (const a of order) {
-    for (const l of S.lobes.filter((l) => l.atom === a.index)) {
-      const r = 8 + 30 * Math.abs(l.coefficient) / maxc;
-      const x = X(a.x), y = Y(a.y);
-      if (l.kind === "s") {
-        svg.append(el("circle", { cx: x, cy: y, r, class: l.coefficient > 0 ? "lobe-pos" : "lobe-neg" }));
-      } else {
-        const [dx, dy] = l.dir2d, n = Math.hypot(dx, dy);
-        if (n < 1e-6) {  // p orbital pointing at the viewer: draw it face-on
-          svg.append(el("circle", { cx: x, cy: y, r: r * 0.6, class: l.coefficient > 0 ? "lobe-pos" : "lobe-neg" }));
-          continue;
-        }
-        const ang = Math.atan2(-dy, dx) * 180 / Math.PI, len = r * Math.max(0.35, n);
-        for (const sgn of [1, -1]) {
-          const positive = (sgn > 0) === (l.coefficient > 0);
-          svg.append(el("ellipse", { cx: x + sgn * len * Math.cos(ang * Math.PI / 180), cy: y + sgn * len * Math.sin(ang * Math.PI / 180),
-                                     rx: len, ry: r * 0.42, transform: `rotate(${ang} ${x + sgn * len * Math.cos(ang * Math.PI / 180)} ${y + sgn * len * Math.sin(ang * Math.PI / 180)})`,
-                                     class: positive ? "lobe-pos" : "lobe-neg" }));
-        }
-      }
-    }
-    svg.append(el("circle", { cx: X(a.x), cy: Y(a.y), r: 9, class: "atom" }));
-    svg.append(el("text", { x: X(a.x), y: Y(a.y) + 4, "text-anchor": "middle" }, a.element));
-  }
+  drawOrbital(svg, S, X, Y, 1, true);
   svg.append(el("text", { x: 8, y: H - 8, class: "muted" }, "Red = positive phase, blue = negative. Solid line: stabilising contact; dashed: destabilising."));
 }
 
@@ -726,7 +819,7 @@ function proposalUpdate(view) {
   for (const [label, s] of items) {
     const b = document.createElement("button"); b.type = "button"; b.className = "step"; b.textContent = label;
     b.setAttribute("aria-current", Math.abs(view.schedule.s - s) < 1e-9);
-    b.addEventListener("click", () => { $("s").value = s; $("s").dispatchEvent(new Event("input")); });
+    b.addEventListener("click", () => glide(s));
     steps.append(b);
   }
 }
@@ -743,12 +836,11 @@ function proposalUpdate(view) {
     state.case = cases.find((c) => c.name === "SF6 model").name;
     if (await fromLink()) $("s").value = state.s;
     sel.value = state.case;
-    sel.addEventListener("change", () => { state.case = sel.value; state.level = null; state.s = 1; $("s").value = 1; refresh(); });
-    $("s").addEventListener("input", () => { state.s = Number($("s").value); state.level = null; refresh(); });
+    sel.addEventListener("change", () => { glideToken++; state.case = sel.value; state.level = null; state.s = 1; $("s").value = 1; refresh(); });
+    $("s").addEventListener("input", () => { glideToken++; state.s = Number($("s").value); state.level = null; refresh(); });
     $("whyjump").addEventListener("click", () => {
       const o = state.view.origins[state.level];
-      state.s = o.s; state.level = o.level_index_there; $("s").value = state.s;
-      refresh().then(() => status(`Jumped to where this level appeared: ${o.label}`));
+      glide(o.s, o.level_index_there).then((v) => v && status(`Jumped to where this level appeared: ${o.label}`));
     });
     $("ex-svg").addEventListener("click", exportSVG);
     $("ex-png").addEventListener("click", exportPNG);
