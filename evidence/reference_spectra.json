@@ -313,6 +313,44 @@
       "multiplicity": 2
     }
   ],
+  "N2": [
+    {
+      "electrons": 2,
+      "energy_eV": -43.56263133211107,
+      "irrep": "Ag",
+      "multiplicity": 1
+    },
+    {
+      "electrons": 2,
+      "energy_eV": -20.290443655135874,
+      "irrep": "Ag",
+      "multiplicity": 1
+    },
+    {
+      "electrons": 2,
+      "energy_eV": -19.015983413105783,
+      "irrep": "B1u",
+      "multiplicity": 1
+    },
+    {
+      "electrons": 4,
+      "energy_eV": -16.592390245618546,
+      "irrep": "B2u+B3u",
+      "multiplicity": 2
+    },
+    {
+      "electrons": 0,
+      "energy_eV": -6.347609754381465,
+      "irrep": "B2g+B3g",
+      "multiplicity": 2
+    },
+    {
+      "electrons": 0,
+      "energy_eV": 13.84905840035272,
+      "irrep": "B1u",
+      "multiplicity": 1
+    }
+  ],
   "O2": [
     {
       "electrons": 2,

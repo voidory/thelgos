@@ -138,10 +138,10 @@ def run(data,out,groups,check_reference=True):
  # Reference orderings (CONVENTIONS A.6): B2, C2 pi_u below sigma_g(2p); O2, F2 sigma_g(2p) below pi_u. A disagreement is recorded as an
  # Orbital-ordering fidelity warning, never tuned away.
  diatomic_reports=[]
- REF_ORDER={'B2':'pi_u_below_sigma_g_2p','C2':'pi_u_below_sigma_g_2p','O2':'sigma_g_2p_below_pi_u','F2':'sigma_g_2p_below_pi_u'}
+ REF_ORDER={'B2':'pi_u_below_sigma_g_2p','C2':'pi_u_below_sigma_g_2p','N2':'pi_u_below_sigma_g_2p','O2':'sigma_g_2p_below_pi_u','F2':'sigma_g_2p_below_pi_u'}
  # Ground states as listed by NIST CCCBDB (same evidence pages): an open shell is expected exactly when the reference is not a singlet.
- REF_STATE={'B2':('3Sigma_g',3),'C2':('1Sigma_g+',1),'O2':('3Sigma_g',3),'F2':('1Sigma_g',1),'CO':('1Sigma',1)}
- for name,a,b,ne in [('B2','B','B',6),('C2','C','C',8),('O2','O','O',12),('F2','F','F',14),('CO','C','O',10)]:
+ REF_STATE={'B2':('3Sigma_g',3),'C2':('1Sigma_g+',1),'N2':('1Sigma_g',1),'O2':('3Sigma_g',3),'F2':('1Sigma_g',1),'CO':('1Sigma',1)}
+ for name,a,b,ne in [('B2','B','B',6),('C2','C','C',8),('N2','N','N',10),('O2','O','O',12),('F2','F','F',14),('CO','C','O',10)]:
   preset=f'{name}_model';R=P.presets[preset]['geometry_overrides']['bond_length_angstrom']
   atoms=[(a,np.array([0,0,-R/2])),(b,np.array([0,0,R/2]))];basis=[(i,v) for i in range(2) for v in [None]+list(np.eye(3))]
   Vss,Vsp,Vps,Vpp=[P.get(a,b,ch,R,preset) for ch in ['ss_sigma','sp_sigma','pp_sigma','pp_pi']]
@@ -174,7 +174,8 @@ def run(data,out,groups,check_reference=True):
    rep['HOMO_carbon_weight']=wC
   diatomic_reports.append(rep)
  # Missing parameter lookups must error, not become zeros.
- try:P.get('N','N','pp_pi',1.,'H2_fixture')
+ # [K16] v1.2 used N-N as the absent element; N is now parameterised (decision B4), so neon stands in.
+ try:P.get('Ne','Ne','pp_pi',1.,'H2_fixture')
  except ValueError:pass
  else:raise AssertionError('missing pair silently accepted')
  # [K3, revised in patch 3] An existing element pair with an absent channel: O-H has ss/sp rows but no pp_pi row.
@@ -189,7 +190,7 @@ def run(data,out,groups,check_reference=True):
    for r,b in zip(levels,baseline[name]):
     assert r['irrep']==b['irrep'] and r['multiplicity']==b['multiplicity'] and r['electrons']==b['electrons'],name
     assert abs(r['energy_eV']-b['energy_eV'])<1e-9,(name,'committed reference changed',r,b)
- write_json(out/'checks'/'release1_validation.json',{'fixtures':reports,'SF6_combine_block_eV':stage.tolist(),'SF6_combine_split_eV':float(np.ptp(np.linalg.eigvalsh(stage))),'status':'PASS_CURRENT_FIXTURES_ONLY','reference_checked':check_reference,'warning_policy':'degenerate partially filled shell triggers occupation/JT/spin warning, not an assertion of an actual distorted ground state','diatomics':diatomic_reports,'missing_diatomics':[],'excluded_pending_decision':['N2 (B4)']})
+ write_json(out/'checks'/'release1_validation.json',{'fixtures':reports,'SF6_combine_block_eV':stage.tolist(),'SF6_combine_split_eV':float(np.ptp(np.linalg.eigvalsh(stage))),'status':'PASS_CURRENT_FIXTURES_ONLY','reference_checked':check_reference,'warning_policy':'degenerate partially filled shell triggers occupation/JT/spin warning, not an assertion of an actual distorted ground state','diatomics':diatomic_reports,'missing_diatomics':[]})
  write_json(out/'checks'/'crystod_cases.json',cases)
  out.joinpath('checks').mkdir(exist_ok=True,parents=True)
  with (out/'checks'/'release1_energies.csv').open('w',newline='') as f:w=csv.DictWriter(f,fieldnames=list(rows[0]));w.writeheader();w.writerows(rows)

@@ -4,6 +4,8 @@ H,B,ss_sigma,-1.4,7.62,,eV,harrison_inverse_square,H,0.6,harrison_extrapolated_H
 H,B,sp_sigma,1.84,7.62,,eV,harrison_inverse_square,H,0.6,harrison_extrapolated_H,https://github.com/jarvist/HarrisonSolidStateTable.jl/blob/master/src/SolidStateTable.jl,"H extrapolation; pedagogical scale 0.6, not empirical fit"
 H,C,ss_sigma,-1.4,7.62,,eV,harrison_inverse_square,H,0.6,harrison_extrapolated_H,https://github.com/jarvist/HarrisonSolidStateTable.jl/blob/master/src/SolidStateTable.jl,"H extrapolation; pedagogical scale 0.6, not empirical fit"
 H,C,sp_sigma,1.84,7.62,,eV,harrison_inverse_square,H,0.6,harrison_extrapolated_H,https://github.com/jarvist/HarrisonSolidStateTable.jl/blob/master/src/SolidStateTable.jl,"H extrapolation; pedagogical scale 0.6, not empirical fit"
+H,N,ss_sigma,-1.4,7.62,,eV,harrison_inverse_square,H,0.6,harrison_extrapolated_H,https://github.com/jarvist/HarrisonSolidStateTable.jl/blob/master/src/SolidStateTable.jl,"H extrapolation; pedagogical scale 0.6, not empirical fit"
+H,N,sp_sigma,1.84,7.62,,eV,harrison_inverse_square,H,0.6,harrison_extrapolated_H,https://github.com/jarvist/HarrisonSolidStateTable.jl/blob/master/src/SolidStateTable.jl,"H extrapolation; pedagogical scale 0.6, not empirical fit"
 H,O,ss_sigma,-1.4,7.62,,eV,harrison_inverse_square,H,0.6,harrison_extrapolated_H,https://github.com/jarvist/HarrisonSolidStateTable.jl/blob/master/src/SolidStateTable.jl,"H extrapolation; pedagogical scale 0.6, not empirical fit"
 H,O,sp_sigma,1.84,7.62,,eV,harrison_inverse_square,H,0.6,harrison_extrapolated_H,https://github.com/jarvist/HarrisonSolidStateTable.jl/blob/master/src/SolidStateTable.jl,"H extrapolation; pedagogical scale 0.6, not empirical fit"
 H,F,ss_sigma,-1.4,7.62,,eV,harrison_inverse_square,H,0.6,harrison_extrapolated_H,https://github.com/jarvist/HarrisonSolidStateTable.jl/blob/master/src/SolidStateTable.jl,"H extrapolation; pedagogical scale 0.6, not empirical fit"
@@ -18,6 +20,10 @@ B,C,ss_sigma,-1.4,7.62,,eV,harrison_inverse_square,none,1.0,harrison,https://git
 B,C,sp_sigma,1.84,7.62,,eV,harrison_inverse_square,none,1.0,harrison,https://github.com/jarvist/HarrisonSolidStateTable.jl/blob/master/src/SolidStateTable.jl,
 B,C,pp_sigma,3.24,7.62,,eV,harrison_inverse_square,none,1.0,harrison,https://github.com/jarvist/HarrisonSolidStateTable.jl/blob/master/src/SolidStateTable.jl,
 B,C,pp_pi,-0.81,7.62,,eV,harrison_inverse_square,none,1.0,harrison,https://github.com/jarvist/HarrisonSolidStateTable.jl/blob/master/src/SolidStateTable.jl,
+B,N,ss_sigma,-1.4,7.62,,eV,harrison_inverse_square,none,1.0,harrison,https://github.com/jarvist/HarrisonSolidStateTable.jl/blob/master/src/SolidStateTable.jl,
+B,N,sp_sigma,1.84,7.62,,eV,harrison_inverse_square,none,1.0,harrison,https://github.com/jarvist/HarrisonSolidStateTable.jl/blob/master/src/SolidStateTable.jl,
+B,N,pp_sigma,3.24,7.62,,eV,harrison_inverse_square,none,1.0,harrison,https://github.com/jarvist/HarrisonSolidStateTable.jl/blob/master/src/SolidStateTable.jl,
+B,N,pp_pi,-0.81,7.62,,eV,harrison_inverse_square,none,1.0,harrison,https://github.com/jarvist/HarrisonSolidStateTable.jl/blob/master/src/SolidStateTable.jl,
 B,O,ss_sigma,-1.4,7.62,,eV,harrison_inverse_square,none,1.0,harrison,https://github.com/jarvist/HarrisonSolidStateTable.jl/blob/master/src/SolidStateTable.jl,
 B,O,sp_sigma,1.84,7.62,,eV,harrison_inverse_square,none,1.0,harrison,https://github.com/jarvist/HarrisonSolidStateTable.jl/blob/master/src/SolidStateTable.jl,
 B,O,pp_sigma,3.24,7.62,,eV,harrison_inverse_square,none,1.0,harrison,https://github.com/jarvist/HarrisonSolidStateTable.jl/blob/master/src/SolidStateTable.jl,
@@ -34,6 +40,10 @@ C,C,ss_sigma,-1.4,7.62,,eV,harrison_inverse_square,none,1.0,harrison,https://git
 C,C,sp_sigma,1.84,7.62,,eV,harrison_inverse_square,none,1.0,harrison,https://github.com/jarvist/HarrisonSolidStateTable.jl/blob/master/src/SolidStateTable.jl,
 C,C,pp_sigma,3.24,7.62,,eV,harrison_inverse_square,none,1.0,harrison,https://github.com/jarvist/HarrisonSolidStateTable.jl/blob/master/src/SolidStateTable.jl,
 C,C,pp_pi,-0.81,7.62,,eV,harrison_inverse_square,none,1.0,harrison,https://github.com/jarvist/HarrisonSolidStateTable.jl/blob/master/src/SolidStateTable.jl,
+C,N,ss_sigma,-1.4,7.62,,eV,harrison_inverse_square,none,1.0,harrison,https://github.com/jarvist/HarrisonSolidStateTable.jl/blob/master/src/SolidStateTable.jl,
+C,N,sp_sigma,1.84,7.62,,eV,harrison_inverse_square,none,1.0,harrison,https://github.com/jarvist/HarrisonSolidStateTable.jl/blob/master/src/SolidStateTable.jl,
+C,N,pp_sigma,3.24,7.62,,eV,harrison_inverse_square,none,1.0,harrison,https://github.com/jarvist/HarrisonSolidStateTable.jl/blob/master/src/SolidStateTable.jl,
+C,N,pp_pi,-0.81,7.62,,eV,harrison_inverse_square,none,1.0,harrison,https://github.com/jarvist/HarrisonSolidStateTable.jl/blob/master/src/SolidStateTable.jl,
 C,O,ss_sigma,-1.4,7.62,,eV,harrison_inverse_square,none,1.0,harrison,https://github.com/jarvist/HarrisonSolidStateTable.jl/blob/master/src/SolidStateTable.jl,
 C,O,sp_sigma,1.84,7.62,,eV,harrison_inverse_square,none,1.0,harrison,https://github.com/jarvist/HarrisonSolidStateTable.jl/blob/master/src/SolidStateTable.jl,
 C,O,pp_sigma,3.24,7.62,,eV,harrison_inverse_square,none,1.0,harrison,https://github.com/jarvist/HarrisonSolidStateTable.jl/blob/master/src/SolidStateTable.jl,
@@ -46,6 +56,22 @@ C,S,ss_sigma,-1.4,7.62,,eV,harrison_inverse_square,none,1.0,harrison,https://git
 C,S,sp_sigma,1.84,7.62,,eV,harrison_inverse_square,none,1.0,harrison,https://github.com/jarvist/HarrisonSolidStateTable.jl/blob/master/src/SolidStateTable.jl,
 C,S,pp_sigma,3.24,7.62,,eV,harrison_inverse_square,none,1.0,harrison,https://github.com/jarvist/HarrisonSolidStateTable.jl/blob/master/src/SolidStateTable.jl,
 C,S,pp_pi,-0.81,7.62,,eV,harrison_inverse_square,none,1.0,harrison,https://github.com/jarvist/HarrisonSolidStateTable.jl/blob/master/src/SolidStateTable.jl,
+N,N,ss_sigma,-1.4,7.62,,eV,harrison_inverse_square,none,1.0,harrison,https://github.com/jarvist/HarrisonSolidStateTable.jl/blob/master/src/SolidStateTable.jl,
+N,N,sp_sigma,1.84,7.62,,eV,harrison_inverse_square,none,1.0,harrison,https://github.com/jarvist/HarrisonSolidStateTable.jl/blob/master/src/SolidStateTable.jl,
+N,N,pp_sigma,3.24,7.62,,eV,harrison_inverse_square,none,1.0,harrison,https://github.com/jarvist/HarrisonSolidStateTable.jl/blob/master/src/SolidStateTable.jl,
+N,N,pp_pi,-0.81,7.62,,eV,harrison_inverse_square,none,1.0,harrison,https://github.com/jarvist/HarrisonSolidStateTable.jl/blob/master/src/SolidStateTable.jl,
+N,O,ss_sigma,-1.4,7.62,,eV,harrison_inverse_square,none,1.0,harrison,https://github.com/jarvist/HarrisonSolidStateTable.jl/blob/master/src/SolidStateTable.jl,
+N,O,sp_sigma,1.84,7.62,,eV,harrison_inverse_square,none,1.0,harrison,https://github.com/jarvist/HarrisonSolidStateTable.jl/blob/master/src/SolidStateTable.jl,
+N,O,pp_sigma,3.24,7.62,,eV,harrison_inverse_square,none,1.0,harrison,https://github.com/jarvist/HarrisonSolidStateTable.jl/blob/master/src/SolidStateTable.jl,
+N,O,pp_pi,-0.81,7.62,,eV,harrison_inverse_square,none,1.0,harrison,https://github.com/jarvist/HarrisonSolidStateTable.jl/blob/master/src/SolidStateTable.jl,
+N,F,ss_sigma,-1.4,7.62,,eV,harrison_inverse_square,none,1.0,harrison,https://github.com/jarvist/HarrisonSolidStateTable.jl/blob/master/src/SolidStateTable.jl,
+N,F,sp_sigma,1.84,7.62,,eV,harrison_inverse_square,none,1.0,harrison,https://github.com/jarvist/HarrisonSolidStateTable.jl/blob/master/src/SolidStateTable.jl,
+N,F,pp_sigma,3.24,7.62,,eV,harrison_inverse_square,none,1.0,harrison,https://github.com/jarvist/HarrisonSolidStateTable.jl/blob/master/src/SolidStateTable.jl,
+N,F,pp_pi,-0.81,7.62,,eV,harrison_inverse_square,none,1.0,harrison,https://github.com/jarvist/HarrisonSolidStateTable.jl/blob/master/src/SolidStateTable.jl,
+N,S,ss_sigma,-1.4,7.62,,eV,harrison_inverse_square,none,1.0,harrison,https://github.com/jarvist/HarrisonSolidStateTable.jl/blob/master/src/SolidStateTable.jl,
+N,S,sp_sigma,1.84,7.62,,eV,harrison_inverse_square,none,1.0,harrison,https://github.com/jarvist/HarrisonSolidStateTable.jl/blob/master/src/SolidStateTable.jl,
+N,S,pp_sigma,3.24,7.62,,eV,harrison_inverse_square,none,1.0,harrison,https://github.com/jarvist/HarrisonSolidStateTable.jl/blob/master/src/SolidStateTable.jl,
+N,S,pp_pi,-0.81,7.62,,eV,harrison_inverse_square,none,1.0,harrison,https://github.com/jarvist/HarrisonSolidStateTable.jl/blob/master/src/SolidStateTable.jl,
 O,O,ss_sigma,-1.4,7.62,,eV,harrison_inverse_square,none,1.0,harrison,https://github.com/jarvist/HarrisonSolidStateTable.jl/blob/master/src/SolidStateTable.jl,
 O,O,sp_sigma,1.84,7.62,,eV,harrison_inverse_square,none,1.0,harrison,https://github.com/jarvist/HarrisonSolidStateTable.jl/blob/master/src/SolidStateTable.jl,
 O,O,pp_sigma,3.24,7.62,,eV,harrison_inverse_square,none,1.0,harrison,https://github.com/jarvist/HarrisonSolidStateTable.jl/blob/master/src/SolidStateTable.jl,

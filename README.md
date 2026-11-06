@@ -23,12 +23,14 @@ make check-baseline
 make check
 ```
 
-Expected: baseline passes; full `make check` fails with the explicit missing-CrystOD reason. The Make recipe returns nonzero. It also reports missing diatomic coverage. Actual browser/UI release tests are separate and have not been run.
+Expected: baseline passes. `make check` then runs the engine tests and passes; the CrystOD comparison is deferred by owner decision B1 (DECISIONS.md) and runs as `make check-release`, which fails with the explicit missing-CrystOD reason until the original archive and a real adapter are supplied. Diatomic coverage is in place (CHECKER-CHANGES.md K14, K16). Actual browser/UI release tests are separate and have not been run.
+
+*Post-v1.2 note:* this README describes the v1.2 package. Changes since then are recorded in CHECKER-CHANGES.md and DECISIONS.md.
 
 To identify and later compare a real supplied archive:
 
 ```sh
-make check CRYSTOD_ZIP=/absolute/path/original.zip \
+make check-release CRYSTOD_ZIP=/absolute/path/original.zip \
   CRYSTOD_ADAPTER=/absolute/path/verified_native_adapter.py
 ```
 

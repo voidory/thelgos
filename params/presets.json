@@ -280,6 +280,22 @@
       "id": "CO_model",
       "note": "r_e from NIST CCCBDB (evidence/cccbdb_CO.html), primary reference NIST diatomic. Defaults pending owner approval; no slide calibration claim.",
       "provenance_tag": "model"
+    },
+    {
+      "coupling_overrides": [],
+      "edge_policy": {
+        "edges_off": [],
+        "edges_on": [
+          "all"
+        ]
+      },
+      "geometry_overrides": {
+        "bond_length_angstrom": 1.0977
+      },
+      "hydrogen_scale": 0.6,
+      "id": "N2_model",
+      "note": "r_e from NIST CCCBDB (evidence/cccbdb_N2.html), primary reference Huber-Herzberg 1979. Included by owner decision B4 (DECISIONS.md).",
+      "provenance_tag": "model"
     }
   ],
   "schema_version": "1.2"

@@ -117,6 +117,20 @@ Each entry in `levels` needs `irrep`, `energy`, `multiplicity`, `canonical_level
 **K15. `make check` also runs the engine tests.** A new target, `test-engine`, runs `engine/tests/test_engine.py`, and `check` now depends on `check-baseline test-engine` before the CrystOD gate. The engine (`engine/`, provisional, outside the v1.2 package) is described in `engine/README.md`.
 *Observation behind the mutation test:* flipping the sign of only the s(a)–p(b) couplings leaves every central-atom fixture's spectrum unchanged, because it only flips the sign of a whole off-diagonal block. Only cases where s–p couplings run in both directions in one block (the diatomics, CO especially) detect it. Before K14, such a mutation would have passed every check.
 
+### Owner decisions (patch 8)
+
+**K16. Decisions B1 and B4 applied; delegated decisions recorded.** See `DECISIONS.md` for every decision and its reasons.
+- *B4, N2 in:*
+  - nitrogen on-sites added to `params/onsite.csv`, from `evidence/harrison.txt`;
+  - 26 nitrogen pair rows added to `params/pairs.csv`, with the same law and coefficients as existing rows, N–H scaled 0.6. Existing rows are untouched; the change is a pure insertion;
+  - `N2_model` preset and the N2 fixture added, at r_e 1.0977 Å from CCCBDB (`evidence/cccbdb_N2.html`);
+  - a reference spectrum entry added, matching a hand evaluation of the blocks;
+  - result: counting bond order 3, closed-shell singlet, and an orbital ordering that disagrees with the reference (flagged).
+  - The v1.2 missing-element test used N–N and now uses Ne–Ne.
+  - `compare_crystod.py` lists N2 among the required cases.
+- *B1, CrystOD deferred:* `make check` runs `check-baseline` and `test-engine` and prints the deferral. The CrystOD step moved, unchanged, to `make check-release`. The README run instructions are updated to match.
+- *B2, B3, B5:* `params/decision_defaults.json` now records each decision's status and points to `DECISIONS.md`. No script reads this file, so no computed output changes.
+
 ## Verification
 
 **Environment.** `requirements-checker.lock` was installed with `--require-hashes` into `.venv` (CPython 3.12.3), and `pip check` passed. This is not the README's 3.12.8 host and not the production 3.12.7.

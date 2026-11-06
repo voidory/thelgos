@@ -77,7 +77,7 @@ class AnalyticOracles(unittest.TestCase):
         np.testing.assert_allclose(self.spectrum(cases.allyl(P)), sorted([ec + np.sqrt(2) * t, ec, ec - np.sqrt(2) * t]), atol=1e-10)
 
     def test_homonuclear_diatomic_blocks(self):
-        for name in ["B2", "C2", "O2", "F2"]:
+        for name in ["B2", "C2", "N2", "O2", "F2"]:
             el, R = name[0], P.presets[f"{name}_model"]["geometry_overrides"]["bond_length_angstrom"]
             V = {ch: P.coupling(el, el, ch, R, f"{name}_model") for ch in ["ss_sigma", "sp_sigma", "pp_sigma", "pp_pi"]}
             es, ep = P.onsite_energy(el, "s"), P.onsite_energy(el, "p")

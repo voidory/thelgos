@@ -1,18 +1,23 @@
 {
+  "B1": {
+    "status": "decided_by_owner",
+    "value": "CrystOD comparison deferred until the programme is finished; gate moved to make check-release"
+  },
   "B2": {
-    "status": "default_pending_owner_approval",
+    "status": "decided_under_delegation_pending_owner_review",
     "value": 0.6
   },
   "B3": {
-    "status": "default_pending_owner_approval",
-    "value": "benzene xy, atom at +x, C2prime through atoms"
+    "status": "decided_by_owner_orientation_delegated_in_plane_axis",
+    "value": "rings flat, parallel, above and below the metal (ring planes perpendicular to z); one ring atom on +x; C2prime through atoms"
   },
   "B4": {
-    "status": "unresolved_N_parameters_not_added",
-    "value": "N2 excluded pending scope decision"
+    "status": "decided_by_owner",
+    "value": "N2 included in Release 1"
   },
   "B5": {
-    "status": "default_pending_owner_approval",
+    "status": "decided_under_delegation_pending_owner_review",
     "value": "skip zero-coupling construction stages, show no ligand-ligand coupling note"
-  }
+  },
+  "reasons": "DECISIONS.md"
 }
