@@ -15,7 +15,9 @@ from .symmetry import Group, label_levels
 from .analysis import analyse
 from .ledger import contact_ledger
 from .result import run
+from .schedule import build_schedule, hamiltonian_at, checkpoints, lambdas
 
 __version__ = "0.1.0-provisional"
 __all__ = ["Atom", "BasisFunction", "System", "ParameterSet", "build_hamiltonian", "solve",
-           "cluster_levels", "Group", "label_levels", "analyse", "contact_ledger", "run", "__version__"]
+           "cluster_levels", "Group", "label_levels", "analyse", "contact_ledger", "run",
+           "build_schedule", "hamiltonian_at", "checkpoints", "lambdas", "__version__"]

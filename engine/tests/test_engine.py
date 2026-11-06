@@ -173,6 +173,59 @@ class LedgerAndProperties(unittest.TestCase):
             s.validate()
 
 
+class Schedule(unittest.TestCase):
+    """Construction slider (P1, P2, P5; F2.13) and the B5 stage-skipping rule."""
+
+    def sched(self, s):
+        H = hamiltonian.build_hamiltonian(s, P)
+        return H, E.build_schedule(s, E.Group(G[s.group]), H)
+
+    def test_every_fixture_partitions_edges_and_reaches_full_H(self):
+        for s in cases.release1(P):
+            H, sc = self.sched(s)
+            np.testing.assert_allclose(E.hamiltonian_at(sc, 1.0), H, atol=1e-12, err_msg=s.name)
+            np.testing.assert_allclose(E.hamiltonian_at(sc, 0.0), np.diag(np.diag(H)), atol=1e-12, err_msg=s.name)
+
+    def test_stage_counts_and_b5_skips(self):
+        want = {"CH4": (1, 2), "H2O model": (1, 1), "BH3": (1, 2), "SF6 model": (4, 0), "H3+": (2, 0),
+                "six H Oh": (3, 0), "four H Td": (2, 0), "allyl cation pi": (1, 1), "CO": (1, 0), "O2": (1, 0)}
+        for s in cases.release1(P):
+            if s.name in want:
+                _, sc = self.sched(s)
+                self.assertEqual((len(sc["stages"]), len(sc["skipped"])), want[s.name], s.name)
+        _, sc = self.sched(cases.methane(P))
+        self.assertTrue(all(x["note"] == "No ligand–ligand coupling in this model." for x in sc["skipped"]))
+
+    def test_ch4_ligand_plateau_pairs_levels(self):
+        """P1: after fixing and flipping, LGO1' is level with LGO3' and LGO2' with LGO4'."""
+        s = cases.four_h(P)
+        H, sc = self.sched(s)
+        e = np.linalg.eigvalsh(E.hamiltonian_at(sc, 1 / len(sc["stages"])))
+        t = P.coupling("H", "H", "ss_sigma", np.sqrt(8 / 3) * 1.087, "fourH_diagnostic")
+        eh = P.onsite_energy("H", "s")
+        np.testing.assert_allclose(e, sorted([eh + t, eh + t, eh - t, eh - t]), atol=1e-10)
+
+    def test_sf6_first_stage_is_trans_axis_pairs(self):
+        s = cases.sf6(P)
+        H, sc = self.sched(s)
+        self.assertEqual(sc["stages"][0]["edges"], [(1, 2), (3, 4), (5, 6)])
+        self.assertEqual(sc["stages"][-1]["kind"], "between_sets")
+
+    def test_checkpoints_land_on_plateaus(self):
+        for s in [cases.sf6(P), cases.ring_h(P, 2, "H3+"), cases.methane(P)]:
+            _, sc = self.sched(s)
+            K = len(sc["stages"])
+            for tick in E.checkpoints(sc):
+                self.assertTrue(all(l in (0.0, 1.0) for l in E.lambdas(tick["s"], K)), s.name)
+
+    def test_alternative_order_same_endpoint(self):
+        """P5: switching the stages on in another order changes the path, not the endpoint."""
+        s = cases.sf6(P)
+        H, sc = self.sched(s)
+        rev = {"H0": sc["H0"], "stages": list(reversed(sc["stages"])), "skipped": []}
+        np.testing.assert_allclose(np.linalg.eigvalsh(E.hamiltonian_at(rev, 1.0)), np.linalg.eigvalsh(H), atol=1e-10)
+
+
 class Mutation(unittest.TestCase):
     """Spec section 12: flipping one angular-factor sign must make at least one check fail."""
 

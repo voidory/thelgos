@@ -14,6 +14,7 @@ The engine the app runs on (spec sections 8 and 9). It is pure NumPy, with no fi
 | `analysis.py` | F2.6–F2.8, F2.10, F2.11 | Composition, bonding character, filling and warnings, HOMO/LUMO, both bond-order definitions |
 | `ledger.py` | L1 | Contact ledger whose total equals the eigenvalue |
 | `result.py` | F2.9 | `run(system, params, groups)` returns a JSON-serialisable Result |
+| `schedule.py` | P1, P2, P5, F2.13 | Construction-slider stages from symmetry pairing ("fix one, flip its partner", then combine), B5 skipping of zero-coupling stages, H(s) and checkpoints |
 | `cases.py` | F1.1 | Release 1 geometries from CONVENTIONS §2, with lengths and angles taken from `params/presets.json` |
 
 `load.py`, outside the package, is the only code that reads files: `params/`, `groups/`, and the CONVENTIONS hash.
@@ -32,7 +33,6 @@ Run `make test-engine`, which `make check` also runs. The suite covers:
 
 ## Not yet built
 
-- the construction-slider schedule generator (F2.13);
 - the C1 equivalent-set detection beyond plain "—" labels (F2.14);
 - d and f orbitals;
 - the DiagramSpec and renderers (section 10);
