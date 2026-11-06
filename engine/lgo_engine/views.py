@@ -120,7 +120,9 @@ def matching_spec(system, H, frag_left, frag_right, P):
             cols.append({"label": lv["label"] + ("" if lv["multiplicity"] == 1 else suffix[k]), "irrep": lv["irrep"], "v": V[:, k]})
     for l, k in left:
         parts = l["label"].split("/")
-        if len(parts) == l["multiplicity"] and l["multiplicity"] > 1:
+        if "components" in l:
+            name = l["components"][k]
+        elif len(parts) == l["multiplicity"] and l["multiplicity"] > 1:
             name = parts[k]
         elif l["multiplicity"] == 3:
             name = f"{l['label']}{'xyz'[k]}"

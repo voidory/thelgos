@@ -52,3 +52,27 @@ body.proposal .badge .kind { color: inherit; opacity: 0.8; }
   body.proposal .rail button.case { white-space: nowrap; width: auto; border: 1px solid var(--rule); }
   body.proposal header { flex-direction: column; gap: 2px; }
 }
+
+/* ---- MO diagram typography and marks (design pass) ---- */
+#diagram { --serif: "STIX Two Text", "STIX Two Math", "Cambria Math", "Times New Roman", serif; }
+#diagram .orb-label { font-family: var(--serif); font-size: 17px; fill: var(--fg); paint-order: stroke; stroke: var(--panel); stroke-width: 5px; stroke-linejoin: round; }
+#diagram .col-title { font-size: 11px; letter-spacing: 0.08em; fill: var(--muted); font-weight: 600; }
+#diagram .axis-line { stroke: var(--muted); stroke-width: 1; }
+#diagram .axis-num { font-size: 11px; fill: var(--muted); font-feature-settings: "tnum" 1; }
+#diagram .axis-title { font-family: var(--serif); font-style: italic; font-size: 13px; fill: var(--muted); }
+#diagram .level { stroke: var(--fg); stroke-width: 3; stroke-linecap: butt; }
+#diagram .level.frag { stroke: var(--fg); opacity: 0.75; }
+#diagram .level.moving { stroke: var(--muted); }
+#diagram .level.selected { stroke: var(--accent); stroke-width: 5; }
+#diagram .electron { stroke: var(--fg); stroke-width: 1.4; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+#diagram .mix { stroke: var(--mix); stroke-opacity: 0.45; }
+#diagram .allowed { stroke: var(--allowed); stroke-dasharray: 4 4; }
+#diagram .leader { stroke: var(--muted); stroke-width: 0.7; fill: none; }
+#diagram .frontier { font-family: system-ui, sans-serif; font-size: 10px; letter-spacing: 0.06em; fill: var(--accent); font-weight: 600; }
+#diagram .warn-mark { fill: var(--warn); font-size: 10px; }
+#diagram .warn-dot { fill: var(--warn); }
+#diagram.compact .orb-label { font-size: 17px; stroke-width: 4px; }
+#diagram.compact .axis-num { font-size: 12px; }
+#diagram.compact .col-title { font-size: 12px; letter-spacing: 0.04em; }
+#diagram.compact .axis-title { font-size: 12px; }
+#diagram.compact .frontier { font-size: 10px; }

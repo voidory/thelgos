@@ -8,6 +8,8 @@ const ROOT = path.resolve(__dirname, "../..");
 const REF = JSON.parse(fs.readFileSync(path.join(ROOT, "evidence/reference_spectra.json")));
 const shots = process.argv[2];
 const results = [];
+// The case list is a rail of buttons; the underlying <select> stays the single source of state.
+const pick = (page, n) => page.$eval("#case", (s, n) => { s.value = n; s.dispatchEvent(new Event("change")); }, n);
 const check = (name, ok, detail = "") => { results.push({ name, ok, detail }); console.log(`${ok ? "PASS" : "FAIL"} ${name}${detail ? " — " + detail : ""}`); };
 
 (async () => {
@@ -30,10 +32,14 @@ const check = (name, ok, detail = "") => { results.push({ name, ok, detail }); c
     check("runtime is Python 3.12.7 + NumPy 2.0.2", /Python 3\.12\.7 · NumPy 2\.0\.2/.test(footer), footer);
 
     const names = await page.$$eval("#case option", (os) => os.map((o) => o.value));
+    const rail = await page.$$eval(".rail button.case", (bs) => bs.map((b) => b.dataset.case));
+    check("case rail lists every case, grouped by family", rail.length === names.length && (await page.$$eval(".rail h2", (h) => h.length)) === 4, `${rail.length} buttons`);
+    const fonts = await page.evaluate(async () => { await document.fonts.ready; return document.fonts.check('17px "STIX Two Text"'); });
+    check("diagram labels use STIX Two Text", fonts);
     check("all reference fixtures offered", JSON.stringify([...names].sort()) === JSON.stringify(Object.keys(REF).sort()), `${names.length} cases`);
     let worst = 0, timings = [];
     for (const n of names) {
-      await page.selectOption("#case", n);
+      await pick(page, n);
       await page.waitForFunction((n) => document.body.dataset.rendered === `${n}|1|`, n);
       const got = await page.$$eval("[data-mo]", (hs) => hs.map((h) => Number(h.dataset.energy)));
       const want = REF[n].map((x) => x.energy_eV);
@@ -44,12 +50,12 @@ const check = (name, ok, detail = "") => { results.push({ name, ok, detail }); c
     check("browser energies equal committed reference spectra (1e-9 eV)", worst < 1e-9, `max error ${worst.toExponential(2)}`);
     check("warm recompute under 100 ms (this machine, not the reference phone)", Math.max(...timings) < 100, `max ${Math.max(...timings).toFixed(1)} ms`);
 
-    await page.selectOption("#case", "SF6 model");
+    await pick(page, "SF6 model");
     await page.waitForFunction(() => document.body.dataset.rendered === "SF6 model|1|");
     await page.click('[data-mo="0"]');
     await page.waitForFunction(() => document.body.dataset.rendered === "SF6 model|1|0");
     if (shots) await page.screenshot({ path: path.join(shots, "inspector.png"), fullPage: true });
-    await page.waitForSelector("#ledger table");
+    await page.waitForSelector("#ledger table", { state: "attached" });
     const [tot, eig] = await page.$eval("#ledger table", (t) => [Number(t.dataset.total), Number(t.dataset.eigen)]);
     check("ledger total equals eigenvalue (1e-10 eV)", Math.abs(tot - eig) < 1e-10, `${tot} vs ${eig}`);
     if (shots) await page.screenshot({ path: path.join(shots, "sf6-ledger.png"), fullPage: true });
@@ -66,7 +72,7 @@ const check = (name, ok, detail = "") => { results.push({ name, ok, detail }); c
     const eg = await page.$$eval("[data-mo]", (hs) => hs.findIndex((h) => Math.abs(Number(h.dataset.energy) + 14.850508798504222) < 1e-6));
     await page.click(`[data-mo="${eg}"]`);
     await page.waitForFunction((eg) => document.body.dataset.rendered === `SF6 model|1|${eg}`, eg);
-    await page.click("#whyjump");
+    await page.$eval("#whyjump", (b) => b.click());
     await page.waitForFunction(() => document.body.dataset.rendered.startsWith("SF6 model|0.75|"));
     check("P3: why-jump takes eg to checkpoint 3 of 4", true, await page.textContent("#export-status"));
     const exported = await page.evaluate(() => window.lgo.exportJSON());
@@ -102,17 +108,17 @@ const check = (name, ok, detail = "") => { results.push({ name, ok, detail }); c
     check("SF6 slider runs four stages", true);
     if (shots) await page.screenshot({ path: path.join(shots, "sf6-stage1.png"), fullPage: true });
 
-    await page.selectOption("#case", "N2");
+    await pick(page, "N2");
     await page.waitForFunction(() => document.body.dataset.rendered === "N2|1|");
     const verdicts = await page.$$eval("#comparisons li", (ls) => ls.map((l) => l.dataset.agrees + ":" + l.textContent.split(":")[0]));
     check("N2 panel: ordering disagrees, spin agrees", JSON.stringify(verdicts) === JSON.stringify(["0:Orbital ordering", "1:Ground-state spin"]), verdicts.join(", "));
-    await page.selectOption("#case", "CO");
+    await pick(page, "CO");
     await page.waitForFunction(() => document.body.dataset.rendered === "CO|1|");
     const coNote = await page.textContent("#notes");
     check("CO reading note explains the starred HOMO", coNote.includes("carbon lone pair"));
     if (shots) await page.locator(".diagram").screenshot({ path: path.join(shots, "co-about.png") });
 
-    await page.selectOption("#case", "CH4");
+    await pick(page, "CH4");
     await page.waitForFunction(() => document.body.dataset.rendered === "CH4|1|");
     const narr = await page.textContent("#narration");
     check("CH4 shows B5 skip note", narr.includes("No ligand–ligand coupling in this model."), narr.slice(0, 120));

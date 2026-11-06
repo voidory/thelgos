@@ -1,6 +1,6 @@
 # Design proposal for the LGO Method Explorer
 
-**Status:** proposal for the owner. Preview it at `/web/?design=proposal`; the default look is unchanged until you approve. Screenshots were sent in the session.
+**Status:** layout approved by the owner (2026-11-06) and now the default; the old look stays at `/web/?design=classic`. The MO diagram was then redrawn after the owner's critique (section "Diagram redesign").
 
 ## Principles
 
@@ -39,3 +39,22 @@
 
 - Does teal as the single interface colour work for you, or should it match your course or department colours?
 - Should the lecture-vs-model choice (H2O, SF6) be a toggle on one case instead of two separate entries in the list?
+
+## Diagram redesign (after the owner's critique)
+
+The owner asked for larger type, shorter level lines, and a more "physics" look. Changes:
+
+| Before | After | Why |
+|---|---|---|
+| Level lines stretched across the whole column | Short bars, 30 px each; a degenerate set is a row of bars | Textbook convention; degeneracy is read by counting bars, so the ×n tags are gone |
+| 11 px system font | STIX Two Text (the typeface of scientific publishing) at 17 px, with real subscripts and superscripts: 1a₁g, 2t₁u*, 1πg* | Readable at a glance, and looks like the lecture notes and textbooks |
+| Irrep names as typed (A1g) | Mulliken lower case for orbitals, numbered within each symmetry (1a₁g, 2a₁g), valence only, per CONVENTIONS §6 | Standard MO notation |
+| Text arrows ↑↓ | Drawn half-headed electron arrows | How electrons are drawn by hand |
+| Mixing lines dark | Lighter grey under the bars; thickness still ∝ weight | Lines support the levels instead of competing with them |
+| Labels could collide | Labels at least 17 px apart in each gutter, with leader lines; text halos so lines never cross a label | Readability where levels crowd together |
+| Near-degenerate levels drawn on top of each other (water's 2b₂*/3a₁*, 0.1 eV apart) | Levels within 7 px share a row side by side, each still at its own height | Both stay visible; the energy scale is untouched |
+| HOMO/LUMO not marked | Small accent tags after the label | Frontier orbitals at a glance |
+| No axis | A quiet energy axis with ticks, "E / eV (model)" | Keeps the to-scale drawing honest |
+| Phone: whole diagram shrunk to half size | A compact geometry below 560 px with shorter bars and tighter columns, so labels stay at reading size | The phone view is now usable |
+
+The energies stay to scale (spec F3.1): the readability problems came from line length and type, not from the scale.

@@ -8,6 +8,10 @@ To run it, serve the repository root and open `/web/`:
 python3 -m http.server 8000
 ```
 
+## Look
+
+The approved layout (case rail, construction timeline, tabbed inspector) is the default; `?design=classic` shows the first scaffold. The MO diagram uses short bars, STIX Two Text labels in standard notation, drawn electron arrows, an energy axis and collision-free labels; see `drafts/design-proposal.md`.
+
 ## What is built
 
 | Spec | Built |

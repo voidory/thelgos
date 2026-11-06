@@ -69,9 +69,19 @@ def diagram_spec(system, H, result, groups, H_now=None, params=None):
                              "label": f"{el} {name}", "_v": v})
             cols[side] = [{"id": f"{tag}{k}", **r} for k, r in enumerate(rows)]
     elif centre is not None:
-        cols["left"] = [{"id": f"L{k}", "energy_eV": e, "multiplicity": m, "irrep": l,
-                         "label": "/".join(sorted({system.basis[left_idx[i]].label for i in np.flatnonzero(abs(v).sum(axis=1) > 1e-9)})),
-                         "_v": v} for k, (e, m, l, v) in enumerate(_fragment_levels(H, left_idx, P, N))]
+        el = system.atoms[centre].element
+
+        def ao_name(i):
+            f = system.basis[left_idx[i]]
+            name = params.orbital_name.get((el, f.kind), f.kind) if params is not None else f.kind
+            if f.kind == "p":
+                name += "xyz"[int(np.argmax(np.abs(f.direction)))]
+            return f"{el} {name}"
+        cols["left"] = []
+        for k, (e, m, l, v) in enumerate(_fragment_levels(H, left_idx, P, N)):
+            comps = [ao_name(int(np.argmax(abs(v[:, j])))) for j in range(m)]
+            label = comps[0] if m == 1 else (comps[0][:-1] if all(c[:-1] == comps[0][:-1] for c in comps) else "/".join(comps))
+            cols["left"].append({"id": f"L{k}", "energy_eV": e, "multiplicity": m, "irrep": l, "label": label, "components": comps, "_v": v})
         cols["right"] = [{"id": f"R{k}", "energy_eV": e, "multiplicity": m, "irrep": l, "label": f"LGO{k + 1}", "_v": v}
                          for k, (e, m, l, v) in enumerate(_fragment_levels(H, right_idx, P, N))]
     else:
@@ -82,8 +92,11 @@ def diagram_spec(system, H, result, groups, H_now=None, params=None):
                           "label": "/".join(sorted({system.basis[int(np.argmax(abs(c[:, i])))].label.rstrip("0123456789") for i in ix})),
                           "_v": c[:, ix]} for k, ix in enumerate(cluster_levels(e, Hd))]
     mos = []
+    count = {}  # valence-only numbering within each symmetry, ascending energy (CONVENTIONS §6)
     for k, lv_ in enumerate(result["levels"]):
-        mos.append({"id": f"M{k}", "energy_eV": lv_["energy_eV"], "multiplicity": lv_["multiplicity"],
+        key = lv_.get("linear_label") or lv_["irrep"]
+        count[key] = count.get(key, 0) + 1
+        mos.append({"id": f"M{k}", "number": count[key], "energy_eV": lv_["energy_eV"], "multiplicity": lv_["multiplicity"],
                     "electrons": lv_["electrons"], "irrep": lv_["irrep"], "linear_label": lv_.get("linear_label"),
                     "character": lv_["character"], "warnings": lv_["warnings"]})
     C = np.array(result["eigenvectors"])

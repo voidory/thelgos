@@ -27,110 +27,204 @@ function el(tag, attrs = {}, text) {
 }
 
 const fmt = (x, d = 3) => (x >= 0 ? "+" : "−") + Math.abs(x).toFixed(d);
-// D∞h/C∞v names in the textbook form (σg, πu*, …); the star marks an antibonding level as the engine classifies it.
+// ---- Orbital labels in textbook form, set in STIX Two with real subscripts. ----
+// Mulliken symbols are written in lower case for orbitals (1a₁g, 2t₁u); linear molecules use σ/π with
+// g/u subscripts. The star marks a level the engine classifies as antibonding.
 const GREEK = { sigma: "σ", pi: "π" };
-const irrepText = (lv) => {
-  if (!lv.linear_label) return lv.irrep;
-  const [base, par] = lv.linear_label.split("_");
-  return `${GREEK[base] || base}${par || ""}${lv.character === "antibonding" ? "*" : ""}`;
-};
+function labelParts(lv, { number = true } = {}) {
+  // Returns [[text, "base"|"sub"|"sup"], ...]
+  const out = [];
+  if (number && lv.number) out.push([String(lv.number), "base"]);
+  if (lv.linear_label) {
+    const [base, par] = lv.linear_label.split("_");
+    out.push([GREEK[base] || base, "base"]);
+    if (par) out.push([par, "sub"]);
+  } else if (lv.irrep && lv.irrep !== "—") {
+    const m = lv.irrep.match(/^([A-Z])(\d?)([gu]?)('*)$/);
+    if (m) {
+      out.push([m[1].toLowerCase(), "base"]);
+      if (m[2] || m[3]) out.push([m[2] + m[3], "sub"]);
+      if (m[4]) out.push([m[4].length === 1 ? "′" : "″", "base"]);
+    } else out.push([lv.irrep, "base"]);
+  }
+  if (lv.character === "antibonding") out.push(["*", "sup"]);
+  return out;
+}
+const irrepText = (lv) => labelParts(lv).map((p) => p[0]).join("");
+function richText(parts, attrs) {
+  // Sub- and superscripts by explicit dy offsets (baseline-shift is unreliable across browsers),
+  // so a star after a subscript (σg*) sits up as a superscript.
+  const t = el("text", attrs);
+  let shift = 0;
+  for (const [txt, kind] of parts) {
+    const target = kind === "sub" ? 5 : kind === "sup" ? -8 : 0;
+    const a = { dy: target - shift };
+    if (kind === "sub" || kind === "sup") a["font-size"] = "68%";
+    if (kind === "tag") { a.class = "frontier"; a.dx = 8; }
+    if (kind === "warn") { a.class = "warn-mark"; a.dx = 4; }
+    t.append(el("tspan", a, txt));
+    shift = target;
+  }
+  return t;
+}
+function orbitalNameParts(label) {
+  // "O 2p" -> O, 2p ; "S 3px" -> S, 3p, sub x
+  const m = label.match(/^([A-Z][a-z]?) (\d)([spdf])([xyz]?)$/);
+  if (!m) return [[label, "base"]];
+  const parts = [[`${m[1]} `, "base"], [`${m[2]}${m[3]}`, "base"]];
+  if (m[4]) parts.push([m[4], "sub"]);
+  return parts;
+}
+
+// Electron pair drawn as half-headed arrows (harpoons), the way they are drawn by hand.
+function harpoon(x, y, up) {
+  const h = 13, top = y - h / 2, bot = y + h / 2;
+  const d = up ? `M${x},${bot} L${x},${top} L${x - 3.5},${top + 6}` : `M${x},${top} L${x},${bot} L${x + 3.5},${bot - 6}`;
+  return el("path", { d, class: "electron" });
+}
 
 function draw(view) {
   const svg = $("diagram");
   svg.replaceChildren();
   const d = view.diagram;
-  const W = 720, H = 540, top = 36, bottom = 30;
-  svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
   const atEnd = view.schedule.s >= 1;
   const centreLevels = atEnd ? d.centre : d.slider_levels;
+  const three = d.columns.length === 3;
+  // Compact geometry on narrow screens: a narrower canvas so the text is not scaled down to nothing.
+  const compact = (svg.parentElement.clientWidth || 640) < 560;
+  svg.classList.toggle("compact", compact);
+  const W = compact ? 420 : 640, H = compact ? 520 : 600, top = compact ? 44 : 52, bottom = compact ? 28 : 34;
+  svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
   const all = [...d.left, ...d.right, ...d.centre, ...d.slider_levels].map((x) => x.energy_eV);
   let lo = Math.min(...all), hi = Math.max(...all);
-  const pad = (hi - lo) * 0.06 || 1;
+  const pad = (hi - lo) * 0.05 || 1;
   lo -= pad; hi += pad;
   const y = (e) => top + (hi - e) / (hi - lo) * (H - top - bottom);
-  const cols = d.columns;
-  const colX = cols.length === 3 ? { left: [95, 195], centre: [295, 425], right: [515, 615] }
-                                 : { right: [80, 220], centre: [380, 520] };
-  for (const c of cols) svg.append(el("text", { x: (colX[c][0] + colX[c][1]) / 2, y: 18, "text-anchor": "middle", class: "muted" }, d.column_titles[c]));
-  svg.append(el("text", { x: 12, y: H / 2, transform: `rotate(-90 12 ${H / 2})`, "text-anchor": "middle", class: "muted" }, d.axis_label));
-  if (proposal) {
-    for (let e = Math.ceil(lo / 5) * 5; e <= hi; e += 5) {
-      svg.append(el("line", { x1: 30, x2: W - 10, y1: y(e), y2: y(e), class: "axis", "stroke-width": 0.5 }));
-      svg.append(el("text", { x: 34, y: y(e) - 3, class: "muted", "font-size": 9 }, String(e)));
-    }
+  // Column centres: short bars sit at these; labels go in the gutters beside them.
+  const cx = compact ? (three ? { left: 120, centre: 232, right: 340 } : { right: 150, centre: 295 })
+                     : (three ? { left: 165, centre: 335, right: 505 } : { right: 200, centre: 420 });
+  const BAR = compact ? 18 : 30, GAP = compact ? 4 : 7;
+
+  // Energy axis with quiet ticks.
+  const step = (hi - lo) > 60 ? 10 : 5;
+  const AX = compact ? 32 : 52;
+  svg.append(el("line", { x1: AX, x2: AX, y1: top - 6, y2: H - bottom + 4, class: "axis-line" }));
+  for (let e = Math.ceil(lo / step) * step; e <= hi; e += step) {
+    svg.append(el("line", { x1: AX - 4, x2: AX, y1: y(e), y2: y(e), class: "axis-line" }));
+    svg.append(el("text", { x: AX - 7, y: y(e) + 4, "text-anchor": "end", class: "axis-num" }, e === 0 ? "0" : String(e).replace("-", "−")));
   }
+  if (compact) svg.append(el("text", { x: 4, y: top - 14, class: "axis-title" }, "E / eV"));
+  else svg.append(el("text", { x: 12, y: (top + H - bottom) / 2, transform: `rotate(-90 12 ${(top + H - bottom) / 2})`, "text-anchor": "middle", class: "axis-title" }, "E / eV (model)"));
+  const short = { "Molecular orbitals": "MOs", "Ligand group orbitals": "LGOs" };
+  for (const c of d.columns) svg.append(el("text", { x: cx[c], y: 24, "text-anchor": "middle", class: "col-title" },
+                                           compact ? (short[d.column_titles[c]] || d.column_titles[c].replace(" orbitals", "")) : d.column_titles[c].toUpperCase()));
 
   const pos = {};
-  const showIrreps = $("t-irreps").checked;
-  // Layout only: levels of one column at the same energy (e.g. CH4's a1 and t2 H combinations with
-  // H-H coupling off) share the row side by side instead of being drawn on top of each other.
-  const slots = {};
-  function slotFor(col, list) {
+  const labels = { left: [], right: [], centre: [] };
+  // Lay out one column: rows of levels at the same energy share a centred group of short bars.
+  function layout(col, list, isMO) {
+    // Rows: levels closer than 7 px on screen share a row and sit side by side (each still at its own
+    // height), so near-degenerate levels such as water's 2b2*/3a1* stay distinguishable. Groups that
+    // belong to different levels are separated by a wider gap.
     const rows = [];
-    list.forEach((lv) => {
-      const r = rows.find((r) => Math.abs(r.e - lv.energy_eV) < 1e-9);
-      if (r) { r.items.push(lv); r.m += lv.multiplicity; } else rows.push({ e: lv.energy_eV, items: [lv], m: lv.multiplicity });
+    list.forEach((lv, k) => {
+      const r = rows.find((r) => Math.abs(y(r.e) - y(lv.energy_eV)) < 7);
+      if (r) { r.items.push([lv, k]); r.m += lv.multiplicity; } else rows.push({ e: lv.energy_eV, items: [[lv, k]], m: lv.multiplicity });
     });
-    for (const r of rows) { let k = 0; for (const lv of r.items) { slots[col + ":" + (lv.id || lv.energy_eV)] = { start: k, total: r.m, last: lv === r.items[r.items.length - 1], row: r }; k += lv.multiplicity; } }
-  }
-  slotFor("left", d.left); slotFor("right", d.right);
-  function levelRow(lv, col, cls, key) {
-    const [x0, x1] = colX[col];
-    const sl = slots[col + ":" + (lv.id || lv.energy_eV)] || { start: 0, total: lv.multiplicity, last: true, row: { items: [lv] } };
-    const m = lv.multiplicity, M = sl.total, gap = 6, w = (x1 - x0 - gap * (M - 1)) / M, yy = y(lv.energy_eV);
-    const g = el("g");
-    for (let i = 0; i < m; i++) {
-      const a = x0 + (sl.start + i) * (w + gap);
-      g.append(el("line", { x1: a, x2: a + w, y1: yy, y2: yy, class: `level ${cls}` }));
-      if (lv.electrons !== undefined && atEnd) {
-        // One electron per line first, then pair up (the usual drawing; it does not assert a spin state).
-        const n = (i < lv.electrons ? 1 : 0) + (i < lv.electrons - m ? 1 : 0);
-        const arrows = n === 2 ? "↑↓" : n === 1 ? "↑" : "";
-        if (arrows) g.append(el("text", { x: a + w / 2, y: yy - 3, "text-anchor": "middle" }, arrows));
+    const GROUP = 16;
+    for (const r of rows) {
+      const width = r.m * BAR + (r.m - r.items.length) * GAP + (r.items.length - 1) * GROUP;
+      let x = cx[col] - width / 2;
+      for (const [lv, k] of r.items) {
+        const yy = y(lv.energy_eV);
+        const g = el("g");
+        const x0 = x;
+        for (let i = 0; i < lv.multiplicity; i++) {
+          const a = x + i * (BAR + GAP);
+          const cls = isMO ? (state.level === k ? "level selected" : atEnd ? "level" : "level moving") : "level frag";
+          g.append(el("line", { x1: a, x2: a + BAR, y1: yy, y2: yy, class: cls }));
+          if (isMO && atEnd && lv.electrons !== undefined) {
+            const n = (i < lv.electrons ? 1 : 0) + (i < lv.electrons - lv.multiplicity ? 1 : 0);
+            if (n >= 1) g.append(harpoon(a + BAR / 2 - (n === 2 ? 5 : 0), yy, true));
+            if (n === 2) g.append(harpoon(a + BAR / 2 + 5, yy, false));
+          }
+        }
+        x += lv.multiplicity * BAR + (lv.multiplicity - 1) * GAP + GROUP;
+        const x1 = x - GROUP;
+        const key = isMO ? (atEnd ? `M${k}` : `S${k}`) : lv.id;
+        pos[key] = { x0, x1, y: yy };
+        if (isMO) {
+          g.append(el("title", {}, `${view.provenance.level_energy} ${atEnd ? view.provenance.level_label : ""} E = ${fmt(lv.energy_eV, 3)} eV`.trim()));
+          const hit = el("rect", { x: x0 - 4, y: yy - 9, width: x1 - x0 + 8, height: 18, class: "mo-hit", tabindex: 0,
+                                   [atEnd ? "data-mo" : "data-slider-level"]: k, "data-energy": lv.energy_eV });
+          hit.addEventListener("click", () => select(k));
+          hit.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") select(k); });
+          g.append(hit);
+        } else {
+          g.append(el("title", {}, view.provenance.fragment));
+        }
+        svg.append(g);
       }
+      // One label per row; the gutter is to the right of MO and right-hand bars, left of left-hand bars.
+      const rightmost = cx[col] + width / 2, leftmost = cx[col] - width / 2;
+      const yy = y(r.e);
+      const parts = [];
+      const bases = r.items.map(([lv]) => (lv.label || "").replace(/[xyz]$/, ""));
+      const oneBase = !isMO && !(col === "right" && d.column_titles.right === "Ligand group orbitals") && bases.every((b) => b === bases[0]) && bases[0];
+      if (oneBase) parts.push(...orbitalNameParts(bases[0]));
+      else r.items.forEach(([lv], i) => {
+        if (i) parts.push([", ", "base"]);
+        if (isMO) { if (atEnd && $("t-irreps").checked) parts.push(...labelParts(lv)); }
+        else if (col === "right" && d.column_titles.right === "Ligand group orbitals") parts.push(...labelParts(lv, { number: false }));
+        else parts.push(...orbitalNameParts(lv.label));
+      });
+      const homo = isMO && atEnd && r.items.some(([, k]) => k === view.result.frontier.HOMO);
+      const lumo = isMO && atEnd && r.items.some(([, k]) => k === view.result.frontier.LUMO);
+      const warn = isMO && atEnd && r.items.some(([lv]) => lv.warnings && lv.warnings.length);
+      if (homo || lumo) parts.push([homo && lumo ? "HOMO = LUMO" : homo ? "HOMO" : "LUMO", "tag"]);
+      if (warn) parts.push(["◆", "warn"]);
+      if (parts.length) labels[col].push({ y: yy, x: col === "left" ? leftmost - 10 : rightmost + 10, anchor: col === "left" ? "end" : "start", parts, ox: col === "left" ? leftmost : rightmost });
     }
-    const segX0 = x0 + sl.start * (w + gap), segX1 = segX0 + m * w + (m - 1) * gap;
-    if (sl.last) {
-      const items = sl.row.items;
-      const mult = items.map((it) => (it.multiplicity > 1 ? `×${it.multiplicity}` : "")).filter(Boolean).join(" ");
-      const irr = showIrreps && cls !== "moving" ? items.map((it) => (it.irrep && it.irrep !== "—" ? irrepText(it) : "")).filter(Boolean).join(" + ") : "";
-      const txt = [mult, irr].filter(Boolean).join(" ");
-      if (txt) g.append(el("text", { x: col === "left" ? x0 - 4 : x1 + 4, y: yy + 4, "text-anchor": col === "left" ? "end" : "start", class: irr ? "" : "muted" }, txt));
-    }
-    if (lv.label && col !== "centre") g.append(el("text", { x: (segX0 + segX1) / 2, y: yy + 14, "text-anchor": "middle", class: "muted" }, lv.label));
-    pos[key] = { x0: segX0, x1: segX1, y: yy };
-    return g;
   }
-  for (const lv of [...d.left, ...d.right]) {
-    const g = levelRow(lv, d.left.includes(lv) ? "left" : "right", "frag", lv.id);
-    g.append(el("title", {}, view.provenance.fragment));
-    svg.append(g);
-  }
-  centreLevels.forEach((lv, k) => {
-    const g = levelRow(lv, "centre", state.level === k ? "selected" : (atEnd ? "" : "moving"), atEnd ? `M${k}` : `S${k}`);
-    g.append(el("title", {}, `${view.provenance.level_energy} ${atEnd ? view.provenance.level_label : ""}`.trim()));
-    {
-      const [x0, x1] = colX.centre, yy = y(lv.energy_eV);
-      const hit = el("rect", { x: x0, y: yy - 7, width: x1 - x0, height: 14, class: "mo-hit", tabindex: 0,
-                               [atEnd ? "data-mo" : "data-slider-level"]: k, "data-energy": lv.energy_eV });
-      hit.addEventListener("click", () => select(k));
-      hit.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") select(k); });
-      g.append(hit);
-      if (atEnd && lv.warnings && lv.warnings.length) g.append(el("text", { x: x0 - 6, y: yy + 4, "text-anchor": "end", class: "warn" }, "!"));
-    }
-    svg.append(g);
-  });
+  layout("left", d.left, false);
+  layout("right", d.right, false);
+  layout("centre", centreLevels, true);
+
+  // Correlation lines, under the labels.
   if (atEnd) {
+    const g = el("g");
     for (const ln of d.lines) {
-      const layerOn = ln.layer === "mixing" ? $("t-mixing").checked : $("t-allowed").checked;
-      if (!layerOn || !pos[ln.from] || !pos[ln.to]) continue;
+      const on = ln.layer === "mixing" ? $("t-mixing").checked : $("t-allowed").checked;
+      if (!on || !pos[ln.from] || !pos[ln.to]) continue;
       const f = pos[ln.from], t = pos[ln.to];
       const fromRight = f.x0 > t.x0;
-      const xa = fromRight ? f.x0 : f.x1, xb = fromRight ? t.x1 : t.x0;
-      const line = el("line", { x1: xa, y1: f.y, x2: xb, y2: t.y, class: ln.layer === "mixing" ? "mix" : "allowed",
-                                "stroke-width": ln.layer === "mixing" ? (0.6 + 4 * ln.weight).toFixed(2) : 1 });
+      const line = el("line", { x1: fromRight ? f.x0 : f.x1, y1: f.y, x2: fromRight ? t.x1 : t.x0, y2: t.y,
+                                class: ln.layer === "mixing" ? "mix" : "allowed",
+                                "stroke-width": ln.layer === "mixing" ? (0.5 + 2.2 * ln.weight).toFixed(2) : 0.9 });
       line.append(el("title", {}, ln.layer === "mixing" ? `${view.provenance.mixing_line} Weight ${(100 * ln.weight).toFixed(0)} %.` : view.provenance.allowed_line));
-      svg.append(line);
+      g.append(line);
+    }
+    svg.insertBefore(g, svg.firstChild.nextSibling);
+  }
+
+  // Labels: keep at least 17 px apart in each gutter; a short leader line shows where a label was moved from.
+  for (const col of Object.keys(labels)) {
+    const L = labels[col].sort((a, b) => a.y - b.y);
+    for (let it = 0; it < 30; it++) {
+      let moved = false;
+      for (let i = 1; i < L.length; i++) {
+        const need = 17 - (L[i].ly ?? L[i].y) + (L[i - 1].ly ?? L[i - 1].y);
+        if (need > 0) { L[i - 1].ly = (L[i - 1].ly ?? L[i - 1].y) - need / 2; L[i].ly = (L[i].ly ?? L[i].y) + need / 2; moved = true; }
+      }
+      if (!moved) break;
+    }
+    for (const lb of L) {
+      const ly = lb.ly ?? lb.y;
+      if (Math.abs(ly - lb.y) > 1.5) {
+        const xa = lb.anchor === "start" ? lb.ox + 2 : lb.ox - 2, xb = lb.anchor === "start" ? lb.x - 2 : lb.x + 2;
+        svg.append(el("polyline", { points: `${xa},${lb.y} ${(xa + xb) / 2},${lb.y} ${xb},${ly}`, class: "leader" }));
+      }
+      svg.append(richText(lb.parts, { x: lb.x, y: ly + 5, "text-anchor": lb.anchor, class: "orb-label" }));
     }
   }
 }
@@ -580,10 +674,9 @@ const view3d = (() => {
 
 
 // ---- Design proposal preview (?design=proposal). Layout only; same engine data and the same draw code. ----
-const proposal = new URLSearchParams(location.search).get("design") === "proposal";
+const proposal = new URLSearchParams(location.search).get("design") !== "classic";
 function proposalSetup(cases) {
   document.body.classList.add("proposal");
-  const link = document.createElement("link"); link.rel = "stylesheet"; link.href = "proposal.css"; document.head.append(link);
   const main = document.querySelector("main");
   // Left rail: cases grouped by family, instead of a long select.
   const rail = document.createElement("nav"); rail.className = "rail"; rail.setAttribute("aria-label", "Cases");
@@ -603,8 +696,7 @@ function proposalSetup(cases) {
   // Construction timeline above the diagram: named lecture steps plus play.
   const tl = document.createElement("div"); tl.className = "timeline";
   const play = $("watch"); const steps = document.createElement("div"); steps.className = "steps"; steps.id = "steps";
-  const left = document.createElement("div"); left.append(play.cloneNode(true));
-  left.firstChild.id = "watch2"; left.firstChild.disabled = false; left.firstChild.addEventListener("click", () => play.click());
+  const left = document.createElement("div"); left.append(play);
   const right = document.createElement("div"); right.append(steps, document.querySelector(".slider"));
   tl.append(left, right);
   document.querySelector(".diagram").prepend(tl, $("narration"), $("badges"), $("rule-detail"), document.querySelector(".toggles"));
@@ -665,6 +757,7 @@ function proposalUpdate(view) {
     $("im-json").addEventListener("change", async (e) => { const f = e.target.files[0]; if (f) await importJSON(await f.text()); e.target.value = ""; });
     $("t-3d").addEventListener("change", () => { $("view3d").hidden = !$("t-3d").checked; $("structure").hidden = $("t-3d").checked; if ($("t-3d").checked) view3d.render(state.view); });
     window.lgo = { exportJSON, importJSON, shareLink, state };
+    let rz; window.addEventListener("resize", () => { clearTimeout(rz); rz = setTimeout(() => state.view && draw(state.view), 150); });
     $("watch").addEventListener("click", watch);
     for (const id of ["t-mixing", "t-allowed", "t-irreps"]) $(id).addEventListener("change", () => draw(state.view));
     for (const id of ["case", "s", "watch"]) $(id).disabled = false;
