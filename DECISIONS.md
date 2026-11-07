@@ -18,7 +18,7 @@ Status key: **owner** = decided by the owner; **delegated** = decided by Claude 
 | M5 | Period-3 diatomics Al2–Cl2 added; sources documented | owner request, details delegated |
 | M6 | One entry per molecule with a model/lecture toggle | owner |
 | M7 | All on-sites from the Miessler teaching table | owner |
-| B6 | Sign-off of CONVENTIONS v1.2 | owner only |
+| B6 | CONVENTIONS v1.4 signed off and frozen (2026-11-07) | owner |
 
 ---
 
@@ -200,3 +200,8 @@ Each of these has a "Miessler vs Harrison energies" reading note in the app (`pa
 ## B6. Sign-off (owner only)
 
 Not delegated. On 2026-11-06 the owner gave standing permission for Claude to apply the drafted changes. They are now in `CONVENTIONS.md` v1.3 and the spec, and the drafts in `drafts/` remain as the record. Applying them is not sign-off: v1.3 stays "not frozen" until the owner reviews it.
+
+**Signed off, 2026-11-07.** After reading `drafts/signoff-summary-v1.4.md`, the owner wrote "I sign off v1.4". `CONVENTIONS.md` v1.4 is frozen. The signed text is commit 81cf760, sha256 `ca861a1d6f47f5fe9962eb229a3fbdf4313c22ed2e83083dcfa8fdbe71b98d36`. Any later change needs a new version and the owner's approval. Three points the summary flagged as resting on weaker sources remain open for correction in a later version:
+- the Miessler water and CH4 LUMO orderings behind the hydrogen factor's upper limit;
+- CH4's second photoelectron band near 23 eV;
+- the inconsistent CCCBDB entry for Al2.

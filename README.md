@@ -65,6 +65,8 @@ The baseline uses the packaged freshly retrieved snapshots to avoid website avai
 
 ## Owner decisions and later gates
 
+**Current status (2026-11-07):** CONVENTIONS v1.4 is signed off and frozen (B6). All owner and delegated decisions are in `DECISIONS.md`, and Release 1's only open gate is the deferred CrystOD comparison (B1). The paragraph below is the original v1.2 package note, kept as history.
+
 B2=0.6, B3=benzene atoms on ±x, B5=skip zero-coupling stages are **defaults pending approval**. B1 still needs the original zip. B4 is unresolved: N2 stays excluded; N parameter values are not added. B6 sign-off has not happened. C2 diatomic source geometries/explicit blocks/regressions, C1 real checker and C4 browser tests are still open. Tier-D spec edits were not applied.
 
 No lecture-slide alias or slide-calibrated numeric value is claimed without slides. Later d-channel parameters remain out of scope. This package corrects evidence mechanics; it is not a newly completed application engine or a release authorisation.

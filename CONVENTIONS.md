@@ -1,9 +1,9 @@
 # CONVENTIONS.md — LGO Method Explorer
 
-**Version: 1.4 — APPLIED UNDER OWNER PERMISSION; NOT FROZEN (owner sign-off B6 pending)**  
+**Version: 1.4 — FROZEN (owner sign-off B6, 2026-11-07)**  
 **Owner / change authority: the project owner**  
 **Date: 2026-11-07, Singapore**  
-**Release 1 blockers: owner sign-off (B6). CrystOD comparison deferred until the programme is finished (B1). Diatomic fixtures (periods 2 and 3) and browser acceptance tests (C4) in place.**
+**Release 1 blockers: none. CrystOD comparison deferred until the programme is finished (B1). Diatomic fixtures (periods 2 and 3) and browser acceptance tests (C4) in place.**
 
 *v1.3 record:* the owner decided B1 and B4 and the ring orientation in B3, delegated B2, B3 (in-plane axis) and B5 to Claude, and gave standing permission (2026-11-06) for Claude to apply the drafted changes to this file. Every decision and its reasons are in `DECISIONS.md`. Checker changes are in `CHECKER-CHANGES.md` (K1–K19, plus the M7 data change).
 
@@ -227,12 +227,12 @@ The adapter protocol is implemented and unit-tested with explicitly mock inputs,
 
 **Deferral (B1).** The CrystOD comparison is deferred until the programme is finished. `make check` runs the baseline and engine tests; the gate above runs as `make check-release` and stays BLOCKED until the original archive and a real adapter are supplied.
 
-Release 1 remains blocked by:
+Release 1 gates (all closed except C1, which owner decision B1 defers):
 
 - C1 (deferred by B1): original archive identity, tested real default-EHT adapter and executed qualitative comparisons.
 - C2: closed. Source-backed B2, C2, N2, O2, F2, CO, Al2, Si2, P2, S2 and Cl2 geometries, explicit blocks (A.6) and regression rows (Appendix B) are in place.
 - C4: closed 2026-11-07. `web/tests/web_test.js` runs in Pyodide 0.27.7 in Chromium and checks every case: both slider end points (s = 1 against `evidence/reference_spectra.json` to 1e−9 eV; s = 0 against the on-site table to 1e−12 eV, with multiplicities); the ledger identity at s = 1 and s = 0.5 (1e−10 eV); counting bond orders against A.5; and Watch mode playing to the finished diagram. It is not part of `make check`, because it needs the network.
-- Owner sign-off B6. B2, B3 (in-plane axis) and B5 are decided under delegation and documented for review, not inferred consent.
+- B6: closed 2026-11-07. The owner signed off v1.4 ("I sign off v1.4") after reading `drafts/signoff-summary-v1.4.md`, which lists the delegated decisions (B2, B3 in-plane axis, B5, M1–M4) and the points resting on weaker sources. The signed text is this file at commit 81cf760, sha256 `ca861a1d6f47f5fe9962eb229a3fbdf4313c22ed2e83083dcfa8fdbe71b98d36`. The only edits made afterwards are this status record, the header and the changelog row.
 
 Slides/aliases are nonblocking. Later d-channel parameters remain outside Release 1. Spec-document edits in tier D are reserved for the reviewer after approval, not silently applied here.
 
@@ -248,6 +248,7 @@ Slides/aliases are nonblocking. Later d-channel parameters remain outside Releas
 | 1.3.1 | 2026-11-06 | Applied by Claude under the owner's standing permission. Period-3 diatomics Si2, P2, S2 at the owner's request (DECISIONS.md M5): Si and P on-sites and Si–Si, P–P pair rows from the same Harrison transcription; CCCBDB geometries and ground states; Appendix B rows; checker patch K18. Al2 and Cl2 wait for a sourced Al/Cl on-site. Not frozen: owner sign-off B6 pending. |
 | 1.3.2 | 2026-11-07 | Applied by Claude under the owner's standing permission. Al2 and Cl2 added (DECISIONS.md M5, checker patch K19): Al and Cl on-sites from the teaching table (snapshot packaged), CCCBDB geometries and ground states, Appendix B rows. Al2's spin disagrees with experiment and is recorded as a fidelity warning. Not frozen: owner sign-off B6 pending. |
 | 1.4 | 2026-11-07 | Applied by Claude on the owner's decision M7: all on-sites from the Miessler teaching table (§9.1); couplings unchanged (Harrison η, H scale 0.6). Every fixture involving B, C, N, O, Si, P or S has new Appendix B values. Unchanged: the H-only sets, F2, Al2, Cl2. No qualitative result changed: orderings, spin agreements and counting bond orders are as before. H-scale window updated. Not frozen: owner sign-off B6 pending. |
+| 1.4 (frozen) | 2026-11-07 | Owner sign-off B6. Signed text: commit 81cf760, sha256 `ca861a1d6f47f5fe9962eb229a3fbdf4313c22ed2e83083dcfa8fdbe71b98d36`. No content change. |
 
 **A5 disposition:** the pairs.csv column specification is restored in §9.2. Exact legacy Appendix A.7 text was not present in the accessible attachments or earlier inline answer; it is not silently reconstructed as a quotation. The unknown legacy A.7 is **removed as an unrecoverable legacy section**, because its original content cannot be verified; it is replaced by the explicitly newly authored ledger/limit/invariance contract below. If the owner supplies the original, review whether it contains additional obligations before freezing. No claim that its exact old content has been recovered.
 
