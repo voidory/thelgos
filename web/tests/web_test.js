@@ -312,6 +312,40 @@ const check = (name, ok, detail = "") => { results.push({ name, ok, detail }); c
     const speed = await page.textContent("#speed-out");
     check("D10 speed test runs every case and reports the warm budget", /Warm full update/.test(speed) && /Budget/.test(speed), speed.split("\n")[5]);
 
+    // ---- Release 2, Milestone C: node markers (L5), rule check (L4), phase painting (D3). ----
+    await pick(page, "allyl cation pi");
+    await page.waitForFunction(() => document.body.dataset.rendered === "allyl cation pi|1|");
+    const nodeLabels = await page.$$eval("#diagram .nodes-tag", (t) => t.map((x) => x.textContent));
+    await page.$eval('[data-mo="1"]', (h) => h.dispatchEvent(new Event("click")));
+    await page.waitForFunction(() => document.body.dataset.rendered === "allyl cation pi|1|1");
+    const psi2 = await page.evaluate(() => ({
+      through: document.querySelectorAll("#structure .node-through").length,
+      pos: document.querySelectorAll("#structure .lobe-pos").length, neg: document.querySelectorAll("#structure .lobe-neg").length,
+      rows: [...document.querySelectorAll("#ledger tr.node-through")].map((r) => r.textContent).join(" | ") }));
+    check("L5 allyl ψ2: one node through C2 linked to its zero-weight ledger rows; node counts beside the levels",
+          psi2.through === 1 && psi2.rows.includes("node through C2") && JSON.stringify(nodeLabels) === JSON.stringify(["2 nodes", "1 node", "0 nodes"]), `${psi2.rows.slice(0, 60)}; ${nodeLabels}`);
+    check("π lobes facing the viewer keep their sign (ψ2: one positive, one negative)", psi2.pos === 1 && psi2.neg === 1, JSON.stringify(psi2));
+    await page.$eval('[data-mo="2"]', (h) => h.dispatchEvent(new Event("click")));
+    await page.waitForFunction(() => document.body.dataset.rendered === "allyl cation pi|1|2");
+    const psi3 = await page.$$eval("#structure .node-between", (m) => m.map((x) => x.dataset.row));
+    await page.$eval("#structure .node-between", (m) => m.dispatchEvent(new Event("mouseenter")));
+    const linked = await page.$eval(`#ledger tr[data-row="${psi3[0]}"]`, (r) => r.classList.contains("hot") && r.textContent.includes("out-of-phase"));
+    check("L5 allyl ψ3: two nodes between atoms, each linked to its out-of-phase ledger row", psi3.length === 2 && linked, `${psi3.length} markers`);
+    await page.$eval('[data-mo="0"]', (h) => h.dispatchEvent(new Event("click")));
+    await page.waitForFunction(() => document.body.dataset.rendered === "allyl cation pi|1|0");
+    const rc = await page.$$eval("#rulecheck .rc", (r) => r.map((x) => `${x.dataset.rule}:${x.querySelector(".badge").textContent}`));
+    check("L4 allyl ψ1: R6 badged approximate and R9 exact, both shown", JSON.stringify(rc) === JSON.stringify(["R6:approximate", "R9:exact"]), rc.join(", "));
+    await pick(page, "H3+");
+    await page.waitForFunction(() => document.body.dataset.rendered === "H3+|1|");
+    await page.$eval("#paint-toggle", (b) => b.click());
+    await page.waitForFunction(() => !document.querySelector("#paintbox").hidden);
+    const pureAll = await page.$eval("#paintbox", (b) => b.dataset.pure);
+    const clickAtom = async (i) => { const n = await page.evaluate(() => document.body.dataset.dials); await page.$eval(`#structure circle.atom[data-atom="${i}"]`, (c) => c.dispatchEvent(new MouseEvent("click", { bubbles: true }))); await page.waitForFunction((n) => document.body.dataset.dials !== n, n); };
+    await clickAtom(1); await clickAtom(2); await clickAtom(2);
+    const ep = await page.$eval("#paintbox", (b) => [b.dataset.pure, b.textContent]);
+    check("D3 phase painting: all-red H3+ is a true MO (a1′); painting (+, −, 0) gives 100 % e′", pureAll === "true" && ep[0] === "true" && ep[1].includes("100 % 1e"), ep[1].slice(-40));
+    await page.$eval("#paint-toggle", (b) => b.click());
+
     // ---- Release 2, Milestone B: Practice and Exam modes. ----
     await pick(page, "N2");
     await page.waitForFunction(() => document.body.dataset.rendered === "N2|1|");

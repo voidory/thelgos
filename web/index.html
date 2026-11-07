@@ -55,7 +55,9 @@
   </section>
   <section class="inspector" aria-label="Inspector">
     <h2>Structure <span class="badge-slot" data-rules="R1"></span></h2>
-    <div class="structure-tools"><label><input type="checkbox" id="t-3d"> 3D view</label></div>
+    <div class="structure-tools"><label><input type="checkbox" id="t-3d"> 3D view</label>
+      <button type="button" id="paint-toggle" class="chipbtn" aria-pressed="false" hidden>Paint phases</button></div>
+    <div id="paintbox" class="dialbox" hidden></div>
     <svg id="structure" role="img" aria-label="Structure with orbital lobes and contacts"></svg>
     <canvas id="view3d" width="600" height="420" hidden aria-label="3D view: drag to rotate"></canvas>
     <div id="dialbox" class="dialbox" hidden>
@@ -73,6 +75,7 @@
     <p id="ledger-hint">Tap a molecular orbital to see every contact that sets its energy.</p>
     <button id="whyjump" type="button" hidden>Show where this level appeared</button>
     <div id="ledger"></div>
+    <div id="rulecheck" class="rulecheck" hidden></div>
     <h2>Matching <span class="badge-slot" data-rules="R7"></span></h2>
     <div id="matching"></div>
     <h2>Bond order <span class="badge-slot" data-rules="R8"></span></h2>

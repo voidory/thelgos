@@ -18,7 +18,7 @@ const call = (cmd, args) => new Promise((resolve, reject) => {
 const $ = (id) => document.getElementById(id);
 const NS = "http://www.w3.org/2000/svg";
 const state = { case: null, s: 1, level: null, fragment: null, view: null, info: null, watching: false,
-  electrons: null, approx: null, dial: 0, lp: 0 };
+  electrons: null, approx: null, dial: 0, lp: 0, paint: null };
 
 function el(tag, attrs = {}, text) {
   const e = document.createElementNS(NS, tag);
@@ -63,6 +63,7 @@ function richText(parts, attrs) {
     if (kind === "sub" || kind === "sup") a["font-size"] = "68%";
     if (kind === "tag") { a.class = "frontier"; a.dx = 8; }
     if (kind === "warn") { a.class = "warn-mark"; a.dx = 4; }
+    if (kind === "nodes") { a.class = "nodes-tag"; a.dx = 8; }
     t.append(el("tspan", a, txt));
     shift = target;
   }
@@ -240,6 +241,8 @@ function draw(view) {
       const homo = isMO && atEnd && r.items.some(([, k]) => k === view.result.frontier.HOMO);
       const lumo = isMO && atEnd && r.items.some(([, k]) => k === view.result.frontier.LUMO);
       const warn = isMO && atEnd && r.items.some(([lv]) => lv.warnings && lv.warnings.length);
+      // L5: node count beside the level (one-orbital-per-atom chains and rings).
+      if (isMO && atEnd && r.items.length === 1 && r.items[0][0].nodes !== undefined) parts.push([`${r.items[0][0].nodes} node${r.items[0][0].nodes === 1 ? "" : "s"}`, "nodes"]);
       if (homo || lumo) parts.push([homo && lumo ? "HOMO = LUMO" : homo ? "HOMO" : "LUMO", "tag"]);
       if (warn) parts.push(["◆", "warn"]);
       if (parts.length) labels[col].push({ y: yy, x: col === "left" ? leftmost - 10 : rightmost + 10, anchor: col === "left" ? "end" : "start", parts, ox: col === "left" ? leftmost : rightmost });
@@ -393,7 +396,9 @@ function ledger(view) {
   wj.hidden = !(L && L.level !== null && view.schedule.s >= 1);
   if (!L) { $("ledger-hint").textContent = "Tap a molecular orbital (at any point of the construction) to see every contact that sets its energy."; return; }
   const when = view.schedule.s >= 1 ? "" : ` at this point of the construction (s = ${view.schedule.s.toFixed(2)})`;
-  $("ledger-hint").textContent = L.fragment
+  $("ledger-hint").textContent = L.painted
+    ? `Your painted combination: ledger total ${fmt(L.total_eV, 6)} eV (its energy, computed from the contacts within the set).`
+    : L.fragment
     ? `${L.fragment_label}${L.multiplicity > 1 ? ` (one of ${L.multiplicity} degenerate components)` : ""}: ledger total ${fmt(L.total_eV, 6)} eV; orbital energy ${fmt(L.eigenvalue_eV, 6)} eV. Only contacts within its own set appear: it has not met the other side yet.`
     : `Level ${L.level + 1}${when}: ledger total ${fmt(L.total_eV, 6)} eV; eigenvalue ${fmt(L.eigenvalue_eV, 6)} eV.`;
   const t = document.createElement("table");
@@ -403,13 +408,15 @@ function ledger(view) {
   const tb = document.createElement("tbody");
   let run = 0;
   for (const r of L.rows) {
-    if (Math.abs(r.energy_eV) < 1e-9) continue;
+    if (Math.abs(r.energy_eV) < 1e-9 && r.node !== "through") continue;
     run += r.energy_eV;
     const tr = document.createElement("tr");
     tr.dataset.row = L.rows.indexOf(r);
     if (r.kind === "contact") { tr.addEventListener("mouseenter", () => hot(tr.dataset.row, true)); tr.addEventListener("mouseleave", () => hot(tr.dataset.row, false)); }
     const name = r.kind === "onsite" ? L.basis_labels[r.mu] : `${L.basis_labels[r.mu]}–${L.basis_labels[r.nu]}`;
-    tr.innerHTML = `<td>${name}</td><td>${r.kind === "onsite" ? "on-site" : (r.phase === "in" ? "in-phase" : "out-of-phase")}</td>` +
+    if (r.node) tr.classList.add(`node-${r.node}`);
+    const phaseTxt = r.node === "through" ? `zero (node through ${r.node_atom})` : r.kind === "onsite" ? "on-site" : (r.phase === "in" ? "in-phase" : "out-of-phase") + (r.node === "between" ? " (node)" : "");
+    tr.innerHTML = `<td>${name}</td><td>${phaseTxt}</td>` +
       `<td>${r.kind === "onsite" ? "" : fmt(r.contact_weight_eV)}</td><td>${fmt(r.energy_eV)}</td><td>${fmt(run)}</td>`;
     tb.append(tr);
   }
@@ -499,7 +506,7 @@ function reproject(S, u, v, w) {
   const dot = (a, b) => a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
   return { ...S,
     atoms: S.atoms.map((a) => ({ ...a, x: dot(a.xyz, u), y: dot(a.xyz, v), depth: dot(a.xyz, w) })),
-    lobes: S.lobes.map((l) => (l.kind === "p" ? { ...l, dir2d: [dot(l.dir3d, u), dot(l.dir3d, v)] } : l)) };
+    lobes: S.lobes.map((l) => (l.kind === "p" ? { ...l, dir2d: [dot(l.dir3d, u), dot(l.dir3d, v)], depth: dot(l.dir3d, w) } : l)) };
 }
 function miniOrbital(svg, S, axes) {
   if (axes) S = reproject(S, ...axes);
@@ -768,6 +775,40 @@ function showResult(stepName) {
   document.body.dataset.quizChecked = String(Date.now());
 }
 
+// ---- L4 rule check and D3 phase painting. ----
+function ruleCheck(view) {
+  const box = $("rulecheck"); if (!box) return;
+  const R = view.rule_check;
+  box.hidden = !R; box.replaceChildren();
+  if (!R) return;
+  const h = document.createElement("h3"); h.textContent = "Rule check"; box.append(h);
+  const r6 = R.R6, p6 = document.createElement("p"); p6.className = `rc ${r6.agrees ? "ok" : "approx"}`; p6.dataset.rule = "R6";
+  p6.innerHTML = `<b>R6 counting</b> <span class="badge">${r6.badge}</span><br>${r6.n_in} in-phase, ${r6.n_out} out-of-phase contacts over N = ${r6.N}: ` +
+    `predicts ${fmt(r6.prediction_eV, 3)} eV; exact ${fmt(r6.exact_eV, 3)} eV.` + (r6.reason ? `<br><span class="muted-text">Differs because ${r6.reason}.</span>` : "");
+  box.append(p6);
+  if (R.R9) {
+    const p9 = document.createElement("p"); p9.className = `rc ${R.R9.agrees === false ? "approx" : "ok"}`; p9.dataset.rule = "R9";
+    p9.innerHTML = `<b>R9 nodes</b> <span class="badge">${R.R9.badge}</span><br>${R.R9.text}`;
+    box.append(p9);
+  }
+}
+function paintPanel(view) {
+  const btn = $("paint-toggle"), box = $("paintbox"); if (!btn) return;
+  btn.hidden = !view.paint_set;
+  btn.setAttribute("aria-pressed", !!state.paint);
+  box.hidden = !view.paint;
+  if (!view.paint) return;
+  const P = view.paint;
+  const pct = (w) => `${(100 * w).toFixed(w > 0.995 || w < 0.005 ? 0 : 1)} %`;
+  const items = P.decomposition.slice().sort((a, b) => b.weight - a.weight).map((d) =>
+    `<li><span class="bar" style="width:${(100 * d.weight).toFixed(1)}%"></span>${pct(d.weight)} ${d.label ? `${d.label} ` : ""}${d.number || ""}${htmlLabel(d)}</li>`).join("");
+  box.innerHTML = `<p>Click atoms in the structure to set each one's phase (red +, blue −, then empty for zero).</p>` +
+    `<p><b>${fmt(P.energy_eV, 3)} eV</b>${P.nodes !== null && P.nodes !== undefined ? `, ${P.nodes} node${P.nodes === 1 ? "" : "s"}` : ""}. ` +
+    (P.pure ? `<b>This is a true ${P.column === "MOs" ? "molecular orbital" : "ligand group orbital"}</b> (all its weight is on one level).`
+            : `Not a true ${P.column === "MOs" ? "MO" : "LGO"}: it is a mixture of these levels.`) + `</p><ul class="decomp">${items}</ul>`;
+  box.dataset.pure = P.pure;
+}
+
 function bonds(view) {
   const bo = view.result.bond_orders;
   const c = bo.counting, dm = bo.density_matrix;
@@ -819,21 +860,21 @@ let latest = 0;
 async function refresh() {
   const mine = ++latest;
   const view = await call("view", { case: state.case, s: state.s, level: state.level, fragment: state.fragment, electrons: state.electrons,
-    approx: state.approx, dial: state.dial, lone_pair_angle: state.case && state.case.startsWith("H2O") ? state.lp : null });
+    approx: state.approx, dial: state.dial, lone_pair_angle: state.case && state.case.startsWith("H2O") ? state.lp : null, paint: state.paint });
   if (mine !== latest) return state.view;  // a newer request superseded this one
   state.view = view;
-  draw(view); levelTable(view); narrate(view); ledger(view); bonds(view); pes(view); dials(view); banner(view); about(view);
+  draw(view); levelTable(view); narrate(view); ledger(view); bonds(view); pes(view); dials(view); ruleCheck(view); paintPanel(view); banner(view); about(view);
   structure(view); matching(view); slotBadges(view);
   if (proposal) proposalUpdate(view);
   if ($("t-3d").checked) view3d.render(view);
   document.body.dataset.computeMs = view.compute_ms.toFixed(1);
-  document.body.dataset.dials = JSON.stringify({ electrons: view.electrons.count, approx: view.approx.value, dial: view.dial ? view.dial.angle_deg : null, lp: view.lone_pairs ? view.lone_pairs.angle_deg : null });
+  document.body.dataset.dials = JSON.stringify({ electrons: view.electrons.count, approx: view.approx.value, dial: view.dial ? view.dial.angle_deg : null, lp: view.lone_pairs ? view.lone_pairs.angle_deg : null, paint: view.paint ? view.paint.signs : null });
   document.body.dataset.rendered = `${view.case}|${view.schedule.s}|${view.ledger ? (view.ledger.fragment ?? view.ledger.level) : ""}`;
   return view;
 }
 
-function select(k) { glideToken++; state.level = k; state.fragment = null; state.dial = 0; refresh(); }
-function selectFragment(id) { glideToken++; state.fragment = id; state.level = null; state.dial = 0; refresh(); }
+function select(k) { glideToken++; state.level = k; state.fragment = null; state.dial = 0; state.paint = null; refresh(); }
+function selectFragment(id) { glideToken++; state.fragment = id; state.level = null; state.dial = 0; state.paint = null; refresh(); }
 
 // Glide: when jumping between construction steps (step buttons, "why does it jump"), the levels slide
 // to their new energies through intermediate s values instead of snapping, so the eye can follow each
@@ -914,7 +955,7 @@ function slotBadges(view) {
 
 // ---- Linked contacts: a ledger row and its structure line highlight together (L2). ----
 function hot(row, on) {
-  for (const e of document.querySelectorAll(`[data-row="${row}"]`)) e.classList.toggle("hot", on);
+  for (const e of document.querySelectorAll(`[data-row="${row}"], [data-rows~="${row}"]`)) e.classList.toggle("hot", on);
   view3d.hot(on ? Number(row) : null);
 }
 
@@ -950,11 +991,16 @@ function drawOrbital(parent, S, X, Y, scale, labels) {
       const r = (8 + 30 * Math.abs(l.coefficient) / maxc) * scale;
       const x = X(a.x), y = Y(a.y);
       if (l.kind === "s") {
-        parent.append(el("circle", { cx: x, cy: y, r, class: l.coefficient > 0 ? "lobe-pos" : "lobe-neg" }));
+        parent.append(el("circle", { cx: x, cy: y, r, class: l.coefficient > 0 ? "lobe-pos" : "lobe-neg", "data-atom": a.index }));
       } else {
         const [dx, dy] = l.dir2d, n = Math.hypot(dx, dy);
-        if (n < 1e-6) {  // p orbital pointing at the viewer: draw it face-on
-          parent.append(el("circle", { cx: x, cy: y, r: r * 0.6, class: l.coefficient > 0 ? "lobe-pos" : "lobe-neg" }));
+        if (n < 1e-6) {  // p orbital pointing at the viewer: draw it face-on, coloured by the lobe that faces us
+          // The merged lobe's size is |c| (positive); its sign is in the direction, so read whether the positive
+          // lobe points towards the viewer (depth > 0) or away.
+          const depth = l.depth !== undefined ? l.depth
+            : (S.view_rotation ? S.view_rotation[2].reduce((acc, v, i) => acc + v * l.dir3d[i], 0) : 1);
+          const facing = (depth >= 0) === (l.coefficient > 0);
+          parent.append(el("circle", { cx: x, cy: y, r: r * 0.6, class: facing ? "lobe-pos" : "lobe-neg", "data-atom": a.index }));
           continue;
         }
         const ang = Math.atan2(-dy, dx) * 180 / Math.PI, len = r * Math.max(0.35, n);
@@ -962,11 +1008,11 @@ function drawOrbital(parent, S, X, Y, scale, labels) {
           const positive = (sgn > 0) === (l.coefficient > 0);
           parent.append(el("ellipse", { cx: x + sgn * len * Math.cos(ang * Math.PI / 180), cy: y + sgn * len * Math.sin(ang * Math.PI / 180),
                                      rx: len, ry: r * 0.42, transform: `rotate(${ang} ${x + sgn * len * Math.cos(ang * Math.PI / 180)} ${y + sgn * len * Math.sin(ang * Math.PI / 180)})`,
-                                     class: positive ? "lobe-pos" : "lobe-neg" }));
+                                     class: positive ? "lobe-pos" : "lobe-neg", "data-atom": a.index }));
         }
       }
     }
-    parent.append(el("circle", { cx: X(a.x), cy: Y(a.y), r: 9 * scale, class: "atom" }));
+    parent.append(el("circle", { cx: X(a.x), cy: Y(a.y), r: 9 * scale, class: "atom", "data-atom": a.index }));
     if (labels) parent.append(el("text", { x: X(a.x), y: Y(a.y) + 4, "text-anchor": "middle" }, a.element));
   }
 }
@@ -1004,6 +1050,30 @@ function structure(view) {
     svg.append(line);
   }
   drawOrbital(svg, S, X, Y, 1, true);
+  // L5 node markers: a bar across the bond for a node between atoms (an out-of-phase contact), a dotted ring
+  // round the atom for a node through it (zero coefficient). Each is linked to its ledger rows.
+  if (S.nodes) {
+    for (const b of S.nodes.between) {
+      const a = at[b.atoms[0]], c = at[b.atoms[1]];
+      const mx = (X(a.x) + X(c.x)) / 2, my = (Y(a.y) + Y(c.y)) / 2, len = Math.hypot(X(c.x) - X(a.x), Y(c.y) - Y(a.y)) || 1;
+      const nx = -(Y(c.y) - Y(a.y)) / len * 22, ny = (X(c.x) - X(a.x)) / len * 22;
+      const m = el("line", { x1: mx - nx, y1: my - ny, x2: mx + nx, y2: my + ny, class: "node-mark node-between", "data-row": b.ledger_row });
+      m.append(el("title", {}, "Node between these atoms: an out-of-phase contact, which costs energy"));
+      m.addEventListener("mouseenter", () => hot(b.ledger_row, true)); m.addEventListener("mouseleave", () => hot(b.ledger_row, false));
+      svg.append(m);
+    }
+    for (const i of S.nodes.through) {
+      const a = at[i];
+      const m = el("circle", { cx: X(a.x), cy: Y(a.y), r: 24, class: "node-mark node-through", "data-rows": S.nodes.through_rows.join(" ") });
+      m.append(el("title", {}, "Node through this atom: its coefficient is zero, so its contacts drop out and cost nothing"));
+      m.addEventListener("mouseenter", () => S.nodes.through_rows.forEach((r) => hot(r, true)));
+      m.addEventListener("mouseleave", () => S.nodes.through_rows.forEach((r) => hot(r, false)));
+      svg.append(m);
+    }
+    const nb = S.nodes.between.length, nt = S.nodes.through.length;
+    svg.append(el("text", { x: 8, y: 20, class: "nodes-caption" },
+      `${S.nodes.count !== null ? `${S.nodes.count} node${S.nodes.count === 1 ? "" : "s"}: ` : ""}${nb} between atoms, ${nt} through an atom`));
+  }
   svg.append(el("text", { x: 8, y: H - 8, class: "muted" }, "Red = positive phase, blue = negative. Solid line: stabilising contact; dashed: destabilising."));
 }
 
@@ -1380,7 +1450,7 @@ function proposalUpdate(view) {
     state.case = cases.find((c) => c.name === "SF6 model").name;
     if (await fromLink()) $("s").value = state.s;
     sel.value = state.case;
-    sel.addEventListener("change", () => { if (quiz.mode !== "explore") { state.case = sel.value; state.level = null; state.fragment = null; state.electrons = null; state.approx = null; refresh(); newAttempt(); return; } glideToken++; state.case = sel.value; state.level = null; state.fragment = null; state.electrons = null; state.approx = null; state.dial = 0; state.lp = 0; state.s = 1; $("s").value = 1; refresh(); });
+    sel.addEventListener("change", () => { if (quiz.mode !== "explore") { state.case = sel.value; state.level = null; state.fragment = null; state.electrons = null; state.approx = null; refresh(); newAttempt(); return; } glideToken++; state.case = sel.value; state.level = null; state.fragment = null; state.electrons = null; state.approx = null; state.dial = 0; state.lp = 0; state.paint = null; state.s = 1; $("s").value = 1; refresh(); });
     $("s").addEventListener("input", () => { glideToken++; state.s = Number($("s").value); state.level = null; state.fragment = null; refresh(); });
     $("whyjump").addEventListener("click", () => {
       const o = state.view.origins[state.level];
@@ -1407,6 +1477,18 @@ function proposalUpdate(view) {
     $("dial").addEventListener("input", (e) => { state.dial = Number(e.target.value); refresh(); });
     $("lpdial").addEventListener("input", (e) => { state.lp = Number(e.target.value); refresh(); });
     $("t-symonly").addEventListener("change", () => draw(state.view));
+    $("paint-toggle").addEventListener("click", () => {
+      state.paint = state.paint ? null : state.view.paint_set.atoms.map(() => 1);
+      state.level = null; state.fragment = null; refresh();
+    });
+    $("structure").addEventListener("click", (e) => {
+      const a = e.target.closest("[data-atom]"); if (!a || !state.paint) return;
+      const k = state.view.paint_set.atoms.indexOf(Number(a.dataset.atom)); if (k < 0) return;
+      const next = { 1: -1, "-1": 0, 0: 1 }[state.paint[k]];
+      const trial = state.paint.map((x, i) => (i === k ? next : x));
+      state.paint = trial.some((x) => x !== 0) ? trial : state.paint.map((x, i) => (i === k ? 1 : x));
+      refresh();
+    });
     for (const id of ["t-mixing", "t-allowed", "t-irreps"]) $(id).addEventListener("change", () => draw(state.view));
     for (const id of ["case", "s", "watch"]) $(id).disabled = false;
     await refresh();

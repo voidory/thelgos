@@ -232,6 +232,27 @@ The owner approved these defaults: the current molecules only; two question type
 - **Left out of the quizzes:** the two hydrogen-only diagnostic sets (six H Oh, four H Td), which are not molecules.
 - **Water model vs lecture.** The model counts 3a1 as bonding and gives water a bond order of 1.5; the lecture preset gives the textbook 1. The quiz uses whichever preset is selected. This is model behaviour, not a quiz bug.
 
+## Release 2, Milestone C: node markers, rule checks, phase painting, design choices (delegated, 2026-11-07)
+
+- **Where they apply.** Node markers (L5), the rule check (L4) and phase painting (D3) work on "one orbital per atom" sets with equal on-site energies, the setting R6 and R9 are stated for:
+  - the ligand set of a central-atom molecule (its LGO side);
+  - a whole molecule with one orbital per atom (H2, H3+, neutral H3, allyl π, the hydrogen-only sets).
+
+  Diatomics with s and p, and the MOs of central-atom molecules, mix different orbital types on one atom. Counting nodes there is not well defined, so these features are not offered.
+- **Node count (L5).** The chain or ring is read from which atoms are coupled.
+  - *Chain:* the number of sign changes along it, where a zero coefficient counts once (a node through that atom).
+  - *Ring:* the number of nodal planes, which is sign changes divided by 2.
+  - *3D sets:* markers only, with no count.
+
+  Node markers link to the ledger: between-atom nodes to out-of-phase rows, through-atom nodes to the zero-weight rows, which the ledger now shows (it used to hide zero rows).
+- **R6 (L4).** The prediction is ε + (2/N) Σ ± t over the contacts of the nonzero atoms. When every contact is the same size, this is the lecture's ε + (2t/N)(n_in − n_out). It is exact exactly when all nonzero coefficients have equal size. The stated reasons when it is not:
+  - unequal coefficients, shown scaled to the smallest one, e.g. (1, 1.41, 1) for allyl ψ1 and (2, 2, −1, −1, −1, −1) for octahedral e_g;
+  - unequal contacts (neighbouring vs opposite atoms).
+- **R9 (L4).** Ordering by node count is compared with the exact ordering, badged "exact" for chains and "exact up to degenerate pairs" for rings. 3D sets are "heuristic", and sets with no contacts are "not applied".
+- **Default component of a degenerate set.** The first component is now the projection of the basis function with the largest weight, so it "points at" an atom. This gives the textbook patterns, (2, −1, −1) for e′ and the d_z²-like e_g, instead of the eigen-solver's arbitrary (and machine-dependent) choice. The D4 dial rotates from there.
+- **Painting (D3).** Clicking an atom or one of its lobes cycles + → − → 0. The painted combination's energy, ledger, nodes and rule check follow. Its decomposition onto the set's levels (LGOs, or MOs for a whole-molecule set) shows "a true LGO/MO" when one level holds all the weight.
+- **Regression fixed.** Since the p functions on an atom were merged into one oriented lobe (design pass), a p lobe pointing at the viewer was always drawn red, because the merged size is positive and the sign is in the direction. So the allyl π orbitals lost their colours. The face-on lobe is now coloured by whether its positive end faces the viewer, and a browser check guards it.
+
 ## B6. Sign-off (owner only)
 
 Not delegated. On 2026-11-06 the owner gave standing permission for Claude to apply the drafted changes. They are now in `CONVENTIONS.md` v1.3 and the spec, and the drafts in `drafts/` remain as the record. Applying them is not sign-off: v1.3 stays "not frozen" until the owner reviews it.

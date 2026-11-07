@@ -389,6 +389,66 @@ class ReleaseTwoDials(unittest.TestCase):
         self.assertIsNone(api.view(P, G, "CH4", lone_pair_angle=45)["lone_pairs"])
 
 
+class NodesRulesPainting(unittest.TestCase):
+    """Release 2, Milestone C: L4 rule check, L5 node markers, D3 phase painting (spec 'done when')."""
+
+    def setUp(self):
+        from lgo_engine import app_api
+        self.api = app_api
+
+    def test_l4_rule_check(self):
+        api = self.api
+        r = api.view(P, G, "allyl cation pi", level=0)["rule_check"]
+        self.assertEqual(r["R6"]["badge"], "approximate")
+        self.assertIn("unequal coefficients (1, 1.41, 1)", r["R6"]["reason"])
+        self.assertEqual(r["R9"]["badge"], "exact"); self.assertTrue(r["R9"]["agrees"])
+        for name, kw in (("CH4", {"fragment": "R0"}), ("CH4", {"fragment": "R1"}), ("H3+", {"level": 0})):
+            r6 = api.view(P, G, name, **kw)["rule_check"]["R6"]
+            self.assertEqual(r6["badge"], "exact", (name, kw))
+            self.assertAlmostEqual(r6["prediction_eV"], r6["exact_eV"], delta=1e-9)
+        for name, kw in (("SF6 model", {"fragment": "R2"}), ("six H Oh", {"level": 2})):
+            self.assertIn("(2, 2, −1, −1, −1, −1)", api.view(P, G, name, **kw)["rule_check"]["R6"]["reason"], name)
+
+    def test_l5_node_markers(self):
+        api = self.api
+        v = api.view(P, G, "allyl cation pi", level=1)
+        self.assertEqual(v["nodes"]["through_atoms"], [1]); self.assertEqual(v["nodes"]["count"], 1)
+        rows = v["structure"]["nodes"]["through_rows"]
+        self.assertTrue(rows and all(abs(v["ledger"]["rows"][i]["energy_eV"]) < 1e-9 and v["ledger"]["rows"][i]["node_atom"] == "C2" for i in rows))
+        v = api.view(P, G, "allyl cation pi", level=2)
+        self.assertEqual(v["nodes"]["count"], 2); self.assertEqual(len(v["structure"]["nodes"]["between"]), 2)
+        for b in v["structure"]["nodes"]["between"]:
+            self.assertEqual(v["ledger"]["rows"][b["ledger_row"]]["phase"], "out")
+        # Every node count equals the sign changes of the engine's eigenvector (chains: along the chain).
+        for name in ("allyl cation pi", "H2", "H3+", "neutral H3"):
+            v = api.view(P, G, name)
+            C = np.array(api.run(api._system(P, name), P, G)["eigenvectors"])
+            for k, (x, lv) in enumerate(zip(v["diagram"]["centre"], v["result"]["levels"])):
+                self.assertIn("nodes", x, name)
+                c = api.canonical_components(C[:, lv["indices"]])[:, 0]
+                z = np.abs(c) < 1e-7 * np.max(np.abs(c))
+                if name in ("allyl cation pi", "H2"):
+                    want = int(z.sum()) + sum(1 for i in range(len(c) - 1) if not z[i] and not z[i + 1] and c[i] * c[i + 1] < 0)
+                else:
+                    want = (2 * int(z.sum()) + sum(1 for i in range(3) if not z[i] and not z[(i + 1) % 3] and c[i] * c[(i + 1) % 3] < 0)) // 2
+                self.assertEqual(x["nodes"], want, (name, k))
+
+    def test_d3_phase_painting(self):
+        api = self.api
+        for name, signs, label in (("H3+", [1, 1, 1], "A1'"), ("H3+", [1, -1, 0], "E'"), ("allyl cation pi", [1, 0, -1], "A2")):
+            p = api.view(P, G, name, paint=signs)["paint"]
+            self.assertTrue(p["pure"], (name, signs))
+            self.assertEqual([d["irrep"] for d in p["decomposition"] if d["weight"] > 1e-9], [label])
+        p = api.view(P, G, "H3+", paint=[1, 0, 0])["paint"]
+        self.assertFalse(p["pure"])
+        self.assertAlmostEqual(sum(d["weight"] for d in p["decomposition"]), 1.0, delta=1e-12)
+        p = api.view(P, G, "SF6 model", paint=[1, 1, 1, 1, 1, 1])["paint"]
+        self.assertTrue(p["pure"]); self.assertEqual(p["decomposition"][0]["label"], "LGO1")
+        self.assertIsNone(api.view(P, G, "N2")["paint_set"])
+        with self.assertRaises(ValueError):
+            api.view(P, G, "H3+", paint=[0, 0, 0])
+
+
 class PracticeAndExam(unittest.TestCase):
     """Release 2, Milestone B: questions are generated and checked in the engine, against the Miessler levels (M8)."""
 

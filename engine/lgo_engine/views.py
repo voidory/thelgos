@@ -258,6 +258,148 @@ def lone_pairs(system, H, result, angle_deg):
             "density_change_max": float(np.max(np.abs(rho - rho0)))}
 
 
+# ---- Release 2, Milestone C: one-orbital-per-atom sets, node markers (L5), rule checks (L4), phase painting (D3). ----
+
+def orbital_set(system, H, diagram):
+    """The set of orbitals that node counting, R6 and painting apply to: one basis function per atom, all
+    with the same on-site energy. For a central-atom molecule that is the ligand set (the LGO side); for a
+    molecule with no central atom, the whole basis. Diatomics and mixed s/p sets have none.
+    Returns dict(idx, atoms, H (the set's own block), topology, order) or None."""
+    cols = diagram["columns"]
+    one_each = len({f.atom for f in system.basis}) == len(system.basis)
+    if "left" in cols and system.central_atom is not None:
+        idx = [k for k, f in enumerate(system.basis) if f.atom != system.central_atom]
+    elif one_each:
+        idx = list(range(len(system.basis)))    # the whole molecule: H2, H3+, allyl pi, ligand-only sets
+    else:
+        return None
+    atoms = [system.basis[k].atom for k in idx]
+    if len(set(atoms)) != len(atoms) or len(idx) < 2:
+        return None
+    Hs = H[np.ix_(idx, idx)]
+    if np.ptp(np.diag(Hs)) > 1e-9:
+        return None
+    n = len(idx)
+    adj = [[j for j in range(n) if j != i and abs(Hs[i, j]) > 1e-9] for i in range(n)]
+    edges = sum(len(a) for a in adj) // 2
+    topo, order = ("none" if edges == 0 else "other"), None
+    deg = [len(a) for a in adj]
+    def walk(start):
+        seq, prev = [start], None
+        while True:
+            nxt = [j for j in adj[seq[-1]] if j != prev and j not in seq]
+            if not nxt:
+                return seq
+            prev = seq[-1]
+            seq.append(nxt[0])
+    if edges == n - 1 and max(deg) <= 2 and n >= 2:
+        end = deg.index(1)
+        seq = walk(end)
+        if len(seq) == n:
+            topo, order = "chain", seq
+    elif edges == n and all(d == 2 for d in deg):
+        seq = walk(0)
+        if len(seq) == n:
+            topo, order = "ring", seq
+    return {"idx": idx, "atoms": atoms, "H": Hs, "topology": topo, "order": order, "whole": len(idx) == len(system.basis)}
+
+
+def _zero(cs):
+    return np.abs(cs) < 1e-7 * max(np.max(np.abs(cs)), 1e-30)
+
+
+def node_info(system, oset, c_full):
+    """L5: nodes of an orbital on a one-orbital-per-atom set. A zero coefficient is a node through that atom;
+    an out-of-phase contact is a node between the two atoms. For chains the count is the number of sign
+    changes along the chain (a zero counts once); for rings, the number of nodal planes (sign changes / 2).
+    Other shapes get markers but no count."""
+    cs = np.asarray(c_full)[oset["idx"]]
+    z = _zero(cs)
+    Hs = oset["H"]
+    n = len(cs)
+    through = [oset["atoms"][k] for k in range(n) if z[k]]
+    between = [{"atoms": [oset["atoms"][i], oset["atoms"][j]], "mu": oset["idx"][i], "nu": oset["idx"][j]}
+               for i in range(n) for j in range(i + 1, n)
+               if abs(Hs[i, j]) > 1e-9 and not z[i] and not z[j] and cs[i] * cs[j] < 0]
+    count = None
+    if oset["topology"] in ("chain", "ring"):
+        seq = [cs[k] for k in oset["order"]]
+        zs = [_zero(np.array(seq))[k] for k in range(n)]
+        if oset["topology"] == "chain":
+            interior_zero = sum(1 for k in range(n) if zs[k])
+            flips = sum(1 for k in range(n - 1) if not zs[k] and not zs[k + 1] and seq[k] * seq[k + 1] < 0)
+            count = interior_zero + flips
+        else:
+            pairs = [(k, (k + 1) % n) for k in range(n)]
+            flips = sum(1 for a, b in pairs if not zs[a] and not zs[b] and seq[a] * seq[b] < 0)
+            count = (2 * sum(zs) + flips) // 2
+    return {"through_atoms": [int(a) for a in through], "count": None if count is None else int(count), "topology": oset["topology"],
+            "between": [{"atoms": [int(x) for x in b["atoms"]], "mu": int(b["mu"]), "nu": int(b["nu"])} for b in between]}
+
+
+def _ratio_text(cs):
+    """Coefficients scaled by the smallest non-zero one, e.g. (2, −1, −1, 2, −1, −1) or (1, 1.41, 1)."""
+    mx = np.max(np.abs(cs))
+    m = min(abs(x) for x in cs if abs(x) >= 1e-7 * mx)
+    vals = [(x / m if abs(x) >= 1e-7 * mx else 0.0) for x in cs]
+    txt = lambda v: f"{abs(v):.0f}" if abs(abs(v) - round(abs(v))) < 1e-6 else f"{abs(v):.2f}"  # noqa: E731
+    return "(" + ", ".join(("−" if v < 0 else "") + txt(v) for v in vals) + ")"
+
+
+def rule_checks(system, oset, c_full, set_levels):
+    """L4: the counting rule R6 and the node rule R9 for an orbital on a one-orbital-per-atom set, each
+    beside the exact value, with the reason when they differ. set_levels: [(energy, vector_full)] of the
+    set's own levels (first component of each degenerate level)."""
+    cs = np.asarray(c_full)[oset["idx"]]
+    cs = cs / np.linalg.norm(cs)
+    Hs = oset["H"]
+    eps = float(Hs[0, 0])
+    exact = float(cs @ Hs @ cs)
+    z = _zero(cs)
+    nz = [k for k in range(len(cs)) if not z[k]]
+    N = len(nz)
+    sgn = np.sign(cs)
+    pairs = [(i, j) for i in nz for j in nz if i < j and abs(Hs[i, j]) > 1e-9]
+    n_in = sum(1 for i, j in pairs if sgn[i] * sgn[j] > 0)
+    n_out = len(pairs) - n_in
+    ts = sorted({round(abs(Hs[i, j]), 9) for i, j in pairs})
+    pred = eps + (2.0 / N) * sum(sgn[i] * sgn[j] * Hs[i, j] for i, j in pairs) if N else eps
+    equal_c = np.ptp(np.abs(cs[nz])) < 1e-6 if N else True
+    reasons = []
+    if not equal_c:
+        reasons.append(f"unequal coefficients {_ratio_text(cs)}: the counting rule assumes every atom contributes equally")
+    if len(ts) > 1:
+        reasons.append(f"the contacts are not all the same size (|t| from {ts[0]:.2f} to {ts[-1]:.2f} eV, e.g. neighbouring vs opposite atoms)")
+    if len(ts) == 1:
+        t = float(next(Hs[i, j] for i, j in pairs))
+        formula = f"ε + (2t/N)(n_in − n_out) = ε + (2t/{N})({n_in} − {n_out})"
+    else:
+        formula = f"ε + (2/N) Σ ± t, over {n_in} in-phase and {n_out} out-of-phase contacts, N = {N}"
+    exact_ok = abs(pred - exact) < 1e-9
+    r6 = {"rule": "R6", "prediction_eV": float(pred), "exact_eV": exact, "agrees": bool(exact_ok),
+          "badge": "exact" if exact_ok else "approximate", "n_in": int(n_in), "n_out": int(n_out), "N": int(N),
+          "formula": formula, "reason": None if exact_ok else "; ".join(reasons) or "the coefficients are not ±1/√N"}
+    out = {"R6": r6, "R9": None}
+    if oset["topology"] in ("chain", "ring") and set_levels:
+        counts = [node_info(system, oset, v)["count"] for _, v in set_levels]
+        es = [e for e, _ in set_levels]
+        mine = node_info(system, oset, c_full)["count"]
+        # Ordering by node count must agree with the energy ordering (ties in energy may share a count).
+        consistent = all((es[a] < es[b] - 1e-9) <= (counts[a] <= counts[b]) for a in range(len(es)) for b in range(len(es)))
+        badge = "exact" if oset["topology"] == "chain" else "exact up to degenerate pairs"
+        out["R9"] = {"rule": "R9", "nodes": mine, "level_nodes": counts, "agrees": bool(consistent), "badge": badge,
+                     "text": f"{mine} node{'s' if mine != 1 else ''}; ordering the levels by node count "
+                             f"({', '.join(str(c) for c in counts)}, lowest first) {'matches' if consistent else 'does not match'} the exact order. "
+                             "It gives the order, not the gaps."}
+    elif oset["topology"] == "none":
+        out["R9"] = {"rule": "R9", "nodes": None, "agrees": None, "badge": "not applied",
+                     "text": "No contacts within this set, so every combination has the same energy and node counting has nothing to order."}
+    else:
+        out["R9"] = {"rule": "R9", "nodes": None, "agrees": None, "badge": "heuristic",
+                     "text": "In a 3D set, node counting is only a heuristic for the order; the out-of-phase contacts are marked instead."}
+    return out
+
+
 def pes_spec(system, result, curated=None):
     """Photoelectron spectrum in Koopmans' picture: one band per occupied level at -energy, height = electrons.
 

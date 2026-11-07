@@ -48,7 +48,7 @@ self.onmessage = async (ev) => {
       const t0 = performance.now();
       out = JSON.parse(py.runPython(`
 a = json.loads(ARGS)
-json.dumps(app_api.view(P, G, a["case"], s=a.get("s", 1.0), level=a.get("level"), conventions_sha256=CSHA, extras=X, fragment=a.get("fragment"), electrons=a.get("electrons"), approx=a.get("approx"), dial=a.get("dial") or 0.0, lone_pair_angle=a.get("lone_pair_angle")), allow_nan=False)`));
+json.dumps(app_api.view(P, G, a["case"], s=a.get("s", 1.0), level=a.get("level"), conventions_sha256=CSHA, extras=X, fragment=a.get("fragment"), electrons=a.get("electrons"), approx=a.get("approx"), dial=a.get("dial") or 0.0, lone_pair_angle=a.get("lone_pair_angle"), paint=a.get("paint")), allow_nan=False)`));
       out.compute_ms = performance.now() - t0;
     } else if (cmd === "export") {
       py.globals.set("ARGS", JSON.stringify(args));

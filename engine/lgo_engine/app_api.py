@@ -85,8 +85,31 @@ def _atom_weights(system, V):
     return [float(x) for x in w]
 
 
+def canonical_components(V):
+    """A deterministic orthonormal basis of a degenerate set's span: the first component is the projection of
+    the basis function with the largest weight in the set (lowest index on ties), so it "points at" that atom
+    or orbital, e.g. the textbook (2, 2, -1, -1, -1, -1) e_g pattern or (2, -1, -1) e' pattern. The eigen-solver's
+    own choice of components is arbitrary and can differ between machines."""
+    V = np.asarray(V, float)
+    if V.shape[1] < 2:
+        return V
+    w = np.sum(V ** 2, axis=1)
+    order = np.argsort(-np.round(w, 9), kind="stable")
+    cols = []
+    for b in order:
+        a = V[b, :].copy()
+        for q in cols:
+            a -= (q @ a) * q
+        if np.linalg.norm(a) > 1e-8:
+            cols.append(a / np.linalg.norm(a))
+        if len(cols) == V.shape[1]:
+            break
+    return V @ np.array(cols).T
+
+
 def _dialled(system, V, angle_deg):
-    """D4: one member of a degenerate set, rotated by angle_deg between its first two components."""
+    """D4: one member of a degenerate set, rotated by angle_deg between its first two (canonical) components."""
+    V = canonical_components(V)
     t = np.deg2rad(angle_deg or 0.0)
     c = V[:, 0] if V.shape[1] < 2 else np.cos(t) * V[:, 0] + np.sin(t) * V[:, 1]
     c = c / np.linalg.norm(c)
@@ -115,7 +138,7 @@ def approx_pair(params, name):
 
 
 def view(params, groups, name, s=1.0, level=None, conventions_sha256=None, extras=None, fragment=None,
-         electrons=None, approx=None, dial=0.0, lone_pair_angle=None):
+         electrons=None, approx=None, dial=0.0, lone_pair_angle=None, paint=None):
     """Everything one screen needs: result, diagram, schedule, slider state and ledger.
 
     Release 2 dials: electrons (D6, electron stepper), approx (D2, 0 = lecture preset .. 1 = model
@@ -174,6 +197,74 @@ def view(params, groups, name, s=1.0, level=None, conventions_sha256=None, extra
         ledger.update({"level": None, "fragment": fragment, "fragment_label": info["label"], "eigenvalue_eV": info["energy_eV"],
                        "multiplicity": info["multiplicity"], "basis_labels": [f.label for f in system.basis]})
         structure = views.structure_spec(system, Hfrag, c, ledger)
+    # ---- Milestone C: node markers (L5), rule checks (L4), phase painting (D3) on one-orbital-per-atom sets.
+    oset = views.orbital_set(system, H, diagram)
+    two_col = oset is not None and oset["whole"]   # the set is the whole molecule: its levels are the MOs
+    set_levels, set_names = [], []
+    if oset is not None:
+        if two_col:
+            Cm = np.array(result["eigenvectors"])
+            for k, lv_ in enumerate(result["levels"]):
+                set_levels.append((lv_["energy_eV"], canonical_components(Cm[:, lv_["indices"]])[:, 0]))
+                set_names.append((diagram["centre"][k], np.array(Cm[:, lv_["indices"]])))
+        else:
+            for f in diagram["right"]:
+                Fv = np.array(frag_vectors[f["id"]])
+                set_levels.append((f["energy_eV"], canonical_components(Fv)[:, 0]))
+                set_names.append((f, Fv))
+        if two_col:
+            for k, x in enumerate(diagram["centre"]):
+                ni = views.node_info(system, oset, set_levels[k][1])
+                if ni["count"] is not None:
+                    x["nodes"] = ni["count"]
+    nodes = rules = paint_out = None
+    on_set = oset is not None and ((level is not None and s >= 1 and two_col) or
+                                   (fragment is not None and any(f["id"] == fragment for f in diagram["right"]) and not two_col))
+    if paint is not None:
+        if oset is None:
+            raise ValueError("paint: this case has no one-orbital-per-atom set to paint")
+        if len(paint) != len(oset["idx"]) or not any(paint):
+            raise ValueError(f"paint: give {len(oset['idx'])} signs (+1, −1 or 0), not all zero")
+        c = np.zeros(len(system.basis))
+        c[oset["idx"]] = np.sign(np.asarray(paint, float))
+        c /= np.linalg.norm(c)
+        Hp = np.zeros_like(H)
+        Hp[np.ix_(oset["idx"], oset["idx"])] = oset["H"]
+        ledger = contact_ledger(Hp, c)
+        decomp = []
+        for info_, V in set_names:
+            w = float(np.sum((V.T @ c) ** 2))
+            if w > 1e-12:
+                decomp.append({"label": info_.get("label") or "", "number": info_.get("number"), "irrep": info_["irrep"],
+                               "linear_label": info_.get("linear_label"), "multiplicity": info_["multiplicity"], "weight": w,
+                               "energy_eV": info_["energy_eV"]})
+        ledger.update({"level": None, "painted": True, "eigenvalue_eV": float(c @ Hp @ c), "multiplicity": 1,
+                       "basis_labels": [f.label for f in system.basis]})
+        structure = views.structure_spec(system, Hp, c, ledger)
+        paint_out = {"signs": [int(x) for x in np.sign(paint)], "energy_eV": float(c @ Hp @ c), "decomposition": decomp,
+                     "pure": bool(decomp) and max(d["weight"] for d in decomp) > 1 - 1e-9, "column": "MOs" if two_col else "LGOs"}
+        on_set = True
+    if on_set and ledger is not None and structure is not None:
+        cvec = c
+        nodes = views.node_info(system, oset, cvec)
+        rules = views.rule_checks(system, oset, cvec, set_levels)
+        through = set(nodes["through_atoms"])
+        bkeys = {(b["mu"], b["nu"]) for b in nodes["between"]}
+        bas = system.basis
+        for k_, r in enumerate(ledger["rows"]):
+            if r["kind"] != "contact":
+                continue
+            za = [bas[m].atom for m in (r["mu"], r["nu"]) if bas[m].atom in through]
+            if za:
+                r["node"] = "through"; r["node_atom"] = f"{system.atoms[za[0]].element}{za[0] + 1}"
+            elif (r["mu"], r["nu"]) in bkeys or (r["nu"], r["mu"]) in bkeys:
+                r["node"] = "between"
+        structure["nodes"] = {"through": sorted(through), "count": nodes["count"],
+                              "between": [{"atoms": b["atoms"], "ledger_row": next(i for i, r in enumerate(ledger["rows"])
+                                           if r["kind"] == "contact" and {r["mu"], r["nu"]} == {b["mu"], b["nu"]})} for b in nodes["between"]],
+                              "through_rows": [i for i, r in enumerate(ledger["rows"]) if r.get("node") == "through"]}
+        if paint_out is not None:
+            paint_out["nodes"] = nodes["count"]
     origin = views.origins(sched, result["levels"])
     for st in sched["stages"]:
         st["rules"] = views.STAGE_RULES.get(st["kind"], [])
@@ -209,6 +300,9 @@ def view(params, groups, name, s=1.0, level=None, conventions_sha256=None, extra
                       "max": 2 * len(system.basis)},
         "approx": {"value": approx, "available": approx_pair(params, name) is not None},
         "dial": dial_info,
+        "nodes": nodes, "rule_check": rules, "paint": paint_out,
+        "paint_set": None if oset is None else {"atoms": oset["atoms"], "labels": [f"{system.atoms[i].element}{i + 1}" for i in oset["atoms"]],
+                                                "column": "molecular orbitals" if two_col else "ligand group orbitals"},
         "lone_pairs": views.lone_pairs(system, H, result, lone_pair_angle) if (lone_pair_angle is not None and name.startswith("H2O")) else None,
     }
 
