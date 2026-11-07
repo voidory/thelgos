@@ -316,6 +316,79 @@ class ReadingPanel(unittest.TestCase):
         self.assertTrue(set(load_extras()["notes"]["cases"]) <= names)
 
 
+class ReleaseTwoDials(unittest.TestCase):
+    """Release 2 gate: invariants hold along every dial (D2, D4, D5, D6)."""
+
+    def setUp(self):
+        from lgo_engine import app_api
+        self.api = app_api
+
+    def test_electron_stepper(self):
+        """D6: allyl cation -> radical -> anion, H3+ -> H3 -> H3-; Jahn-Teller warning at neutral H3."""
+        api = self.api
+        for name, seq in (("allyl cation pi", (2, 3, 4)), ("H3+", (2, 3, 4))):
+            charges = []
+            for n in seq:
+                v = api.view(P, G, name, electrons=n)
+                self.assertEqual(sum(x["electrons"] for x in v["result"]["levels"]), n)
+                charges.append(v["electrons"]["charge"])
+            self.assertEqual(charges, [1, 0, -1], name)
+        w = api.view(P, G, "H3+", electrons=3)["result"]["warnings"]
+        self.assertIn("Jahn_Teller_warning", w)
+        self.assertEqual(api.view(P, G, "H3+", electrons=3)["result"]["levels"][1]["electrons"],
+                         api.view(P, G, "neutral H3")["result"]["levels"][1]["electrons"])
+        # allyl pi bond order per C-C: cation 0.5, radical 0.5 (the extra electron is nonbonding), anion 0.5
+        for n in (2, 3, 4):
+            self.assertAlmostEqual(api.view(P, G, "allyl cation pi", electrons=n)["result"]["bond_orders"]["counting"]["per_bond"], 0.5)
+        with self.assertRaises(ValueError):
+            api.view(P, G, "H2", electrons=5)
+
+    def test_approximation_slider_endpoints(self):
+        """D2: at 0 the lecture preset's spectrum, at 1 the model's; SF6 (identical presets) has no slider."""
+        api = self.api
+        e = lambda v: [x["energy_eV"] for x in v["result"]["levels"]]  # noqa: E731
+        lec, mod = api.view(P, G, "H2O lecture"), api.view(P, G, "H2O model")
+        np.testing.assert_allclose(e(api.view(P, G, "H2O model", approx=0.0)), e(lec), atol=1e-12)
+        np.testing.assert_allclose(e(api.view(P, G, "H2O model", approx=1.0)), e(mod), atol=1e-12)
+        mid = e(api.view(P, G, "H2O model", approx=0.5))
+        self.assertTrue(e(mod)[0] < mid[0] < e(lec)[0])  # the O 2s level drops steadily as it is allowed to mix
+        self.assertFalse(api.view(P, G, "SF6 model")["approx"]["available"])
+        with self.assertRaises(ValueError):
+            api.view(P, G, "SF6 model", approx=0.5)
+
+    def test_degenerate_dial_invariants(self):
+        """D4: rotating within any degenerate set keeps the energy and the set's summed atom weights."""
+        api = self.api
+        n = 0
+        for s in cases.release1(P):
+            v0 = api.view(P, G, s.name)
+            items = [("level", k) for k, lv in enumerate(v0["result"]["levels"]) if lv["multiplicity"] > 1]
+            items += [("fragment", f["id"]) for f in v0["diagram"].get("left", []) + v0["diagram"]["right"] if f["multiplicity"] > 1]
+            for kind, key in items:
+                ref = None
+                for ang in (0, 30, 60, 90):
+                    v = api.view(P, G, s.name, dial=ang, **{kind: key})
+                    got = (v["ledger"]["total_eV"], v["dial"]["summed_weights"])
+                    if ref is None:
+                        ref = got
+                    self.assertAlmostEqual(got[0], ref[0], delta=1e-10, msg=(s.name, key, ang))
+                    np.testing.assert_allclose(got[1], ref[1], atol=1e-12, err_msg=f"{s.name} {key} {ang}")
+                n += 1
+        self.assertGreater(n, 20)
+
+    def test_lone_pair_dial(self):
+        """D5: water's nonbonding pair rotates into two equivalent lone pairs; sum and density unchanged."""
+        api = self.api
+        for name in ("H2O model", "H2O lecture"):
+            for ang in (0, 15, 30, 45):
+                lp = api.view(P, G, name, lone_pair_angle=ang)["lone_pairs"]
+                self.assertAlmostEqual(lp["sum_eV"], lp["canonical_sum_eV"], delta=1e-10)
+                self.assertLess(lp["density_change_max"], 1e-12)
+            lp = api.view(P, G, name, lone_pair_angle=45)["lone_pairs"]
+            self.assertAlmostEqual(lp["orbitals"][0]["energy_eV"], lp["orbitals"][1]["energy_eV"], delta=1e-10)
+        self.assertIsNone(api.view(P, G, "CH4", lone_pair_angle=45)["lone_pairs"])
+
+
 class InspectorViews(unittest.TestCase):
     """L2, L3, P3, P6, F5.1, F5.2, F5.4-F5.5 on the engine side."""
 

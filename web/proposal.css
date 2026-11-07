@@ -124,3 +124,21 @@ input[type=range], input[type=checkbox] { accent-color: var(--accent); }
 .pes-notes { font-size: 0.82rem; padding-left: 18px; margin: 8px 0 0; color: var(--fg); }
 .pes-notes li { margin: 0 0 4px; }
 .badge.approx { font-size: 0.7rem; vertical-align: middle; cursor: help; }
+
+/* Release 2 dials. */
+.estep { display: flex; align-items: center; gap: 6px; font-size: 0.85rem; margin: 4px 0 8px; flex-wrap: wrap; }
+.estep button { font: inherit; width: 28px; height: 28px; border-radius: 999px; border: 1px solid var(--rule); background: var(--panel); color: var(--fg); cursor: pointer; padding: 0; }
+.estep button:disabled { opacity: 0.4; cursor: default; }
+.estep output { min-width: 2ch; text-align: center; font-weight: 600; font-variant-numeric: tabular-nums; }
+.estep .linkish { width: auto; border: 0; background: none; color: var(--accent); text-decoration: underline; height: auto; }
+.dialbox { margin: 10px 0; padding: 8px 10px; border: 1px solid var(--rule); border-radius: 8px; background: var(--panel); font-size: 0.85rem; }
+.dialbox input[type=range] { width: 100%; }
+.lp-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.lp-pair svg { width: 100%; height: auto; border: 1px solid var(--rule); border-radius: 6px; background: var(--panel); }
+.lp-pair .atom { fill: var(--panel); stroke: var(--muted); stroke-width: 0.8; }
+.approx-box { display: inline-flex; align-items: center; gap: 6px; font-size: 0.8rem; color: var(--muted); }
+.approx-box input { width: 140px; }
+#diagram.symonly .level { stroke-dasharray: none; }
+.speed { margin-top: 6px; }
+.speed button { font: inherit; font-size: 0.8rem; padding: 3px 10px; border-radius: 999px; border: 1px solid var(--rule); background: var(--panel); color: var(--fg); cursor: pointer; }
+.speed-out { white-space: pre-wrap; overflow-wrap: anywhere; font-size: 0.75rem; background: var(--panel); border: 1px solid var(--rule); border-radius: 6px; padding: 8px; color: var(--fg); }

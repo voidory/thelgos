@@ -10,6 +10,8 @@
 """
 import numpy as np
 
+from .ledger import contact_ledger
+
 from .solve import cluster_levels
 from .schedule import hamiltonian_at
 
@@ -209,6 +211,51 @@ def explanation(system, result, matching, frontier_levels):
     if result["warnings"]:
         parts.append("A degenerate level is partly filled, so the one-electron picture does not fix the occupation or spin.")
     return " ".join(parts)
+
+
+VALENCE = {"H": 1, "B": 3, "C": 4, "N": 5, "O": 6, "F": 7, "Al": 3, "Si": 4, "P": 5, "S": 6, "Cl": 7}
+
+
+def neutral_electrons(system):
+    """Electrons of the neutral system under the lecture's neutral-atom counting: an atom with its full
+    valence basis gives its valence electrons; an atom represented only by p functions (a pi-only
+    carbon, an inward-pointing ligand p) gives one electron per function."""
+    n = 0
+    for i, a in enumerate(system.atoms):
+        kinds = [f.kind for f in system.basis if f.atom == i]
+        n += VALENCE[a.element] if "s" in kinds else len(kinds)
+    return n
+
+
+def charge_label(q):
+    return "neutral" if q == 0 else (f"{'+' if q > 0 else '−'}{abs(q) if abs(q) > 1 else ''}")
+
+
+def lone_pairs(system, H, result, angle_deg):
+    """D5: rotate water's two nonbonding orbitals (the highest a1 and b1 occupied levels) into a pair of
+    equivalent lone pairs. Individual orbital energies change with the angle; their sum and the total
+    density do not."""
+    lv = result["levels"]
+    occ = [k for k, x in enumerate(lv) if x["electrons"] > 0 and x["multiplicity"] == 1]
+    pick = [k for k in occ if lv[k]["irrep"] in ("A1", "B1")][-2:]
+    if len(pick) != 2:
+        return None
+    C = np.array(result["eigenvectors"])
+    a, b = (C[:, lv[k]["indices"][0]] for k in pick)
+    t = np.deg2rad(angle_deg)
+    p1, p2 = np.cos(t) * a + np.sin(t) * b, -np.sin(t) * a + np.cos(t) * b
+    rho0 = np.outer(a, a) + np.outer(b, b)
+    rho = np.outer(p1, p1) + np.outer(p2, p2)
+    out = []
+    for v in (p1, p2):
+        k = int(np.flatnonzero(abs(v) > 1e-8)[0])
+        v = v if v[k] >= 0 else -v
+        L = contact_ledger(H, v)
+        out.append({"energy_eV": float(v @ H @ v), "structure": structure_spec(system, H, v, L)})
+    return {"angle_deg": float(angle_deg), "from_levels": pick, "orbitals": out,
+            "sum_eV": out[0]["energy_eV"] + out[1]["energy_eV"],
+            "canonical_sum_eV": float(lv[pick[0]]["energy_eV"] + lv[pick[1]]["energy_eV"]),
+            "density_change_max": float(np.max(np.abs(rho - rho0)))}
 
 
 def pes_spec(system, result, curated=None):

@@ -17,7 +17,8 @@ const call = (cmd, args) => new Promise((resolve, reject) => {
 
 const $ = (id) => document.getElementById(id);
 const NS = "http://www.w3.org/2000/svg";
-const state = { case: null, s: 1, level: null, fragment: null, view: null, info: null, watching: false };
+const state = { case: null, s: 1, level: null, fragment: null, view: null, info: null, watching: false,
+  electrons: null, approx: null, dial: 0, lp: 0 };
 
 function el(tag, attrs = {}, text) {
   const e = document.createElementNS(NS, tag);
@@ -140,7 +141,15 @@ function draw(view) {
   let lo = Math.min(...all), hi = Math.max(...all);
   const pad = (hi - lo) * 0.05 || 1;
   lo -= pad; hi += pad;
-  const y = (e) => top + (hi - e) / (hi - lo) * (H - top - bottom);
+  // F3.6 symmetry-only view: heights show order only (energies collapsed to evenly spaced ranks), since
+  // symmetry fixes labels and connections but not energies. Labels and lines are unchanged.
+  const symOnly = $("t-symonly") && $("t-symonly").checked;
+  const ranks = [...all].sort((a, b) => a - b).filter((e, i, a) => i === 0 || e - a[i - 1] > 1e-6);
+  const rankOf = (e) => ranks.findIndex((r) => Math.abs(r - e) <= 1e-6);
+  const y = symOnly
+    ? (e) => H - bottom - 14 - (rankOf(e) / Math.max(ranks.length - 1, 1)) * (H - top - bottom - 28)
+    : (e) => top + (hi - e) / (hi - lo) * (H - top - bottom);
+  svg.classList.toggle("symonly", !!symOnly);
   // Column centres: short bars sit at these; labels go in the gutters beside them.
   const cx = compact ? (three ? { left: 120, centre: 232, right: 340 } : { right: 150, centre: 295 })
                      : (three ? { left: 165, centre: 335, right: 505 } : { right: 200, centre: 420 });
@@ -150,12 +159,13 @@ function draw(view) {
   const step = (hi - lo) > 60 ? 10 : 5;
   const AX = compact ? 32 : 52;
   svg.append(el("line", { x1: AX, x2: AX, y1: top - 6, y2: H - bottom + 4, class: "axis-line" }));
-  for (let e = Math.ceil(lo / step) * step; e <= hi; e += step) {
+  for (let e = Math.ceil(lo / step) * step; e <= hi && !symOnly; e += step) {
     svg.append(el("line", { x1: AX - 4, x2: AX, y1: y(e), y2: y(e), class: "axis-line" }));
     svg.append(el("text", { x: AX - 7, y: y(e) + 4, "text-anchor": "end", class: "axis-num" }, e === 0 ? "0" : String(e).replace("-", "−")));
   }
-  if (compact) svg.append(el("text", { x: 4, y: top - 14, class: "axis-title" }, "E / eV"));
-  else svg.append(el("text", { x: 12, y: (top + H - bottom) / 2, transform: `rotate(-90 12 ${(top + H - bottom) / 2})`, "text-anchor": "middle", class: "axis-title" }, "E / eV (model)"));
+  const axisTitle = symOnly ? "order only (symmetry)" : compact ? "E / eV" : "E / eV (model)";
+  if (compact) svg.append(el("text", { x: 4, y: top - 14, class: "axis-title" }, axisTitle));
+  else svg.append(el("text", { x: 12, y: (top + H - bottom) / 2, transform: `rotate(-90 12 ${(top + H - bottom) / 2})`, "text-anchor": "middle", class: "axis-title" }, axisTitle));
   const short = { "Molecular orbitals": "MOs", "Ligand group orbitals": "LGOs" };
   for (const c of d.columns) svg.append(el("text", { x: cx[c], y: 24, "text-anchor": "middle", class: "col-title" },
                                            compact ? (short[d.column_titles[c]] || d.column_titles[c].replace(" orbitals", "")) : capsTitle(d.column_titles[c])));
@@ -449,6 +459,96 @@ function pes(view) {
   for (const c of P.caveats) { const li = document.createElement("li"); li.textContent = c; ul.append(li); }
 }
 
+// ---- Release 2 dials: electron stepper (D6), degenerate-set dial (D4), lone-pair dial (D5), approximation slider (D2). ----
+function dials(view) {
+  const E = view.electrons;
+  $("e-count").textContent = String(E.count);
+  $("e-charge").textContent = E.charge === 0 ? "neutral" : `charge ${E.charge > 0 ? "+" : "−"}${Math.abs(E.charge)}`;
+  $("e-minus").disabled = E.count <= 0; $("e-plus").disabled = E.count >= E.max;
+  $("e-reset").hidden = E.count === E.default;
+  const D = view.dial, box = $("dialbox");
+  box.hidden = !D;
+  if (D) {
+    $("dial").value = D.angle_deg; $("dial-out").textContent = `${D.angle_deg.toFixed(0)}°`;
+    const fmtW = (w) => D.atoms.map((a, i) => [a, w[i]]).filter(([, x]) => x > 0.005).map(([a, x]) => `${a} ${(100 * x).toFixed(0)} %`).join(", ");
+    $("dial-note").textContent = `One of ${D.components} equivalent components, rotated by ${D.angle_deg.toFixed(0)}°. ` +
+      `Its energy stays ${fmt(view.ledger.total_eV, 3)} eV. This component: ${fmtW(D.shown_weights)}. Averaged over the set (unchanged by the dial): ${fmtW(D.summed_weights)}.`;
+  }
+  const L = view.lone_pairs, lp = $("lpbox");
+  lp.hidden = !L;
+  if (L) {
+    $("lpdial").value = L.angle_deg; $("lp-out").textContent = `${L.angle_deg.toFixed(0)}°`;
+    // Side view along the molecular plane (water lies in yz, C2 along z): x across, -z up, so the hydrogens sit
+    // below and the two lone pairs show as the familiar pair of lobes above oxygen.
+    L.orbitals.forEach((o, i) => miniOrbital($(`lp${i + 1}`), o.structure, [[1, 0, 0], [0, 0, -1], [0, 1, 0]]));
+    const [a, b] = L.orbitals.map((o) => o.energy_eV);
+    $("lp-note").textContent = `Orbital energies ${fmt(a, 2)} and ${fmt(b, 2)} eV; their sum ${fmt(L.sum_eV, 4)} eV equals the canonical pair's ${fmt(L.canonical_sum_eV, 4)} eV, ` +
+      `and the total electron density is unchanged (largest change ${L.density_change_max.toExponential(0)}). ` +
+      (L.angle_deg >= 45 ? "At 45° the two are equivalent: mirror images through the molecular plane, the VSEPR-style lone pairs." : "At 0° they are the canonical MOs (one a1, one b1).");
+  }
+  const ap = $("approx");
+  if (ap) {
+    const c = caseInfo(view.case);
+    const show = view.approx.available;
+    $("approx-box").hidden = !show;
+    if (show) ap.value = Math.round(100 * (view.approx.value ?? (c && c.variant === "lecture" ? 0 : 1)));
+  }
+}
+// Re-project a structure spec onto chosen screen axes (u right, v up, w towards the viewer), from its 3D data.
+function reproject(S, u, v, w) {
+  const dot = (a, b) => a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
+  return { ...S,
+    atoms: S.atoms.map((a) => ({ ...a, x: dot(a.xyz, u), y: dot(a.xyz, v), depth: dot(a.xyz, w) })),
+    lobes: S.lobes.map((l) => (l.kind === "p" ? { ...l, dir2d: [dot(l.dir3d, u), dot(l.dir3d, v)] } : l)) };
+}
+function miniOrbital(svg, S, axes) {
+  if (axes) S = reproject(S, ...axes);
+  svg.replaceChildren();
+  const size = 120; svg.setAttribute("viewBox", `0 0 ${size} ${size}`);
+  const xs = S.atoms.map((a) => a.x), ys = S.atoms.map((a) => a.y);
+  const span = Math.max(Math.max(...xs) - Math.min(...xs), Math.max(...ys) - Math.min(...ys), 1);
+  const k = (size - 44) / span, cx = (Math.max(...xs) + Math.min(...xs)) / 2, cy = (Math.max(...ys) + Math.min(...ys)) / 2;
+  drawOrbital(svg, S, (x) => size / 2 + (x - cx) * k, (y) => size / 2 - (y - cy) * k, 0.45, false);
+}
+
+// ---- D10 speed test: every case twice; the second (warm) pass is reported. Run on the reference phone. ----
+async function speedTest() {
+  const btn = $("speed-run"), out = $("speed-out");
+  btn.disabled = true; out.hidden = false;
+  const saved = { case: state.case, s: state.s, level: state.level, fragment: state.fragment };
+  Object.assign(state, { s: 1, level: null, fragment: null, electrons: null, approx: null, dial: 0 });
+  const rows = [];
+  try {
+    for (const pass of [0, 1]) {
+      for (const c of state.cases) {
+        out.textContent = `Pass ${pass + 1} of 2: ${c.name}…`;
+        state.case = c.name;
+        const t0 = performance.now();
+        const v = await refresh();
+        const total = performance.now() - t0;
+        if (pass === 1) rows.push({ name: c.name, n: v.result.levels.reduce((a, l) => a + l.multiplicity, 0), compute: v.compute_ms, total });
+      }
+    }
+  } finally {
+    Object.assign(state, saved); $("case").value = state.case; await refresh();
+    btn.disabled = false;
+  }
+  const med = (xs) => { const a = [...xs].sort((p, q) => p - q); return a[Math.floor(a.length / 2)]; };
+  const worst = rows.reduce((a, r) => (r.total > a.total ? r : a));
+  const info = state.info || {};
+  const text = [
+    `LGO Method Explorer speed test (D10), ${new Date().toISOString().slice(0, 16).replace("T", " ")} UTC`,
+    `Device: ${navigator.userAgent}`,
+    `Cores: ${navigator.hardwareConcurrency || "?"}; screen ${screen.width}x${screen.height} @${devicePixelRatio}x`,
+    `First load (cold): ${info.load_ms ? (info.load_ms / 1000).toFixed(1) + " s" : "?"}`,
+    `Warm engine recompute: median ${med(rows.map((r) => r.compute)).toFixed(1)} ms, max ${Math.max(...rows.map((r) => r.compute)).toFixed(1)} ms`,
+    `Warm full update (engine + redraw): median ${med(rows.map((r) => r.total)).toFixed(1)} ms, max ${worst.total.toFixed(1)} ms (${worst.name}, ${worst.n} functions)`,
+    `Budget (spec D10): under 100 ms warm. ${worst.total < 100 ? "Met on this device." : "NOT met on this device."}`,
+  ].join("\n");
+  out.textContent = text; $("speed-copy").hidden = false; out.dataset.done = "1";
+  return rows;
+}
+
 function bonds(view) {
   const bo = view.result.bond_orders;
   const c = bo.counting, dm = bo.density_matrix;
@@ -499,20 +599,22 @@ function banner(view) {
 let latest = 0;
 async function refresh() {
   const mine = ++latest;
-  const view = await call("view", { case: state.case, s: state.s, level: state.level, fragment: state.fragment });
+  const view = await call("view", { case: state.case, s: state.s, level: state.level, fragment: state.fragment, electrons: state.electrons,
+    approx: state.approx, dial: state.dial, lone_pair_angle: state.case && state.case.startsWith("H2O") ? state.lp : null });
   if (mine !== latest) return state.view;  // a newer request superseded this one
   state.view = view;
-  draw(view); levelTable(view); narrate(view); ledger(view); bonds(view); pes(view); banner(view); about(view);
+  draw(view); levelTable(view); narrate(view); ledger(view); bonds(view); pes(view); dials(view); banner(view); about(view);
   structure(view); matching(view); slotBadges(view);
   if (proposal) proposalUpdate(view);
   if ($("t-3d").checked) view3d.render(view);
   document.body.dataset.computeMs = view.compute_ms.toFixed(1);
+  document.body.dataset.dials = JSON.stringify({ electrons: view.electrons.count, approx: view.approx.value, dial: view.dial ? view.dial.angle_deg : null, lp: view.lone_pairs ? view.lone_pairs.angle_deg : null });
   document.body.dataset.rendered = `${view.case}|${view.schedule.s}|${view.ledger ? (view.ledger.fragment ?? view.ledger.level) : ""}`;
   return view;
 }
 
-function select(k) { glideToken++; state.level = k; state.fragment = null; refresh(); }
-function selectFragment(id) { glideToken++; state.fragment = id; state.level = null; refresh(); }
+function select(k) { glideToken++; state.level = k; state.fragment = null; state.dial = 0; refresh(); }
+function selectFragment(id) { glideToken++; state.fragment = id; state.level = null; state.dial = 0; refresh(); }
 
 // Glide: when jumping between construction steps (step buttons, "why does it jump"), the levels slide
 // to their new energies through intermediate s values instead of snapping, so the eye can follow each
@@ -1002,7 +1104,16 @@ function variantSetup() {
     seg.append(b); return b;
   });
   const note = document.createElement("span"); note.className = "note"; note.id = "variant-note";
-  box.append(lab, seg, note);
+  // D2: a continuous slider between the two presets, where they differ.
+  const apb = document.createElement("label"); apb.id = "approx-box"; apb.className = "approx-box"; apb.hidden = true;
+  apb.innerHTML = `<span>Lecture</span><input type="range" id="approx" min="0" max="100" step="1" aria-label="Lecture to model"><span>Model</span>`;
+  apb.querySelector("input").addEventListener("input", (e) => {
+    const v = Number(e.target.value) / 100, c = caseInfo(state.case);
+    if (v <= 0) { state.approx = null; pickEntry(c.entry, "lecture"); return; }
+    if (v >= 1) { state.approx = null; pickEntry(c.entry, "model"); return; }
+    state.case = `${c.entry} model`; state.approx = v; state.level = null; state.fragment = null; refresh();
+  });
+  box.append(lab, seg, note, apb);
   return box;
 }
 function variantUpdate(view) {
@@ -1049,7 +1160,7 @@ function proposalUpdate(view) {
     state.case = cases.find((c) => c.name === "SF6 model").name;
     if (await fromLink()) $("s").value = state.s;
     sel.value = state.case;
-    sel.addEventListener("change", () => { glideToken++; state.case = sel.value; state.level = null; state.fragment = null; state.s = 1; $("s").value = 1; refresh(); });
+    sel.addEventListener("change", () => { glideToken++; state.case = sel.value; state.level = null; state.fragment = null; state.electrons = null; state.approx = null; state.dial = 0; state.lp = 0; state.s = 1; $("s").value = 1; refresh(); });
     $("s").addEventListener("input", () => { glideToken++; state.s = Number($("s").value); state.level = null; state.fragment = null; refresh(); });
     $("whyjump").addEventListener("click", () => {
       const o = state.view.origins[state.level];
@@ -1064,6 +1175,18 @@ function proposalUpdate(view) {
     window.lgo = { exportJSON, importJSON, shareLink, state };
     let rz; window.addEventListener("resize", () => { clearTimeout(rz); rz = setTimeout(() => state.view && draw(state.view), 150); });
     $("watch").addEventListener("click", watch);
+    $("speed-run").addEventListener("click", speedTest);
+    $("speed-copy").addEventListener("click", async () => {
+      try { await navigator.clipboard.writeText($("speed-out").textContent); $("speed-copy").textContent = "Copied"; }
+      catch { $("speed-copy").textContent = "Select the text above to copy"; }
+    });
+    const stepE = (d) => { const E = state.view.electrons; state.electrons = Math.min(Math.max(E.count + d, 0), E.max); if (state.electrons === E.default) state.electrons = null; refresh(); };
+    $("e-minus").addEventListener("click", () => stepE(-1));
+    $("e-plus").addEventListener("click", () => stepE(+1));
+    $("e-reset").addEventListener("click", () => { state.electrons = null; refresh(); });
+    $("dial").addEventListener("input", (e) => { state.dial = Number(e.target.value); refresh(); });
+    $("lpdial").addEventListener("input", (e) => { state.lp = Number(e.target.value); refresh(); });
+    $("t-symonly").addEventListener("change", () => draw(state.view));
     for (const id of ["t-mixing", "t-allowed", "t-irreps"]) $(id).addEventListener("change", () => draw(state.view));
     for (const id of ["case", "s", "watch"]) $(id).disabled = false;
     await refresh();

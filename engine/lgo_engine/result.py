@@ -1,4 +1,6 @@
 """Run a system end to end and return a JSON-serialisable Result (F2.9)."""
+import numpy as np
+
 from . import __name__ as _pkg
 from .hamiltonian import build_hamiltonian
 from .solve import solve, cluster_levels
@@ -6,9 +8,10 @@ from .symmetry import Group, label_levels
 from .analysis import analyse
 
 
-def run(system, params, groups, conventions_sha256=None):
+def run(system, params, groups, conventions_sha256=None, H=None):
+    """H overrides the assembled Hamiltonian (used for the approximation slider, D2); default: assemble it."""
     from . import __version__
-    H = build_hamiltonian(system, params)
+    H = build_hamiltonian(system, params) if H is None else np.asarray(H, float)
     e, c, checks = solve(H)
     levels = cluster_levels(e, H)
     labels, linear, comm = (None, None, 0.0)

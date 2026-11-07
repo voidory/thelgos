@@ -1,4 +1,6 @@
 """Entry points the browser worker calls. Pure functions returning JSON-ready dicts."""
+import dataclasses
+
 import numpy as np
 
 from . import cases
@@ -74,10 +76,67 @@ def _system(params, name):
     raise ValueError(f"unknown case {name!r}")
 
 
-def view(params, groups, name, s=1.0, level=None, conventions_sha256=None, extras=None, fragment=None):
-    """Everything one screen needs: result, diagram, schedule, slider state and ledger."""
+def _atom_weights(system, V):
+    """Per-atom weight of one orbital (V a vector) or averaged over a degenerate set (V a matrix)."""
+    V = np.atleast_2d(np.asarray(V).T).T
+    w = np.zeros(len(system.atoms))
+    for i, f in enumerate(system.basis):
+        w[f.atom] += float(np.sum(V[i, :] ** 2)) / V.shape[1]
+    return [float(x) for x in w]
+
+
+def _dialled(system, V, angle_deg):
+    """D4: one member of a degenerate set, rotated by angle_deg between its first two components."""
+    t = np.deg2rad(angle_deg or 0.0)
+    c = V[:, 0] if V.shape[1] < 2 else np.cos(t) * V[:, 0] + np.sin(t) * V[:, 1]
+    c = c / np.linalg.norm(c)
+    k = int(np.flatnonzero(abs(c) > 1e-8)[0]) if np.any(abs(c) > 1e-8) else 0
+    c = c if c[k] >= 0 else -c
+    info = None
+    if V.shape[1] > 1:
+        info = {"angle_deg": float(angle_deg or 0.0), "components": int(V.shape[1]),
+                "shown_weights": _atom_weights(system, c), "summed_weights": _atom_weights(system, V),
+                "atoms": [a.element + str(i + 1) for i, a in enumerate(system.atoms)]}
+    return c, info
+
+
+def approx_pair(params, name):
+    """D2: the (lecture, model) fixture names for an entry whose two presets differ, else None."""
+    entry, variant = _entry(name)
+    if not variant:
+        return None
+    names = {s.name: s.preset for s in cases.release1(params)}
+    lec, mod = f"{entry} lecture", f"{entry} model"
+    if lec not in names or mod not in names:
+        return None
+    a, b = params.presets[names[lec]], params.presets[names[mod]]
+    keys = ("coupling_overrides", "edge_policy", "geometry_overrides", "hydrogen_scale")
+    return None if all(a.get(k) == b.get(k) for k in keys) else (lec, mod)
+
+
+def view(params, groups, name, s=1.0, level=None, conventions_sha256=None, extras=None, fragment=None,
+         electrons=None, approx=None, dial=0.0, lone_pair_angle=None):
+    """Everything one screen needs: result, diagram, schedule, slider state and ledger.
+
+    Release 2 dials: electrons (D6, electron stepper), approx (D2, 0 = lecture preset .. 1 = model
+    preset, linear in the couplings that differ), dial (D4, rotation within a selected degenerate set)
+    and lone_pair_angle (D5, water's nonbonding pair)."""
     system = _system(params, name)
-    result = run(system, params, groups, conventions_sha256)
+    default_electrons = system.electrons
+    if electrons is not None:
+        electrons = int(electrons)
+        if not 0 <= electrons <= 2 * len(system.basis):
+            raise ValueError(f"electrons: must be 0..{2 * len(system.basis)}")
+        system = dataclasses.replace(system, electrons=electrons)
+    Happ = None
+    if approx is not None:
+        pair = approx_pair(params, name)
+        if pair is None:
+            raise ValueError(f"approx: {name!r} has no lecture/model pair with different parameters")
+        approx = min(max(float(approx), 0.0), 1.0)
+        Hl, Hm = (build_hamiltonian(_system(params, n), params) for n in pair)
+        Happ = Hl + approx * (Hm - Hl)
+    result = run(system, params, groups, conventions_sha256, H=Happ)
     H = np.array(result["hamiltonian_eV"])
     sched = build_schedule(system, Group(groups[system.group]) if system.group != "C1" else None, H)
     Hs = hamiltonian_at(sched, s)
@@ -86,16 +145,14 @@ def view(params, groups, name, s=1.0, level=None, conventions_sha256=None, extra
     K = len(sched["stages"])
     lam = lambdas(s, K)
     active = next((k for k, x in enumerate(lam) if 0 < x < 1), None)
-    ledger = structure = None
+    ledger = structure = dial_info = None
     if level is not None:
         # At s < 1 the ledger and structure describe level `level` of H(s) (P3: "that moment's ledger").
         Huse = Hs if s < 1 else H
         e_s, c_s = np.linalg.eigh(Huse)
         lv_s = cluster_levels(e_s, Huse)
         ix = lv_s[min(level, len(lv_s) - 1)]
-        c = c_s[:, ix[0]]
-        k = int(np.flatnonzero(abs(c) > 1e-8)[0]) if np.any(abs(c) > 1e-8) else 0
-        c = c if c[k] >= 0 else -c
+        c, dial_info = _dialled(system, c_s[:, ix], dial)
         ledger = contact_ledger(Huse, c)
         ledger["level"] = level
         ledger["eigenvalue_eV"] = float(e_s[ix[0]])
@@ -107,15 +164,16 @@ def view(params, groups, name, s=1.0, level=None, conventions_sha256=None, extra
         # structure, from the full Hamiltonian. Only one component of a degenerate set is shown.
         if fragment not in frag_vectors:
             raise ValueError(f"unknown fragment orbital {fragment!r}")
-        c = np.array(frag_vectors[fragment])[:, 0]
-        c = c / np.linalg.norm(c)
-        k = int(np.flatnonzero(abs(c) > 1e-8)[0])
-        c = c if c[k] >= 0 else -c
+        c, dial_info = _dialled(system, np.array(frag_vectors[fragment]), dial)
         info = next(x for side in ("left", "right") for x in diagram.get(side, []) if x["id"] == fragment)
-        ledger = contact_ledger(H, c)
+        # The fragment's own Hamiltonian: for a central-atom or diatomic layout, the full H restricted to the
+        # fragment (cross-fragment terms vanish for a vector on one side); for the two-column layout the
+        # "Atomic orbitals" are separate atoms, degenerate only under the on-site part.
+        Hfrag = H if "left" in diagram["columns"] else np.diag(np.diag(H))
+        ledger = contact_ledger(Hfrag, c)
         ledger.update({"level": None, "fragment": fragment, "fragment_label": info["label"], "eigenvalue_eV": info["energy_eV"],
                        "multiplicity": info["multiplicity"], "basis_labels": [f.label for f in system.basis]})
-        structure = views.structure_spec(system, H, c, ledger)
+        structure = views.structure_spec(system, Hfrag, c, ledger)
     origin = views.origins(sched, result["levels"])
     for st in sched["stages"]:
         st["rules"] = views.STAGE_RULES.get(st["kind"], [])
@@ -145,6 +203,13 @@ def view(params, groups, name, s=1.0, level=None, conventions_sha256=None, extra
         "explanation": views.explanation(system, result, diagram.get("matching"), (fr["HOMO"], fr["LUMO"])),
         "provenance": views.provenance(system, params),
         "pes": views.pes_spec(system, result, extras["curated"] if extras else None),
+        "electrons": {"count": system.electrons, "default": default_electrons, "neutral": views.neutral_electrons(system),
+                      "charge": views.neutral_electrons(system) - system.electrons,
+                      "charge_label": views.charge_label(views.neutral_electrons(system) - system.electrons),
+                      "max": 2 * len(system.basis)},
+        "approx": {"value": approx, "available": approx_pair(params, name) is not None},
+        "dial": dial_info,
+        "lone_pairs": views.lone_pairs(system, H, result, lone_pair_angle) if (lone_pair_angle is not None and name.startswith("H2O")) else None,
     }
 
 

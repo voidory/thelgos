@@ -197,6 +197,17 @@ Each of these has a "Miessler vs Harrison energies" reading note in the app (`pa
 
 **Hydrogen scale.** The window widened to 0.4235–1.0313, which now includes 1.0. Keeping 0.6 leaves every H-containing result as it would be under the decision already approved (B2), and changes one thing at a time. Whether to drop the scale altogether is a separate owner question.
 
+## Release 2, Milestone A: design choices (delegated, 2026-11-07)
+
+The owner asked for Milestone A first and for D10 to be measured on the owner's phone. The spec fixes each item's purpose and "done when"; these are the details it leaves open, and none needs a CONVENTIONS change.
+
+- **D2 approximation slider.** The path from "lecture" to "model" is linear in the Hamiltonian: H(t) = H_lecture + t·(H_model − H_lecture). Only the couplings that differ move; for water that is the O 2s–H 1s coupling. The ends are exactly the two presets (tested to 1e−12 eV). SF6's presets are identical (M4), so it gets no slider.
+- **D4 degenerate-set dial.** It rotates between the first two components of a degenerate set (0–90°). A 3-fold set has more freedom than that, but one rotation is enough to show the invariance: the energy and the set's per-atom weights stay fixed (tested on every degenerate MO and fragment orbital in all 23 cases). For the two-column layout, the separate atoms are degenerate only under the on-site part of H, so their dial and ledger use that part.
+- **D5 lone-pair dial.** Water's highest occupied a1 and b1 levels rotate by up to 45°. At 45° they are equal-energy mirror images through the molecular plane. The sum of the two energies and the total density are unchanged (tested). The sketches are drawn side-on, because seen face-on the two mirror images look identical.
+- **D6 electron stepper.** The charge is worked out from neutral-atom counting. An atom with its full valence basis gives its valence electrons; an atom represented only by p functions (π-only carbon, an inward ligand p) gives one per function. This gives the expected charges for all 23 fixtures (H3+ and the allyl cation +1, all others 0).
+- **F3.6 symmetry-only view.** Levels are spaced evenly by energy rank, with no energy scale. Labels and lines are unchanged (tested). The order itself is still the model's, because symmetry alone does not fix it; the axis says "order only".
+- **D10 speed test.** A footer button times every case twice and reports the warm pass: engine time, and engine plus redraw, against the spec's 100 ms budget. The owner runs it on the reference phone and sends the copied result.
+
 ## B6. Sign-off (owner only)
 
 Not delegated. On 2026-11-06 the owner gave standing permission for Claude to apply the drafted changes. They are now in `CONVENTIONS.md` v1.3 and the spec, and the drafts in `drafts/` remain as the record. Applying them is not sign-off: v1.3 stays "not frozen" until the owner reviews it.

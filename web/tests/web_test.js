@@ -267,6 +267,51 @@ const check = (name, ok, detail = "") => { results.push({ name, ok, detail }); c
     const after = await page.$eval("#s", (s) => Number(s.value));
     check("Watch mode plays to the finished diagram", after === 1);
 
+    // ---- Release 2, Milestone A: dials keep their invariants in the browser too. ----
+    const dialsNow = () => page.evaluate(() => JSON.parse(document.body.dataset.dials));
+    await pick(page, "H3+");
+    await page.waitForFunction(() => document.body.dataset.rendered === "H3+|1|");
+    await page.click("#e-plus");
+    await page.waitForFunction(() => JSON.parse(document.body.dataset.dials).electrons === 3);
+    const d6 = [await page.textContent("#e-charge"), await page.textContent("#banner")];
+    check("D6 electron stepper: H3+ plus one electron is neutral H3 with the Jahn–Teller warning", d6[0] === "neutral" && d6[1].includes("Jahn_Teller"), d6[0]);
+    await pick(page, "H2O lecture");
+    await page.waitForFunction(() => document.body.dataset.rendered === "H2O lecture|1|");
+    const eLec = await page.$$eval("[data-mo]", (h) => Number(h[0].dataset.energy));
+    await page.$eval("#approx", (x) => { x.value = 50; x.dispatchEvent(new Event("input")); });
+    await page.waitForFunction(() => JSON.parse(document.body.dataset.dials).approx === 0.5);
+    const eMid = await page.$$eval("[data-mo]", (h) => Number(h[0].dataset.energy));
+    await page.$eval("#approx", (x) => { x.value = 100; x.dispatchEvent(new Event("input")); });
+    await page.waitForFunction(() => document.body.dataset.rendered === "H2O model|1|" && JSON.parse(document.body.dataset.dials).approx === null);
+    const eMod = await page.$$eval("[data-mo]", (h) => Number(h[0].dataset.energy));
+    check("D2 approximation slider: lecture → model passes through intermediate values and lands on the model", eMod < eMid && eMid < eLec, `${eLec.toFixed(2)} → ${eMid.toFixed(2)} → ${eMod.toFixed(2)} eV`);
+    await page.$eval("#lpdial", (x) => { x.value = 45; x.dispatchEvent(new Event("input")); });
+    await page.waitForFunction(() => JSON.parse(document.body.dataset.dials).lp === 45);
+    const lpNote = await page.textContent("#lp-note");
+    const lpE = [...lpNote.matchAll(/([−+]\d+\.\d+) and ([−+]\d+\.\d+) eV/g)][0];
+    check("D5 lone-pair dial: at 45° two equivalent lone pairs, sum and density unchanged", lpE && lpE[1] === lpE[2] && lpNote.includes("unchanged"), lpE ? `${lpE[1]} / ${lpE[2]} eV` : lpNote.slice(0, 80));
+    await pick(page, "CH4");
+    await page.waitForFunction(() => document.body.dataset.rendered === "CH4|1|");
+    const t2 = await page.$$eval("[data-mo]", (h) => h.findIndex((x) => x.getAttribute("aria-label").includes("3-fold")));
+    await page.$eval(`[data-mo="${t2}"]`, (h) => h.dispatchEvent(new Event("click")));
+    await page.waitForFunction((k) => document.body.dataset.rendered === `CH4|1|${k}`, t2);
+    const tot0 = await page.$eval("#ledger table", (t) => Number(t.dataset.total));
+    await page.$eval("#dial", (x) => { x.value = 37; x.dispatchEvent(new Event("input")); });
+    await page.waitForFunction(() => JSON.parse(document.body.dataset.dials).dial === 37);
+    const tot37 = await page.$eval("#ledger table", (t) => Number(t.dataset.total));
+    check("D4 degenerate-set dial: rotating a t2 component leaves its energy unchanged", Math.abs(tot37 - tot0) < 1e-10, `${(tot37 - tot0).toExponential(1)} eV`);
+    const symBefore = await page.$$eval("#diagram .orb-label, #diagram line.mix, #diagram line.allowed", (e) => e.map((x) => x.textContent || x.getAttribute("class")).sort().join("|"));
+    await page.check("#t-symonly");
+    await page.waitForTimeout(200);
+    const symAfter = await page.$$eval("#diagram .orb-label, #diagram line.mix, #diagram line.allowed", (e) => e.map((x) => x.textContent || x.getAttribute("class")).sort().join("|"));
+    const noTicks = await page.$$eval("#diagram .axis-num", (t) => t.length);
+    check("F3.6 symmetry-only view: same labels and connections, no energy scale", symBefore === symAfter && noTicks === 0, `${noTicks} ticks`);
+    await page.uncheck("#t-symonly");
+    await page.click("#speed-run");
+    await page.waitForFunction(() => document.querySelector("#speed-out").dataset.done === "1", null, { timeout: 120000 });
+    const speed = await page.textContent("#speed-out");
+    check("D10 speed test runs every case and reports the warm budget", /Warm full update/.test(speed) && /Budget/.test(speed), speed.split("\n")[5]);
+
     // Banner shows the CONVENTIONS version read from the file, not a hard-coded one.
     const convVer = fs.readFileSync(path.join(ROOT, "CONVENTIONS.md"), "utf8").match(/\*\*Version: ([0-9.]+)/)[1];
     const banner = await page.textContent("#banner");

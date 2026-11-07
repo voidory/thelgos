@@ -32,7 +32,16 @@
       <label><input type="checkbox" id="t-mixing" checked> Mixing lines</label>
       <label><input type="checkbox" id="t-allowed"> Symmetry-allowed lines</label>
       <label><input type="checkbox" id="t-irreps" checked> Irrep labels</label>
+      <label><input type="checkbox" id="t-symonly"> Symmetry only</label>
     </fieldset>
+    <div class="estep" id="estep" role="group" aria-labelledby="estep-label">
+      <span id="estep-label">Electrons</span>
+      <button type="button" id="e-minus" aria-label="Remove an electron">−</button>
+      <output id="e-count" aria-live="polite"></output>
+      <button type="button" id="e-plus" aria-label="Add an electron">+</button>
+      <span id="e-charge" class="muted-text"></span>
+      <button type="button" id="e-reset" class="linkish" hidden>reset</button>
+    </div>
   </section>
   <section class="diagram" aria-label="Molecular-orbital diagram">
     <svg id="diagram" role="group" aria-label="MO diagram: each molecular-orbital level is a button; the table after it lists every level"></svg>
@@ -49,6 +58,17 @@
     <div class="structure-tools"><label><input type="checkbox" id="t-3d"> 3D view</label></div>
     <svg id="structure" role="img" aria-label="Structure with orbital lobes and contacts"></svg>
     <canvas id="view3d" width="600" height="420" hidden aria-label="3D view: drag to rotate"></canvas>
+    <div id="dialbox" class="dialbox" hidden>
+      <label for="dial">Rotate within the degenerate set <output id="dial-out"></output></label>
+      <input type="range" id="dial" min="0" max="90" step="1" value="0">
+      <p id="dial-note" class="muted-text"></p>
+    </div>
+    <div id="lpbox" class="dialbox" hidden>
+      <label for="lpdial">Lone pairs: canonical → equivalent <output id="lp-out"></output></label>
+      <input type="range" id="lpdial" min="0" max="45" step="1" value="0">
+      <div class="lp-pair"><svg id="lp1" role="img" aria-label="First nonbonding orbital"></svg><svg id="lp2" role="img" aria-label="Second nonbonding orbital"></svg></div>
+      <p id="lp-note" class="muted-text"></p>
+    </div>
     <h2>Contact ledger <span class="badge-slot" data-rules="R1 R6"></span></h2>
     <p id="ledger-hint">Tap a molecular orbital to see every contact that sets its energy.</p>
     <button id="whyjump" type="button" hidden>Show where this level appeared</button>
@@ -73,7 +93,11 @@
     <p id="export-status" class="muted-text" aria-live="polite"></p>
   </section>
 </main>
-<footer><small id="footer"></small></footer>
+<footer><small id="footer"></small>
+  <div class="speed"><button type="button" id="speed-run">Run speed test</button>
+    <button type="button" id="speed-copy" hidden>Copy result</button>
+    <pre id="speed-out" class="speed-out" hidden></pre></div>
+</footer>
 <script src="app.js"></script>
 </body>
 </html>

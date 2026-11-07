@@ -21,6 +21,7 @@ The approved layout (case rail, construction timeline, tabbed inspector) is the 
 | P3 | Why-jump: "Show where this level appeared" moves the slider to the checkpoint at which the selected level first reached its final energy, with that moment's ledger and structure |
 | P6 | Matching table: ⟨central orbital\|H\|LGO⟩ tallies; zero means no interaction, and the zero pattern follows the irreps |
 | F3.7 | 3D view (WebGL2): atoms, ledger contacts as rods, and the selected orbital's lobes (p functions on an atom merged into one oriented lobe); opens in the 2D sketch's orientation; drag to rotate. Any MO or fragment orbital (LGO, central-atom or atom orbital) can be selected in the diagram; the ledger, 2D structure, sketch card and 3D view follow it; hovering a ledger row highlights that contact in 2D and 3D |
+| D2, D4, D5, D6, F3.6, D10 | Release 2 Milestone A: approximation slider (lecture ↔ model), rotation within a degenerate set, water's lone-pair dial, electron stepper with charge, symmetry-only view, and an in-app speed test (footer) |
 | F5.1–F5.6 | Provenance tooltips; generated explanation; SVG, PNG and JSON export; JSON import with validation; share links (compressed config in the URL fragment, nothing stored on a server) |
 | L1 | Contact ledger for the selected level: every on-site and contact row, phase, contact weight, energy contribution, running total. The total equals the eigenvalue |
 | P1–P2 | Construction slider over H(s), with stage ticks and narration, and B5 notes for skipped stages |
@@ -48,6 +49,7 @@ The approved layout (case rail, construction timeline, tabbed inspector) is the 
 - the selected level's sketch card sits clear of bars and labels;
 - accessibility: every level is a named button and is listed in the screen-reader table; the inspector tabs answer to the arrow keys; Enter selects a focused level and keeps focus on it;
 - F3.7: a ligand group orbital is selectable with its own ledger; hovering a ledger contact changes the 3D view;
+- Release 2 Milestone A: D6 electron stepper (H3+ + e⁻ is neutral H3 with the Jahn–Teller warning); D2 approximation slider passes lecture → model; D5 lone pairs equivalent at 45°; D4 dial keeps the energy; F3.6 symmetry-only view keeps labels and lines; D10 speed test runs;
 - the CH4 photoelectron spectrum: two bands 3:1, badged approximate, measured positions cited;
 - the banner shows the CONVENTIONS version read from the file;
 - layout: the full diagram from 1024 px up, the phone geometry at 360 px, and nothing clipped or scrolling sideways;
