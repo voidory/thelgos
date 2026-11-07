@@ -1,5 +1,7 @@
 # LGO Method Explorer
 
+**Continuing this work? Start with [`HANDOFF.md`](HANDOFF.md):** the current state, working rules, commands and what remains to be done.
+
 An interactive explorer for ligand-group-orbital (LGO) molecular-orbital diagrams: build the diagram step by step, see every contact that sets an orbital's energy, and compare the model with experiment.
 
 ## Live app
