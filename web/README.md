@@ -70,4 +70,4 @@ The approved layout (case rail, construction timeline, tabbed inspector) is the 
 
 ## Not built yet
 
-From Release 2: the D10 measurement on the reference phone. D8 (case map) is planned for a later release. Share links and exports carry a selected MO but not a selected fragment orbital, schedule or doubts.
+From Release 2: nothing. D10 was measured on the reference phone (warm update at most 57 ms; `evidence/d10_speed_reference_phone.txt`); a first-load budget is still to be set from a private-tab (empty-cache) run. D8 (case map) is planned for a later release. Share links and exports carry a selected MO but not a selected fragment orbital, schedule or doubts.

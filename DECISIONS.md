@@ -343,6 +343,12 @@ Built on top, the Release 2 items that waited for v1.5:
 
 `drafts/CONVENTIONS-v1.5-draft.md` proposes NH3, H2S and SiH4 (needed for the BH3 → NH3 morph and the H2O/H2S and CH4/SiH4 comparisons), the C3v group, Si–H rows, optional diatomic hydrides NH, OH and HF, and lecture presets that switch the central s–H coupling off (V5). It also records an erratum in signed v1.4. The frozen §9.1 table still shows the earlier Harrison composite values, although the text, `params/onsite.csv` and every result use Miessler; no computed number is affected. Nothing is applied until the owner signs off. The C3v group data and the new geometries come from fresh Bilbao and CCCBDB snapshots in `evidence/` (the Bilbao host was added to a new personal environment for this repository, with the owner's approval). The draft's numbers come from a scratch prototype with the unchanged engine.
 
+## D10 measured on the reference phone (2026-11-07)
+
+The owner ran the in-app speed test on their phone, which is now the reference device: an iPhone running iOS 18.7, Safari, 414×896 at 3×, reported with 4 cores. The result is in `evidence/d10_speed_reference_phone.txt`. Every case's warm full update (engine plus redraw) took at most 57 ms, the slowest being SF6 lecture, with a median of 15 ms. Warm engine recompute alone took at most 53 ms. That is under the spec's 100 ms, so **D10's warm budget is met.**
+
+The first load took 3.8 s. The test labels this "cold", but it measures the page that ran the test. If Safari already held the Pyodide runtime and NumPy from earlier visits, the download was not included. The spec leaves the first-load budget to be set once the reference device is chosen. Proposed for the owner: measure once in a private tab, which has an empty cache, and set the budget from that.
+
 ## Loading screen (2026-11-07, at the owner's request)
 
 The owner found the first load slow and asked for a loading screen. A full-screen card now shows five steps (fetching the engine and data, downloading the Python runtime, loading NumPy, starting the engine, drawing the first diagram), a progress bar and the elapsed time. It says that later visits load from the browser's cache. The worker reports each step. If loading fails, the card says so and suggests reloading.
