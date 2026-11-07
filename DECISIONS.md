@@ -343,6 +343,12 @@ Built on top, the Release 2 items that waited for v1.5:
 
 `drafts/CONVENTIONS-v1.5-draft.md` proposes NH3, H2S and SiH4 (needed for the BH3 → NH3 morph and the H2O/H2S and CH4/SiH4 comparisons), the C3v group, Si–H rows, optional diatomic hydrides NH, OH and HF, and lecture presets that switch the central s–H coupling off (V5). It also records an erratum in signed v1.4. The frozen §9.1 table still shows the earlier Harrison composite values, although the text, `params/onsite.csv` and every result use Miessler; no computed number is affected. Nothing is applied until the owner signs off. The C3v group data and the new geometries come from fresh Bilbao and CCCBDB snapshots in `evidence/` (the Bilbao host was added to a new personal environment for this repository, with the owner's approval). The draft's numbers come from a scratch prototype with the unchanged engine.
 
+## Loading screen (2026-11-07, at the owner's request)
+
+The owner found the first load slow and asked for a loading screen. A full-screen card now shows five steps (fetching the engine and data, downloading the Python runtime, loading NumPy, starting the engine, drawing the first diagram), a progress bar and the elapsed time. It says that later visits load from the browser's cache. The worker reports each step. If loading fails, the card says so and suggests reloading.
+
+The worker also fetches its 37 engine and data files in parallel, while the runtime downloads, instead of one after another. Here the load takes about 3 s either way, because the files are local and the time goes on the runtime download. On a phone each sequential fetch costs a network round trip, so the saving should be larger there; it has not been measured on the phone.
+
 ## B6. Sign-off (owner only)
 
 Not delegated. On 2026-11-06 the owner gave standing permission for Claude to apply the drafted changes. They are now in `CONVENTIONS.md` v1.3 and the spec, and the drafts in `drafts/` remain as the record. Applying them is not sign-off: v1.3 stays "not frozen" until the owner reviews it.

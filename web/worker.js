@@ -12,15 +12,28 @@ const DATA = ["params/onsite.csv", "params/pairs.csv", "params/presets.json", "p
   ...ENGINE.map(f => `engine/lgo_engine/${f}`)];
 
 let py = null;
+// Progress for the loading screen: posted without an id, so the page can tell it from command replies.
+const progress = (step, extra = {}) => self.postMessage({ progress: { step, ...extra } });
 const ready = (async () => {
   const t0 = performance.now();
-  py = await loadPyodide();
-  await py.loadPackage("numpy");
   const base = new URL("../", self.location.href);
-  for (const path of DATA) {
+  // Fetch the engine and data in parallel, while the Python runtime downloads.
+  let fetched = 0;
+  const files = Promise.all(DATA.map(async (path) => {
     const r = await fetch(new URL(path, base));
     if (!r.ok) throw new Error(`fetch ${path}: ${r.status}`);
     const bytes = new Uint8Array(await r.arrayBuffer());
+    fetched++;
+    progress("files", { done: fetched, total: DATA.length });
+    return [path, bytes];
+  }));
+  progress("runtime");
+  py = await loadPyodide();
+  progress("numpy");
+  await py.loadPackage("numpy");
+  const all = await files;
+  progress("engine");
+  for (const [path, bytes] of all) {
     const dir = "/bundle/" + path.split("/").slice(0, -1).join("/");
     py.FS.mkdirTree(dir);
     py.FS.writeFile("/bundle/" + path, bytes);
@@ -32,6 +45,7 @@ from load import load_params, load_groups, conventions_sha256, conventions_versi
 from lgo_engine import app_api, __version__
 P = load_params("/bundle"); G = load_groups("/bundle"); CSHA = conventions_sha256("/bundle"); X = load_extras("/bundle")
 `);
+  progress("first");
   return { load_ms: performance.now() - t0, version: py.runPython("__version__"),
            python: py.runPython("sys.version.split()[0]"), conventions: JSON.parse(py.runPython("json.dumps(conventions_version('/bundle'))")), numpy: py.runPython("import numpy; numpy.__version__") };
 })();

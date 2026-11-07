@@ -4,6 +4,7 @@ const worker = new Worker("worker.js");
 let seq = 0;
 const pending = new Map();
 worker.onmessage = (ev) => {
+  if (ev.data.progress) { loadingProgress(ev.data.progress); return; }
   const { id, ok, out, error } = ev.data;
   const p = pending.get(id);
   pending.delete(id);
@@ -16,6 +17,49 @@ const call = (cmd, args) => new Promise((resolve, reject) => {
 });
 
 const $ = (id) => document.getElementById(id);
+
+// ---- Loading screen: the first visit downloads the Python runtime and NumPy, which takes a while. ----
+const LOAD_STEPS = [["files", "Fetching the engine and data"], ["runtime", "Downloading the Python runtime"], ["numpy", "Loading NumPy"],
+  ["engine", "Starting the engine"], ["first", "Drawing the first diagram"]];
+const loadT0 = performance.now();
+let loadState = { step: "runtime", files: [0, 1] };
+function loadingProgress(p) {
+  if (p.step === "files") loadState.files = [p.done, p.total];
+  else loadState.step = p.step;
+  renderLoading();
+}
+function renderLoading() {
+  const box = document.getElementById("loading"); if (!box || box.hidden) return;
+  const at = loadState.step === "done" ? LOAD_STEPS.length : LOAD_STEPS.findIndex(([k]) => k === loadState.step);
+  const [fd, ft] = loadState.files;
+  const list = box.querySelector("ol"); list.replaceChildren();
+  let score = 0;
+  LOAD_STEPS.forEach(([k, label], i) => {
+    const li = document.createElement("li");
+    // Files download in parallel with the runtime, so they count as done once all have arrived.
+    const done = k === "files" ? fd >= ft : i < at;
+    const active = k === "files" ? !done : i === at;
+    score += done ? 1 : (k === "files" ? fd / ft : 0);
+    li.className = done ? "done" : active ? "active" : "";
+    li.textContent = label + (k === "files" ? ` (${fd} of ${ft})` : "");
+    list.append(li);
+  });
+  const frac = Math.min(1, score / LOAD_STEPS.length);
+  box.querySelector(".bar span").style.width = `${(100 * frac).toFixed(0)}%`;
+  box.querySelector(".elapsed").textContent = `${((performance.now() - loadT0) / 1000).toFixed(0)} s`;
+}
+const loadTick = setInterval(renderLoading, 500);
+function loadingDone(err) {
+  clearInterval(loadTick);
+  const box = document.getElementById("loading"); if (!box) return;
+  if (err) {
+    box.querySelector(".msg").textContent = `The engine failed to load: ${err}. Reloading the page usually fixes a dropped download.`;
+    box.classList.add("failed"); return;
+  }
+  loadState.step = "done"; renderLoading();
+  box.classList.add("leaving");
+  setTimeout(() => { box.hidden = true; }, 250);
+}
 const NS = "http://www.w3.org/2000/svg";
 const state = { case: null, s: 1, level: null, fragment: null, view: null, info: null, watching: false,
   electrons: null, approx: null, dial: 0, lp: 0, paint: null, morph: null, schedule: null, doubt: [], doubtOpen: null, compare: null, compareView: null };
@@ -1826,8 +1870,10 @@ function proposalUpdate(view) {
     await morphMenu();
     compareMenu();
     document.body.dataset.ready = "1";
+    loadingDone();
   } catch (e) {
     $("banner").textContent = `Engine failed to load: ${e.message}`;
     document.body.dataset.error = e.message;
+    loadingDone(e.message);
   }
 })();

@@ -37,6 +37,9 @@ const check = (name, ok, detail = "") => { results.push({ name, ok, detail }); c
     await page.waitForFunction(() => document.body.dataset.ready || document.body.dataset.error, null, { timeout: 180000 });
     const err = await page.evaluate(() => document.body.dataset.error);
     check("engine loads in Pyodide", !err, err || `cold load ${((Date.now() - t0) / 1000).toFixed(1)} s`);
+    await page.waitForFunction(() => document.getElementById("loading").hidden, null, { timeout: 5000 });
+    const loadSteps = await page.$$eval("#loading li", (l) => l.map((x) => x.className));
+    check("loading screen shows the steps and goes away once the engine is ready", loadSteps.length === 5 && loadSteps.every((c) => c === "done"), loadSteps.join(","));
     const footer = await page.textContent("#footer");
     check("runtime is Python 3.12.7 + NumPy 2.0.2", /Python 3\.12\.7 · NumPy 2\.0\.2/.test(footer), footer);
 

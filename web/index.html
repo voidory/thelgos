@@ -11,6 +11,15 @@
 <link rel="stylesheet" href="proposal.css">
 </head>
 <body>
+<div id="loading" class="loading" role="status" aria-live="polite">
+  <div class="loading-card">
+    <h1>LGO Method Explorer</h1>
+    <p class="msg">Getting the engine ready. The first visit downloads a Python runtime and NumPy to run the calculations in your browser, so it can take a while; later visits load from your browser's cache and are much quicker.</p>
+    <div class="bar" aria-hidden="true"><span></span></div>
+    <ol></ol>
+    <p class="elapsed muted-text"></p>
+  </div>
+</div>
 <header>
   <h1>LGO Method Explorer</h1>
   <p id="banner" class="banner" role="note">Loading the engine…</p>

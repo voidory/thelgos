@@ -264,3 +264,25 @@ body:not(.comparing) .cmp-cap { display: none; }
 #ledger tr.linked td, #matching .linked { background: var(--accent-soft); }
 #pes .pes-band.linked rect, #pes .pes-band.linked path, #pes .pes-band.linked line { stroke: var(--warn); stroke-width: 3; }
 #walsh .wl.linked { stroke: var(--warn); stroke-width: 3.5; opacity: 1; }
+
+/* ---- Loading screen (first load downloads Pyodide and NumPy). ---- */
+.loading { position: fixed; inset: 0; z-index: 100; display: flex; align-items: center; justify-content: center; padding: 16px; background: var(--bg); transition: opacity 0.25s; }
+.loading.leaving { opacity: 0; pointer-events: none; }
+.loading[hidden] { display: none; }
+.loading-card { width: min(460px, 100%); background: var(--panel); border: 1px solid var(--rule); border-radius: 14px; padding: 22px 24px; box-shadow: 0 6px 30px rgba(0, 0, 0, 0.08); }
+.loading-card h1 { margin: 0 0 8px; font-size: 1.25rem; }
+.loading-card .msg { margin: 0 0 14px; font-size: 0.9rem; line-height: 1.45; }
+.loading-card .bar { height: 6px; border-radius: 999px; background: var(--accent-soft); overflow: hidden; }
+.loading-card .bar span { display: block; height: 100%; width: 0; background: var(--accent); transition: width 0.4s; }
+.loading-card ol { list-style: none; padding: 0; margin: 14px 0 6px; font-size: 0.88rem; }
+.loading-card li { padding: 3px 0 3px 24px; position: relative; color: var(--muted, #6b6a64); }
+.loading-card li::before { content: ""; position: absolute; left: 4px; top: 8px; width: 9px; height: 9px; border-radius: 50%; border: 1.5px solid var(--rule); }
+.loading-card li.active { color: var(--fg); font-weight: 600; }
+.loading-card li.active::before { border-color: var(--accent); border-top-color: transparent; animation: lgo-spin 0.9s linear infinite; }
+.loading-card li.done { color: var(--fg); }
+.loading-card li.done::before { background: var(--accent); border-color: var(--accent); }
+.loading-card .elapsed { margin: 0; font-size: 0.8rem; text-align: right; }
+.loading.failed .loading-card { border-color: var(--warn); }
+.loading.failed .msg { color: var(--warn); }
+@keyframes lgo-spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .loading-card li.active::before { animation: none; border-top-color: var(--accent); } .loading, .loading-card .bar span { transition: none; } }
