@@ -208,6 +208,14 @@ The owner asked for Milestone A first and for D10 to be measured on the owner's 
 - **F3.6 symmetry-only view.** Levels are spaced evenly by energy rank, with no energy scale. Labels and lines are unchanged (tested). The order itself is still the model's, because symmetry alone does not fix it; the axis says "order only".
 - **D10 speed test.** A footer button times every case twice and reports the warm pass: engine time, and engine plus redraw, against the spec's 100 ms budget. The owner runs it on the reference phone and sends the copied result.
 
+## M8. Exam and Practice modes check against the Miessler levels (owner decision, 2026-11-07)
+
+**Decision.** Exam and Practice modes (Milestone B) check a student's answers against the app's own levels, which come from the Miessler table (M7). They do not take level orders from a question's hint.
+
+**Why.** Only one real exam question has been seen so far. That is too few to design an alternative convention around.
+
+**Known consequence.** That question asks about NH and hints that H 1s lies slightly above N 2p. Miessler puts it slightly below (−13.61 vs −13.18 eV). Miessler's value is averaged over the whole 2p³ configuration, whereas the hint follows N's ground state (first IE 14.53 eV). The expected answer is the same under both: one σ bond, a nonbonding π pair on N, and a triplet. Only the drawn position of H 1s relative to N 2p differs. If NH is added later (it needs CONVENTIONS v1.5), its reading note should explain the difference. Revisit this decision if more exam questions show the lecturer's ordering differing from Miessler.
+
 ## B6. Sign-off (owner only)
 
 Not delegated. On 2026-11-06 the owner gave standing permission for Claude to apply the drafted changes. They are now in `CONVENTIONS.md` v1.3 and the spec, and the drafts in `drafts/` remain as the record. Applying them is not sign-off: v1.3 stays "not frozen" until the owner reviews it.
