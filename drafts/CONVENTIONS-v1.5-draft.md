@@ -12,7 +12,7 @@ v1.5 adds the molecules Release 2 still needs: NH3 (for the BH3 → NH3 morph), 
 | V2 | **Add NH3, H2S and SiH4** as fixtures, with CCCBDB geometries and the C3v group. | Yes: the spec's remaining Release 2 items need them. |
 | V3 | **Si–H coupling.** No Si–H row exists. | Add Si–H ss and sp rows with the same Harrison η and hydrogen factor 0.6 as every other X–H row (flagged as extrapolated, like all H rows). |
 | V4 | **Diatomic hydrides NH, OH, HF.** | Optional. Yes if you want your exam's NH question in the app. |
-| V5 | **Lecture presets for the new hydrides.** In the model, the central atom's s mixes with H 1s, so the lowest σ (or a1) level counts as bonding. The counting bond order is then 2 for NH, OH and HF (textbook 1), 4/3 for NH3 and 3/2 for H2S (textbook 1). Model water already gives 3/2 for the same reason. Switching the central s–H coupling off, as lecture water does, gives 1 in all five. | Give NH3, H2S, NH, OH and HF a Model/Lecture pair, like water. Not SiH4: switching Si 3s off breaks it (bond order 3/4, wrong HOMO), so SiH4 stays model-only like CH4. |
+| V5 | **Bond orders for the new hydrides.** Your module's definition is (bonding − antibonding)/2; the question is which levels count as bonding. In the model each level is classified by the sign of its contacts. In NH, OH and HF the lowest σ is mostly central s (74–90 %) but mixes with H 1s and is clearly bonding (−4.9 to −6.3 eV of contact energy), giving 2. Miessler's HF diagram treats F 2s as too deep to interact (nonbonding), giving 1. In NH3 and H2S the model's diagram is already the textbook one, but the lone-pair-like 3a1 is very slightly bonding (−0.43 eV for NH3, −1.31 eV for H2S), so the count is 4/3 and 3/2 rather than 1. Switching N 2s off would give 1 only by making the lone pair a strongly bonding orbital (−5.4 eV), which is not the textbook picture. | **Decided by the owner (2026-11-07), as recommended.** NH, OH and HF get a Model/Lecture pair: Lecture switches the central s–H 1s coupling off, as in lecture water, and reproduces Miessler's picture and bond order 1. NH3, H2S and SiH4 are model-only. For NH3 and H2S the bond-order panel states that the count is 4/3 or 3/2 because the lone pair is very slightly bonding, and that taking it as nonbonding, as textbooks do, gives 1. The density-matrix value is shown beside it. There is no cut-off rule for "weakly bonding": any cut-off is arbitrary (one that catches NH3's −0.43 eV misses H2S's −1.31 eV). |
 
 The hydrogen factor stays 0.6. Every new ordering holds for any factor between 0.30 and 1.20, except NH3's two empty levels (a1* and e*), which swap at about 0.80, outside the signed window 0.4235–0.6668. So the new molecules neither move nor tighten the window.
 
@@ -22,7 +22,7 @@ The exam's hint for Q2(a) (H 1s "slightly higher" than N 2p) still disagrees wit
 
 ### Header and §12
 
-Version 1.5, not frozen until owner sign-off B7. Change-log row: "V1 erratum (§9.1 table); C3v; NH3, H2S, SiH4 [and NH, OH, HF]; Si–H rows; lecture presets (V5); Appendix A.3 and B rows; checker patch K21."
+Version 1.5, not frozen until owner sign-off B7. Change-log row: "V1 erratum (§9.1 table); C3v; NH3, H2S, SiH4 [and NH, OH, HF]; Si–H rows; lecture presets for NH, OH, HF (V5); Appendix A.3 and B rows; checker patch K21."
 
 ### §2 Geometries (V2, V4)
 
@@ -76,7 +76,7 @@ Add `H,Si,ss_sigma,-1.4,…,H,0.6,harrison_extrapolated_H` and `H,Si,sp_sigma,1.
 
 ### §9.3 Presets (V5)
 
-`NH3_model`, `H2S_model`, `SiH4_model`, `NH_model`, `OH_model`, `HF_model`: geometry as §2, hydrogen scale 0.6. If V5 is accepted, also `NH3_lecture`, `H2S_lecture`, `NH_lecture`, `OH_lecture`, `HF_lecture`: the central s–H 1s coupling forced to zero, as in `H2O_lecture`.
+`NH3_model`, `H2S_model`, `SiH4_model`, `NH_model`, `OH_model`, `HF_model`: geometry as §2, hydrogen scale 0.6. Per V5, also `NH_lecture`, `OH_lecture`, `HF_lecture`: the central s–H 1s coupling forced to zero, as in `H2O_lecture`. NH3, H2S and SiH4 have no lecture preset.
 
 ### Appendix A.3 (new blocks)
 
@@ -93,11 +93,11 @@ NH3, with β the angle of each N–H bond from −z: a1 is A(ε_Ns, ε_Np, ε_H;
 | OH | σ −35.060791; σ −22.045407; π×2 −15.850000 (3 electrons, warns); σ −4.733802 |
 | HF | σ −42.516934; σ −25.152810; π×2 −18.650000 (HOMO); σ −4.760256 (LUMO) |
 
-Lecture rows, if V5 is accepted, are generated when applied.
+Lecture rows for NH, OH and HF are generated when applied (prototype: NH σ(N 2s) −25.56, σ −21.2, π×2 −13.18; OH σ −32.38, σ −23.7, π×2 −15.85; HF σ −40.17, σ −26.5, π×2 −18.65; each with one empty σ*).
 
 ### A.5 bond-order oracles
 
-Model counting: NH3 4/3, H2S 3/2, SiH4 1, NH 2, OH 2, HF 2. With V5, lecture counting: NH3, H2S, NH, OH, HF 1.
+Model counting: NH3 4/3, H2S 3/2, SiH4 1, NH 2, OH 2, HF 2. Lecture counting (V5): NH, OH, HF 1. NH3 and H2S: the counting value stands, with the stated note that the textbook's 1 takes the slightly bonding 3a1 lone pair as nonbonding.
 
 ### Fidelity references (no new claims)
 
