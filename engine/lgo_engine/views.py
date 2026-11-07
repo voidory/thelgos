@@ -211,6 +211,35 @@ def explanation(system, result, matching, frontier_levels):
     return " ".join(parts)
 
 
+def pes_spec(system, result, curated=None):
+    """Photoelectron spectrum in Koopmans' picture: one band per occupied level at -energy, height = electrons.
+
+    Model orbital energies, not predicted ionisation energies; heights count electrons, not
+    photoionisation cross-sections. Measured reference values, where curated, are returned alongside
+    so the view can show the gap honestly (spec Release 1, CH4).
+    """
+    bands = [{"level": k, "ie_eV": -lv["energy_eV"], "electrons": lv["electrons"], "multiplicity": lv["multiplicity"]}
+             for k, lv in enumerate(result["levels"]) if lv["electrons"] > 0]
+    ref = ((curated or {}).get("photoelectron") or {}).get(system.name)
+    caveats = [
+        "Approximate. Band height counts electrons, so a triply degenerate level gives a band three times as tall. "
+        "Measured intensities follow photoionisation cross-sections, so real band heights differ.",
+        "Band positions are this model's orbital energies with the sign flipped (Koopmans' picture). "
+        "They are not predicted ionisation energies.",
+    ]
+    if any(lv["warnings"] for lv in result["levels"] if lv["electrons"] > 0):
+        caveats.append("A degenerate level is partly filled, so the one-electron picture does not fix which band appears first.")
+    if ref:
+        first = min(bands, key=lambda b: b["ie_eV"])
+        caveats.append(
+            f"Measured, the first band starts at {ref['first_band_adiabatic_eV']:.2f} eV and peaks at {ref['first_band_vertical_eV']:.2f} eV "
+            f"(NIST CCCBDB); this model puts it at {first['ie_eV']:.1f} eV. This simple model binds bonding levels too strongly, "
+            "so read the number of bands and their 3:1 heights, not the positions. "
+            f"The second band lies near {ref['second_band_near_eV']:g} eV, beyond a He I lamp ({ref['he_i_eV']:.2f} eV), "
+            "so a He I spectrum shows only the first band.")
+    return {"bands": bands, "reference": ref, "caveats": caveats}
+
+
 def provenance(system, params):
     preset = params.presets[system.preset]
     return {

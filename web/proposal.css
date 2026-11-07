@@ -111,3 +111,16 @@ input[type=range], input[type=checkbox] { accent-color: var(--accent); }
 .variant .seg button { font: inherit; border: 0; background: var(--panel); color: var(--fg); padding: 3px 12px; cursor: pointer; }
 .variant .seg button[aria-checked="true"] { background: var(--accent); color: var(--on-accent); }
 .variant .note { color: var(--muted); }
+
+/* Photoelectron spectrum panel. */
+#pes { width: 100%; height: auto; display: block; background: var(--panel); border: 1px solid var(--rule); border-radius: 8px; }
+#pes .pes-band rect { fill: var(--fg); }
+#pes .pes-label { font-family: "STIX Two Text", serif; font-size: 13px; fill: var(--fg); }
+#pes .pes-ref { stroke: var(--warn); stroke-width: 1.5; stroke-dasharray: 4 3; }
+#pes .pes-hei { stroke: var(--muted); stroke-width: 1; stroke-dasharray: 2 3; }
+#pes .pes-mark { font-size: 9px; fill: var(--muted); }
+#pes .axis-num { font-size: 10px; fill: var(--muted); }
+#pes .axis-title { font-size: 10px; fill: var(--muted); }
+.pes-notes { font-size: 0.82rem; padding-left: 18px; margin: 8px 0 0; color: var(--fg); }
+.pes-notes li { margin: 0 0 4px; }
+.badge.approx { font-size: 0.7rem; vertical-align: middle; cursor: help; }

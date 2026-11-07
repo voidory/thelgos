@@ -129,6 +129,7 @@ def view(params, groups, name, s=1.0, level=None, conventions_sha256=None, extra
         "rules": views.rules_payload(),
         "explanation": views.explanation(system, result, diagram.get("matching"), (fr["HOMO"], fr["LUMO"])),
         "provenance": views.provenance(system, params),
+        "pes": views.pes_spec(system, result, extras["curated"] if extras else None),
     }
 
 

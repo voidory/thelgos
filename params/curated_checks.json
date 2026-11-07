@@ -13,5 +13,10 @@
     "P2": {"ordering": null, "ground_state": "¹Σg", "multiplicity": 1, "source": "NIST CCCBDB (evidence/cccbdb_P2.html); no sourced orbital-ordering reference for period 3"},
     "S2": {"ordering": null, "ground_state": "³Σg", "multiplicity": 3, "source": "NIST CCCBDB (evidence/cccbdb_S2.html); no sourced orbital-ordering reference for period 3"},
     "Cl2": {"ordering": null, "ground_state": "¹Σg", "multiplicity": 1, "source": "NIST CCCBDB (evidence/cccbdb_Cl2.html); no sourced orbital-ordering reference for period 3"}
+  },
+  "photoelectron": {
+    "CH4": {"first_band_adiabatic_eV": 12.61, "first_band_vertical_eV": 13.60, "first_band_source": "NIST CCCBDB (evidence/cccbdb_CH4.html), from the NIST WebBook",
+            "second_band_near_eV": 23, "second_band_source": "Functional specification, Release 1 case list (owner); no packaged measurement yet",
+            "he_i_eV": 21.22, "he_i_source": "He I resonance line, 58.4 nm (standard value)"}
   }
 }

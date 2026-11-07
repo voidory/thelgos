@@ -398,6 +398,48 @@ function ledger(view) {
   box.append(t);
 }
 
+// Photoelectron spectrum (Koopmans' picture): bands at -energy, height = electrons. Measured markers where curated.
+function pes(view) {
+  const svg = $("pes"); if (!svg) return;
+  svg.replaceChildren();
+  const P = view.pes, W = 360, H = 190, L = 34, R = 12, T = 18, B = 34;
+  svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+  const ref = P.reference;
+  const xs = P.bands.map((b) => b.ie_eV).concat(ref ? [ref.first_band_adiabatic_eV, ref.second_band_near_eV, ref.he_i_eV] : []);
+  const lo = Math.floor(Math.min(...xs) / 5) * 5 - 2, hi = Math.ceil(Math.max(...xs) / 5) * 5 + 2;
+  const x = (e) => L + (e - lo) / (hi - lo) * (W - L - R);
+  const maxE = Math.max(...P.bands.map((b) => b.electrons), 1);
+  const y = (n) => H - B - n / maxE * (H - B - T - 14);
+  svg.append(el("line", { x1: L, x2: W - R, y1: H - B, y2: H - B, class: "axis-line" }));
+  for (let e = Math.ceil(lo / 5) * 5; e <= hi; e += 5) {
+    svg.append(el("line", { x1: x(e), x2: x(e), y1: H - B, y2: H - B + 4, class: "axis-line" }));
+    svg.append(el("text", { x: x(e), y: H - B + 16, "text-anchor": "middle", class: "axis-num" }, String(e)));
+  }
+  svg.append(el("text", { x: (L + W - R) / 2, y: H - 4, "text-anchor": "middle", class: "axis-title" }, "ionisation energy / eV (model: −orbital energy)"));
+  if (ref) {
+    const he = x(ref.he_i_eV);
+    svg.append(el("line", { x1: he, x2: he, y1: T, y2: H - B, class: "pes-hei" }));
+    for (const e of [ref.first_band_vertical_eV, ref.second_band_near_eV]) {
+      const xe = x(e);
+      svg.append(el("line", { x1: xe, x2: xe, y1: T, y2: H - B, class: "pes-ref" }));
+    }
+  }
+  const leg = $("pes-legend");
+  if (leg) leg.textContent = ref
+    ? `Black bars: model bands. Orange dashed: measured band positions (${ref.first_band_vertical_eV.toFixed(2)} eV, NIST CCCBDB; near ${ref.second_band_near_eV} eV). Grey dotted: He I limit (${ref.he_i_eV.toFixed(2)} eV).`
+    : "Black bars: model bands. No measured spectrum is curated for this case yet.";
+  for (const b of P.bands) {
+    const lv = view.diagram.centre[b.level];
+    const g = el("g", { class: "pes-band", "data-ie": b.ie_eV, "data-electrons": b.electrons });
+    g.append(el("rect", { x: x(b.ie_eV) - 4, y: y(b.electrons), width: 8, height: H - B - y(b.electrons), rx: 2 }));
+    g.append(richText(labelParts(lv), { x: x(b.ie_eV), y: y(b.electrons) - 5, "text-anchor": "middle", class: "pes-label" }));
+    g.append(el("title", {}, `${fmt(-b.ie_eV, 2)} eV level, ${b.electrons} electrons`));
+    svg.append(g);
+  }
+  const ul = $("pes-notes"); ul.replaceChildren();
+  for (const c of P.caveats) { const li = document.createElement("li"); li.textContent = c; ul.append(li); }
+}
+
 function bonds(view) {
   const bo = view.result.bond_orders;
   const c = bo.counting, dm = bo.density_matrix;
@@ -451,7 +493,7 @@ async function refresh() {
   const view = await call("view", { case: state.case, s: state.s, level: state.level });
   if (mine !== latest) return state.view;  // a newer request superseded this one
   state.view = view;
-  draw(view); levelTable(view); narrate(view); ledger(view); bonds(view); banner(view); about(view);
+  draw(view); levelTable(view); narrate(view); ledger(view); bonds(view); pes(view); banner(view); about(view);
   structure(view); matching(view); slotBadges(view);
   if (proposal) proposalUpdate(view);
   if ($("t-3d").checked) view3d.render(view);

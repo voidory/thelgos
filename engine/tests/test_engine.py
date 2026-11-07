@@ -282,6 +282,21 @@ class ReadingPanel(unittest.TestCase):
             if "orbital_ordering" in r:
                 self.assertEqual(got["Orbital ordering"], r["orbital_ordering"]["agrees"], r["case"])
 
+    def test_photoelectron_spectrum(self):
+        """Spec Release 1, CH4: two bands with degeneracies 3:1, badged approximate; measured values cited."""
+        from load import load_extras
+        from lgo_engine import app_api
+        X = load_extras()
+        p = app_api.view(P, G, "CH4", extras=X)["pes"]
+        self.assertEqual(sorted(b["electrons"] for b in p["bands"]), [2, 6])
+        self.assertTrue(any("cross-sections" in c for c in p["caveats"]) and any("He I" in c for c in p["caveats"]))
+        self.assertAlmostEqual(p["reference"]["first_band_vertical_eV"], 13.60)
+        for s in cases.release1(P):
+            r = app_api.view(P, G, s.name, extras=X)
+            occ = [lv for lv in r["result"]["levels"] if lv["electrons"] > 0]
+            self.assertEqual(len(r["pes"]["bands"]), len(occ), s.name)
+            self.assertEqual(sum(b["electrons"] for b in r["pes"]["bands"]), s.electrons, s.name)
+
     def test_every_case_name_in_notes_exists(self):
         from load import load_extras
         names = {s.name for s in cases.release1(P)}

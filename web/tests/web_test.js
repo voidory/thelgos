@@ -196,6 +196,11 @@ const check = (name, ok, detail = "") => { results.push({ name, ok, detail }); c
 
     await pick(page, "CH4");
     await page.waitForFunction(() => document.body.dataset.rendered === "CH4|1|");
+    const pesBands = await page.$$eval("#pes .pes-band", (gs) => gs.map((g) => Number(g.dataset.electrons)).sort((a, b) => a - b));
+    const pesLegend = await page.textContent("#pes-legend");
+    const pesBadge = await page.$eval("#pes", (s) => !!s.closest(".tabpanel, .inspector").querySelector(".badge.approx"));
+    check("CH4 photoelectron spectrum: two bands 3:1, badged approximate, measured positions cited",
+          JSON.stringify(pesBands) === "[2,6]" && pesBadge && pesLegend.includes("NIST CCCBDB"), `${pesBands}`);
     const narr = await page.textContent("#narration");
     check("CH4 shows B5 skip note", narr.includes("No ligand–ligand coupling in this model."), narr.slice(0, 120));
     // Accessibility: named level buttons, a text table of levels, keyboard tabs.
