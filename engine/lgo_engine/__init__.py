@@ -4,8 +4,8 @@ The engine takes parameters and point-group tables as plain data and returns a
 JSON-serialisable Result. File loading lives outside the package (engine/load.py),
 so the same code runs under CPython and Pyodide.
 
-Status: provisional. Built against CONVENTIONS.md as it stands (its header gives the version);
-the owner has not yet signed it off (B6).
+Status: Release 1 (version 1.0.0), built against CONVENTIONS.md v1.4, frozen on the owner's
+sign-off (B6). The header of CONVENTIONS.md gives the version the running build uses.
 """
 from .model import Atom, BasisFunction, System
 from .params import ParameterSet
@@ -17,7 +17,7 @@ from .ledger import contact_ledger
 from .result import run
 from .schedule import build_schedule, hamiltonian_at, checkpoints, lambdas
 
-__version__ = "0.1.0-provisional"
+__version__ = "1.0.0"
 __all__ = ["Atom", "BasisFunction", "System", "ParameterSet", "build_hamiltonian", "solve",
            "cluster_levels", "Group", "label_levels", "analyse", "contact_ledger", "run",
            "build_schedule", "hamiltonian_at", "checkpoints", "lambdas", "__version__"]

@@ -1,0 +1,54 @@
+# Deploy the LGO Method Explorer to GitHub Pages.
+# Runs `make check` first (baseline regeneration + engine tests) and deploys only if it passes.
+# Deploys only from the repository's default branch; pushes to other branches run the checks only.
+# One-time setup by the owner: Settings -> Pages -> Build and deployment -> Source: "GitHub Actions".
+name: Pages
+
+on:
+  push:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pages-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12.7"
+      - name: Install the hashed checker environment
+        run: python -m pip install --require-hashes -r requirements-checker.lock
+      - name: make check
+        run: make check PYTHON=python
+
+  build:
+    needs: check
+    if: github.ref_name == github.event.repository.default_branch
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Assemble the site
+        run: web/build_site.sh _site
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-24.04
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

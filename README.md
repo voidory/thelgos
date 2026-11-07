@@ -1,4 +1,14 @@
-# LGO conventions v1.2 review candidate
+# LGO Method Explorer
+
+An interactive explorer for ligand-group-orbital (LGO) molecular-orbital diagrams: build the diagram step by step, see every contact that sets an orbital's energy, and compare the model with experiment.
+
+## Live app
+
+**https://voidory.github.io/thelgos/** is Release 1 (engine 1.0.0, CONVENTIONS v1.4 frozen). Each push to the default branch runs `make check` and, only if it passes, redeploys through `.github/workflows/pages.yml`. `web/build_site.sh` assembles the site: the app, engine sources, `params/`, `groups/` and `CONVENTIONS.md`.
+
+## History: the v1.2 audit package
+
+The rest of this file is the README of the v1.2 package as it was supplied, kept unchanged as history. Current status: `CONVENTIONS.md` v1.4 is frozen (owner sign-off B6), and decisions are in `DECISIONS.md`.
 
 This is an actual generated audit package, not a claim that a file has been produced elsewhere. `CONVENTIONS.md` is the primary candidate. **Not frozen. The owner has not approved v1.2.** The input TODO is preserved in `evidence/CONVENTIONS-v1.2-TODO.md`.
 
