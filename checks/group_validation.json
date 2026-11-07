@@ -120,7 +120,7 @@
     "closure_max_error": 2.220446049250313e-16,
     "group": "D8h",
     "order": 32,
-    "orthogonality_max_error": 1.1102230246251565e-16,
+    "orthogonality_max_error": 5.7117018149428e-17,
     "snap_character_max_residual": 1.9984014443252818e-15,
     "snap_matrix_max_residual": 5.787273125476827e-16
   }

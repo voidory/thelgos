@@ -155,6 +155,12 @@ Each entry in `levels` needs `irrep`, `energy`, `multiplicity`, `canonical_level
 - *Regenerated:* `evidence/reference_spectra.json` (15 entries change; the H-only sets, F2, Al2 and Cl2 do not), plus `checks/release1_energies.csv`, `checks/release1_validation.json` and `checks/crystod_cases.json`.
 - *Unchanged:* every other `checks/` file and `groups/`.
 
+**K20. Pinned OpenBLAS kernel, for byte-identical output on any host** (2026-11-07, found by the first GitHub Actions run). `make check-baseline` compares regenerated `checks/` byte for byte. NumPy's OpenBLAS picks a CPU-specific kernel at run time, and different kernels round the last one or two digits differently. Output was therefore reproducible only on machines that pick the same kernel: here, the AVX-512 SkylakeX path. GitHub's runner differed by up to 3e-14 eV.
+- *Fix.* `OPENBLAS_CORETYPE=Haswell` (the AVX2 path, available on any current x86-64 CPU) is exported by the `Makefile` and set in `scripts/check_baseline.py`'s subprocess environment.
+- *Hashes.* `scripts/check_baseline.py` `fee3e95e812a239770602462bcce9bad39db3c2984f0cfd9f83353118ab0d91f` → `fc79a3266dfcb0b04050b078411d5102497149fe572a4a6269cb1750aa267d8c`. `Makefile` `e443f062c1e61c08639cf0e2f3cb60cf8f5deb2f3bbf243d04fe822c86a62166` → `9824766b26ae37b3255c60e9120891a8bc4e5c29ef53da4ae09dc2dce8e82f2e`.
+- *Regenerated with the pinned kernel:* `checks/crystod_cases.json`, `group_validation.json`, `release1_energies.csv` and `release1_validation.json`. Every non-numeric field is identical. The largest numeric change is 3.2e-14 (a descriptor bond energy), and no energy moves by more than 1.4e-14 eV. `groups/` and `evidence/reference_spectra.json` (compared to 1e-9) are unchanged.
+- *Not a content change to CONVENTIONS v1.4.* Its "any mismatch is a failure" rule is kept; the rule now holds across hosts.
+
 ## Verification
 
 **Environment.** `requirements-checker.lock` was installed with `--require-hashes` into `.venv` (CPython 3.12.3), and `pip check` passed. This is not the README's 3.12.8 host and not the production 3.12.7.

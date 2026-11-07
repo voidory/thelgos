@@ -36,7 +36,17 @@ def _fragment_levels(H, idx, P, N):
         vec = B @ c
         for ix in cluster_levels(e, B.T @ Hf @ B):
             out.append((float(e[ix[0]]), len(ix), label, vec[:, ix]))
-    return sorted(out, key=lambda x: (x[0], x[2]))
+    # Energy order, but levels equal to 1e-8 eV (accidental degeneracies between irreps, e.g. CH4's
+    # a1 and t2 LGOs with H-H coupling off) follow the point group's irrep order, not rounding noise.
+    rank = {label: i for i, label in enumerate(P)}
+    out.sort(key=lambda x: x[0])
+    groups = []
+    for x in out:
+        if groups and abs(x[0] - groups[-1][0][0]) < 1e-8:
+            groups[-1].append(x)
+        else:
+            groups.append([x])
+    return [x for g in groups for x in sorted(g, key=lambda x: rank[x[2]])]
 
 
 def diagram_spec(system, H, result, groups, H_now=None, params=None):

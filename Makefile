@@ -1,6 +1,8 @@
 PYTHON ?= python
 export PYTHONDONTWRITEBYTECODE=1
 export OPENBLAS_NUM_THREADS=1
+# [K20] Pin the OpenBLAS kernel so float output is byte-identical on any x86-64 host (AVX2 path).
+export OPENBLAS_CORETYPE=Haswell
 .PHONY: check-baseline test-engine test-web check check-release
 check-baseline:
 	$(PYTHON) scripts/check_baseline.py
