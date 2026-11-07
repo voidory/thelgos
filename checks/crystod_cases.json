@@ -673,6 +673,1185 @@
       },
       {
         "atom_index": 1,
+        "direction": null,
+        "type": "s"
+      },
+      {
+        "atom_index": 2,
+        "direction": null,
+        "type": "s"
+      },
+      {
+        "atom_index": 3,
+        "direction": null,
+        "type": "s"
+      }
+    ],
+    "case": "NH3",
+    "descriptor_rule": "character: sign of the bond energy sum 2*sum c_i c_j H_ij over central-ligand pairs (central topology) or all inter-atomic pairs (otherwise), averaged over the degenerate set; |x|<=1e-6 eV is nonbonding. dominant_fragment: central if the central-atom weight averaged over the degenerate set exceeds 0.5, else ligand; ligand_only when there is no central atom.",
+    "edges": [
+      [
+        0,
+        1
+      ],
+      [
+        0,
+        2
+      ],
+      [
+        0,
+        3
+      ]
+    ],
+    "electrons": 8,
+    "geometry_angstrom": [
+      {
+        "element": "N",
+        "position": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      {
+        "element": "H",
+        "position": [
+          0.9377174185516152,
+          0.0,
+          -0.3816278330322553
+        ]
+      },
+      {
+        "element": "H",
+        "position": [
+          -0.46885870927580736,
+          0.8120871060368641,
+          -0.3816278330322553
+        ]
+      },
+      {
+        "element": "H",
+        "position": [
+          -0.46885870927580797,
+          -0.8120871060368638,
+          -0.3816278330322553
+        ]
+      }
+    ],
+    "group": "C3v",
+    "levels": [
+      {
+        "descriptor": {
+          "bond_energy_eV": -10.357236504523753,
+          "character": "bonding",
+          "dominant_fragment": "central"
+        },
+        "electrons": 2,
+        "energy_eV": -32.34697196553388,
+        "irrep": "A1",
+        "multiplicity": 1
+      },
+      {
+        "descriptor": {
+          "bond_energy_eV": -9.308281136165077,
+          "character": "bonding",
+          "dominant_fragment": "ligand"
+        },
+        "electrons": 4,
+        "energy_eV": -22.708244497753096,
+        "irrep": "E",
+        "multiplicity": 2
+      },
+      {
+        "descriptor": {
+          "bond_energy_eV": -0.42550103130347905,
+          "character": "bonding",
+          "dominant_fragment": "central"
+        },
+        "electrons": 2,
+        "energy_eV": -15.354182275777879,
+        "irrep": "A1",
+        "multiplicity": 1
+      },
+      {
+        "descriptor": {
+          "bond_energy_eV": 10.782737535827234,
+          "character": "antibonding",
+          "dominant_fragment": "ligand"
+        },
+        "electrons": 0,
+        "energy_eV": -4.648845758688237,
+        "irrep": "A1",
+        "multiplicity": 1
+      },
+      {
+        "descriptor": {
+          "bond_energy_eV": 9.308281136165078,
+          "character": "antibonding",
+          "dominant_fragment": "central"
+        },
+        "electrons": 0,
+        "energy_eV": -4.081755502246901,
+        "irrep": "E",
+        "multiplicity": 2
+      }
+    ],
+    "topology": "central"
+  },
+  {
+    "basis": [
+      {
+        "atom_index": 0,
+        "direction": null,
+        "type": "s"
+      },
+      {
+        "atom_index": 0,
+        "direction": [
+          1.0,
+          0.0,
+          0.0
+        ],
+        "type": "p"
+      },
+      {
+        "atom_index": 0,
+        "direction": [
+          0.0,
+          1.0,
+          0.0
+        ],
+        "type": "p"
+      },
+      {
+        "atom_index": 0,
+        "direction": [
+          0.0,
+          0.0,
+          1.0
+        ],
+        "type": "p"
+      },
+      {
+        "atom_index": 1,
+        "direction": null,
+        "type": "s"
+      },
+      {
+        "atom_index": 2,
+        "direction": null,
+        "type": "s"
+      }
+    ],
+    "case": "H2S",
+    "descriptor_rule": "character: sign of the bond energy sum 2*sum c_i c_j H_ij over central-ligand pairs (central topology) or all inter-atomic pairs (otherwise), averaged over the degenerate set; |x|<=1e-6 eV is nonbonding. dominant_fragment: central if the central-atom weight averaged over the degenerate set exceeds 0.5, else ligand; ligand_only when there is no central atom.",
+    "edges": [
+      [
+        0,
+        1
+      ],
+      [
+        0,
+        2
+      ]
+    ],
+    "electrons": 8,
+    "geometry_angstrom": [
+      {
+        "element": "S",
+        "position": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      {
+        "element": "H",
+        "position": [
+          0.0,
+          0.9616404049011908,
+          0.9268630382432312
+        ]
+      },
+      {
+        "element": "H",
+        "position": [
+          0.0,
+          -0.9616404049011908,
+          0.9268630382432312
+        ]
+      }
+    ],
+    "group": "C2v",
+    "levels": [
+      {
+        "descriptor": {
+          "bond_energy_eV": -4.60286777971991,
+          "character": "bonding",
+          "dominant_fragment": "central"
+        },
+        "electrons": 2,
+        "energy_eV": -25.263727623100394,
+        "irrep": "A1",
+        "multiplicity": 1
+      },
+      {
+        "descriptor": {
+          "bond_energy_eV": -4.702124301975789,
+          "character": "bonding",
+          "dominant_fragment": "ligand"
+        },
+        "electrons": 2,
+        "energy_eV": -17.51900520515259,
+        "irrep": "B2",
+        "multiplicity": 1
+      },
+      {
+        "descriptor": {
+          "bond_energy_eV": -1.3146893220548783,
+          "character": "bonding",
+          "dominant_fragment": "central"
+        },
+        "electrons": 2,
+        "energy_eV": -15.520416802849315,
+        "irrep": "A1",
+        "multiplicity": 1
+      },
+      {
+        "descriptor": {
+          "bond_energy_eV": 4.019307816639262e-31,
+          "character": "nonbonding",
+          "dominant_fragment": "central"
+        },
+        "electrons": 2,
+        "energy_eV": -11.619999999999996,
+        "irrep": "B1",
+        "multiplicity": 1
+      },
+      {
+        "descriptor": {
+          "bond_energy_eV": 4.7021243019757915,
+          "character": "antibonding",
+          "dominant_fragment": "central"
+        },
+        "electrons": 0,
+        "energy_eV": -7.710994794847394,
+        "irrep": "B2",
+        "multiplicity": 1
+      },
+      {
+        "descriptor": {
+          "bond_energy_eV": 5.917557101774791,
+          "character": "antibonding",
+          "dominant_fragment": "central"
+        },
+        "electrons": 0,
+        "energy_eV": -7.1558555740502925,
+        "irrep": "A1",
+        "multiplicity": 1
+      }
+    ],
+    "topology": "central"
+  },
+  {
+    "basis": [
+      {
+        "atom_index": 0,
+        "direction": null,
+        "type": "s"
+      },
+      {
+        "atom_index": 0,
+        "direction": [
+          1.0,
+          0.0,
+          0.0
+        ],
+        "type": "p"
+      },
+      {
+        "atom_index": 0,
+        "direction": [
+          0.0,
+          1.0,
+          0.0
+        ],
+        "type": "p"
+      },
+      {
+        "atom_index": 0,
+        "direction": [
+          0.0,
+          0.0,
+          1.0
+        ],
+        "type": "p"
+      },
+      {
+        "atom_index": 1,
+        "direction": null,
+        "type": "s"
+      },
+      {
+        "atom_index": 2,
+        "direction": null,
+        "type": "s"
+      },
+      {
+        "atom_index": 3,
+        "direction": null,
+        "type": "s"
+      },
+      {
+        "atom_index": 4,
+        "direction": null,
+        "type": "s"
+      }
+    ],
+    "case": "SiH4",
+    "descriptor_rule": "character: sign of the bond energy sum 2*sum c_i c_j H_ij over central-ligand pairs (central topology) or all inter-atomic pairs (otherwise), averaged over the degenerate set; |x|<=1e-6 eV is nonbonding. dominant_fragment: central if the central-atom weight averaged over the degenerate set exceeds 0.5, else ligand; ligand_only when there is no central atom.",
+    "edges": [
+      [
+        0,
+        1
+      ],
+      [
+        0,
+        2
+      ],
+      [
+        0,
+        3
+      ],
+      [
+        0,
+        4
+      ]
+    ],
+    "electrons": 8,
+    "geometry_angstrom": [
+      {
+        "element": "Si",
+        "position": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      {
+        "element": "H",
+        "position": [
+          0.8544206633737272,
+          0.8544206633737272,
+          0.8544206633737272
+        ]
+      },
+      {
+        "element": "H",
+        "position": [
+          0.8544206633737272,
+          -0.8544206633737272,
+          -0.8544206633737272
+        ]
+      },
+      {
+        "element": "H",
+        "position": [
+          -0.8544206633737272,
+          0.8544206633737272,
+          -0.8544206633737272
+        ]
+      },
+      {
+        "element": "H",
+        "position": [
+          -0.8544206633737272,
+          -0.8544206633737272,
+          0.8544206633737272
+        ]
+      }
+    ],
+    "group": "Td",
+    "levels": [
+      {
+        "descriptor": {
+          "bond_energy_eV": -5.737107858649933,
+          "character": "bonding",
+          "dominant_fragment": "central"
+        },
+        "electrons": 2,
+        "energy_eV": -20.7053324515785,
+        "irrep": "A1",
+        "multiplicity": 1
+      },
+      {
+        "descriptor": {
+          "bond_energy_eV": -3.706523968785039,
+          "character": "bonding",
+          "dominant_fragment": "ligand"
+        },
+        "electrons": 6,
+        "energy_eV": -16.00250647238038,
+        "irrep": "T2",
+        "multiplicity": 3
+      },
+      {
+        "descriptor": {
+          "bond_energy_eV": 5.737107858649933,
+          "character": "antibonding",
+          "dominant_fragment": "ligand"
+        },
+        "electrons": 0,
+        "energy_eV": -8.794667548421497,
+        "irrep": "A1",
+        "multiplicity": 1
+      },
+      {
+        "descriptor": {
+          "bond_energy_eV": 3.7065239687850404,
+          "character": "antibonding",
+          "dominant_fragment": "central"
+        },
+        "electrons": 0,
+        "energy_eV": -5.387493527619625,
+        "irrep": "T2",
+        "multiplicity": 3
+      }
+    ],
+    "topology": "central"
+  },
+  {
+    "basis": [
+      {
+        "atom_index": 0,
+        "direction": null,
+        "type": "s"
+      },
+      {
+        "atom_index": 0,
+        "direction": [
+          1.0,
+          0.0,
+          0.0
+        ],
+        "type": "p"
+      },
+      {
+        "atom_index": 0,
+        "direction": [
+          0.0,
+          1.0,
+          0.0
+        ],
+        "type": "p"
+      },
+      {
+        "atom_index": 0,
+        "direction": [
+          0.0,
+          0.0,
+          1.0
+        ],
+        "type": "p"
+      },
+      {
+        "atom_index": 1,
+        "direction": null,
+        "type": "s"
+      }
+    ],
+    "case": "NH model",
+    "descriptor_rule": "character: sign of the bond energy sum 2*sum c_i c_j H_ij over central-ligand pairs (central topology) or all inter-atomic pairs (otherwise), averaged over the degenerate set; |x|<=1e-6 eV is nonbonding. dominant_fragment: central if the central-atom weight averaged over the degenerate set exceeds 0.5, else ligand; ligand_only when there is no central atom.",
+    "edges": [
+      [
+        0,
+        1
+      ]
+    ],
+    "electrons": 6,
+    "geometry_angstrom": [
+      {
+        "element": "N",
+        "position": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      {
+        "element": "H",
+        "position": [
+          0.0,
+          0.0,
+          1.0362
+        ]
+      }
+    ],
+    "group": "C2v",
+    "levels": [
+      {
+        "descriptor": {
+          "bond_energy_eV": -6.340003471225801,
+          "character": "bonding",
+          "dominant_fragment": "ligand_only"
+        },
+        "electrons": 2,
+        "energy_eV": -28.738041475198855,
+        "irrep": "A1",
+        "multiplicity": 1
+      },
+      {
+        "descriptor": {
+          "bond_energy_eV": -2.902006323964269,
+          "character": "bonding",
+          "dominant_fragment": "ligand_only"
+        },
+        "electrons": 2,
+        "energy_eV": -18.92883743830345,
+        "irrep": "A1",
+        "multiplicity": 1
+      },
+      {
+        "descriptor": {
+          "bond_energy_eV": 0.0,
+          "character": "nonbonding",
+          "dominant_fragment": "ligand_only"
+        },
+        "electrons": 2,
+        "energy_eV": -13.18,
+        "irrep": "B1+B2",
+        "multiplicity": 2
+      },
+      {
+        "descriptor": {
+          "bond_energy_eV": 9.24200979519007,
+          "character": "antibonding",
+          "dominant_fragment": "ligand_only"
+        },
+        "electrons": 0,
+        "energy_eV": -4.683121086497697,
+        "irrep": "A1",
+        "multiplicity": 1
+      }
+    ],
+    "topology": "all"
+  },
+  {
+    "basis": [
+      {
+        "atom_index": 0,
+        "direction": null,
+        "type": "s"
+      },
+      {
+        "atom_index": 0,
+        "direction": [
+          1.0,
+          0.0,
+          0.0
+        ],
+        "type": "p"
+      },
+      {
+        "atom_index": 0,
+        "direction": [
+          0.0,
+          1.0,
+          0.0
+        ],
+        "type": "p"
+      },
+      {
+        "atom_index": 0,
+        "direction": [
+          0.0,
+          0.0,
+          1.0
+        ],
+        "type": "p"
+      },
+      {
+        "atom_index": 1,
+        "direction": null,
+        "type": "s"
+      }
+    ],
+    "case": "NH lecture",
+    "descriptor_rule": "character: sign of the bond energy sum 2*sum c_i c_j H_ij over central-ligand pairs (central topology) or all inter-atomic pairs (otherwise), averaged over the degenerate set; |x|<=1e-6 eV is nonbonding. dominant_fragment: central if the central-atom weight averaged over the degenerate set exceeds 0.5, else ligand; ligand_only when there is no central atom.",
+    "edges": [
+      [
+        0,
+        1
+      ]
+    ],
+    "electrons": 6,
+    "geometry_angstrom": [
+      {
+        "element": "N",
+        "position": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      {
+        "element": "H",
+        "position": [
+          0.0,
+          0.0,
+          1.0362
+        ]
+      }
+    ],
+    "group": "C2v",
+    "levels": [
+      {
+        "descriptor": {
+          "bond_energy_eV": 0.0,
+          "character": "nonbonding",
+          "dominant_fragment": "ligand_only"
+        },
+        "electrons": 2,
+        "energy_eV": -25.56,
+        "irrep": "A1",
+        "multiplicity": 1
+      },
+      {
+        "descriptor": {
+          "bond_energy_eV": -7.832013283871305,
+          "character": "bonding",
+          "dominant_fragment": "ligand_only"
+        },
+        "electrons": 2,
+        "energy_eV": -21.23291090130815,
+        "irrep": "A1",
+        "multiplicity": 1
+      },
+      {
+        "descriptor": {
+          "bond_energy_eV": 0.0,
+          "character": "nonbonding",
+          "dominant_fragment": "ligand_only"
+        },
+        "electrons": 2,
+        "energy_eV": -13.18,
+        "irrep": "B1+B2",
+        "multiplicity": 2
+      },
+      {
+        "descriptor": {
+          "bond_energy_eV": 7.832013283871305,
+          "character": "antibonding",
+          "dominant_fragment": "ligand_only"
+        },
+        "electrons": 0,
+        "energy_eV": -5.557089098691849,
+        "irrep": "A1",
+        "multiplicity": 1
+      }
+    ],
+    "topology": "all"
+  },
+  {
+    "basis": [
+      {
+        "atom_index": 0,
+        "direction": null,
+        "type": "s"
+      },
+      {
+        "atom_index": 0,
+        "direction": [
+          1.0,
+          0.0,
+          0.0
+        ],
+        "type": "p"
+      },
+      {
+        "atom_index": 0,
+        "direction": [
+          0.0,
+          1.0,
+          0.0
+        ],
+        "type": "p"
+      },
+      {
+        "atom_index": 0,
+        "direction": [
+          0.0,
+          0.0,
+          1.0
+        ],
+        "type": "p"
+      },
+      {
+        "atom_index": 1,
+        "direction": null,
+        "type": "s"
+      }
+    ],
+    "case": "OH model",
+    "descriptor_rule": "character: sign of the bond energy sum 2*sum c_i c_j H_ij over central-ligand pairs (central topology) or all inter-atomic pairs (otherwise), averaged over the degenerate set; |x|<=1e-6 eV is nonbonding. dominant_fragment: central if the central-atom weight averaged over the degenerate set exceeds 0.5, else ligand; ligand_only when there is no central atom.",
+    "edges": [
+      [
+        0,
+        1
+      ]
+    ],
+    "electrons": 7,
+    "geometry_angstrom": [
+      {
+        "element": "O",
+        "position": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      {
+        "element": "H",
+        "position": [
+          0.0,
+          0.0,
+          0.9697
+        ]
+      }
+    ],
+    "group": "C2v",
+    "levels": [
+      {
+        "descriptor": {
+          "bond_energy_eV": -5.597514873656937,
+          "character": "bonding",
+          "dominant_fragment": "ligand_only"
+        },
+        "electrons": 2,
+        "energy_eV": -35.06079119036198,
+        "irrep": "A1",
+        "multiplicity": 1
+      },
+      {
+        "descriptor": {
+          "bond_energy_eV": -4.794076036562252,
+          "character": "bonding",
+          "dominant_fragment": "ligand_only"
+        },
+        "electrons": 2,
+        "energy_eV": -22.045406869666373,
+        "irrep": "A1",
+        "multiplicity": 1
+      },
+      {
+        "descriptor": {
+          "bond_energy_eV": 0.0,
+          "character": "nonbonding",
+          "dominant_fragment": "ligand_only"
+        },
+        "electrons": 3,
+        "energy_eV": -15.850000000000003,
+        "irrep": "B1+B2",
+        "multiplicity": 2
+      },
+      {
+        "descriptor": {
+          "bond_energy_eV": 10.391590910219186,
+          "character": "antibonding",
+          "dominant_fragment": "ligand_only"
+        },
+        "electrons": 0,
+        "energy_eV": -4.7338019399716575,
+        "irrep": "A1",
+        "multiplicity": 1
+      }
+    ],
+    "topology": "all"
+  },
+  {
+    "basis": [
+      {
+        "atom_index": 0,
+        "direction": null,
+        "type": "s"
+      },
+      {
+        "atom_index": 0,
+        "direction": [
+          1.0,
+          0.0,
+          0.0
+        ],
+        "type": "p"
+      },
+      {
+        "atom_index": 0,
+        "direction": [
+          0.0,
+          1.0,
+          0.0
+        ],
+        "type": "p"
+      },
+      {
+        "atom_index": 0,
+        "direction": [
+          0.0,
+          0.0,
+          1.0
+        ],
+        "type": "p"
+      },
+      {
+        "atom_index": 1,
+        "direction": null,
+        "type": "s"
+      }
+    ],
+    "case": "OH lecture",
+    "descriptor_rule": "character: sign of the bond energy sum 2*sum c_i c_j H_ij over central-ligand pairs (central topology) or all inter-atomic pairs (otherwise), averaged over the degenerate set; |x|<=1e-6 eV is nonbonding. dominant_fragment: central if the central-atom weight averaged over the degenerate set exceeds 0.5, else ligand; ligand_only when there is no central atom.",
+    "edges": [
+      [
+        0,
+        1
+      ]
+    ],
+    "electrons": 7,
+    "geometry_angstrom": [
+      {
+        "element": "O",
+        "position": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      {
+        "element": "H",
+        "position": [
+          0.0,
+          0.0,
+          0.9697
+        ]
+      }
+    ],
+    "group": "C2v",
+    "levels": [
+      {
+        "descriptor": {
+          "bond_energy_eV": 0.0,
+          "character": "nonbonding",
+          "dominant_fragment": "ligand_only"
+        },
+        "electrons": 2,
+        "energy_eV": -32.38,
+        "irrep": "A1",
+        "multiplicity": 1
+      },
+      {
+        "descriptor": {
+          "bond_energy_eV": -8.87712657470517,
+          "character": "bonding",
+          "dominant_fragment": "ligand_only"
+        },
+        "electrons": 2,
+        "energy_eV": -23.746253103824884,
+        "irrep": "A1",
+        "multiplicity": 1
+      },
+      {
+        "descriptor": {
+          "bond_energy_eV": 0.0,
+          "character": "nonbonding",
+          "dominant_fragment": "ligand_only"
+        },
+        "electrons": 3,
+        "energy_eV": -15.85,
+        "irrep": "B1+B2",
+        "multiplicity": 2
+      },
+      {
+        "descriptor": {
+          "bond_energy_eV": 8.87712657470517,
+          "character": "antibonding",
+          "dominant_fragment": "ligand_only"
+        },
+        "electrons": 0,
+        "energy_eV": -5.713746896175117,
+        "irrep": "A1",
+        "multiplicity": 1
+      }
+    ],
+    "topology": "all"
+  },
+  {
+    "basis": [
+      {
+        "atom_index": 0,
+        "direction": null,
+        "type": "s"
+      },
+      {
+        "atom_index": 0,
+        "direction": [
+          1.0,
+          0.0,
+          0.0
+        ],
+        "type": "p"
+      },
+      {
+        "atom_index": 0,
+        "direction": [
+          0.0,
+          1.0,
+          0.0
+        ],
+        "type": "p"
+      },
+      {
+        "atom_index": 0,
+        "direction": [
+          0.0,
+          0.0,
+          1.0
+        ],
+        "type": "p"
+      },
+      {
+        "atom_index": 1,
+        "direction": null,
+        "type": "s"
+      }
+    ],
+    "case": "HF model",
+    "descriptor_rule": "character: sign of the bond energy sum 2*sum c_i c_j H_ij over central-ligand pairs (central topology) or all inter-atomic pairs (otherwise), averaged over the degenerate set; |x|<=1e-6 eV is nonbonding. dominant_fragment: central if the central-atom weight averaged over the degenerate set exceeds 0.5, else ligand; ligand_only when there is no central atom.",
+    "edges": [
+      [
+        0,
+        1
+      ]
+    ],
+    "electrons": 8,
+    "geometry_angstrom": [
+      {
+        "element": "F",
+        "position": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      {
+        "element": "H",
+        "position": [
+          0.0,
+          0.0,
+          0.9168
+        ]
+      }
+    ],
+    "group": "C2v",
+    "levels": [
+      {
+        "descriptor": {
+          "bond_energy_eV": -4.939498975186258,
+          "character": "bonding",
+          "dominant_fragment": "ligand_only"
+        },
+        "electrons": 2,
+        "energy_eV": -42.51693411692392,
+        "irrep": "A1",
+        "multiplicity": 1
+      },
+      {
+        "descriptor": {
+          "bond_energy_eV": -6.366588412968017,
+          "character": "bonding",
+          "dominant_fragment": "ligand_only"
+        },
+        "electrons": 2,
+        "energy_eV": -25.152809936088534,
+        "irrep": "A1",
+        "multiplicity": 1
+      },
+      {
+        "descriptor": {
+          "bond_energy_eV": -1.782695653144114e-30,
+          "character": "nonbonding",
+          "dominant_fragment": "ligand_only"
+        },
+        "electrons": 4,
+        "energy_eV": -18.649999999999984,
+        "irrep": "B1+B2",
+        "multiplicity": 2
+      },
+      {
+        "descriptor": {
+          "bond_energy_eV": 11.306087388154278,
+          "character": "antibonding",
+          "dominant_fragment": "ligand_only"
+        },
+        "electrons": 0,
+        "energy_eV": -4.760255946987537,
+        "irrep": "A1",
+        "multiplicity": 1
+      }
+    ],
+    "topology": "all"
+  },
+  {
+    "basis": [
+      {
+        "atom_index": 0,
+        "direction": null,
+        "type": "s"
+      },
+      {
+        "atom_index": 0,
+        "direction": [
+          1.0,
+          0.0,
+          0.0
+        ],
+        "type": "p"
+      },
+      {
+        "atom_index": 0,
+        "direction": [
+          0.0,
+          1.0,
+          0.0
+        ],
+        "type": "p"
+      },
+      {
+        "atom_index": 0,
+        "direction": [
+          0.0,
+          0.0,
+          1.0
+        ],
+        "type": "p"
+      },
+      {
+        "atom_index": 1,
+        "direction": null,
+        "type": "s"
+      }
+    ],
+    "case": "HF lecture",
+    "descriptor_rule": "character: sign of the bond energy sum 2*sum c_i c_j H_ij over central-ligand pairs (central topology) or all inter-atomic pairs (otherwise), averaged over the degenerate set; |x|<=1e-6 eV is nonbonding. dominant_fragment: central if the central-atom weight averaged over the degenerate set exceeds 0.5, else ligand; ligand_only when there is no central atom.",
+    "edges": [
+      [
+        0,
+        1
+      ]
+    ],
+    "electrons": 8,
+    "geometry_angstrom": [
+      {
+        "element": "F",
+        "position": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      {
+        "element": "H",
+        "position": [
+          0.0,
+          0.0,
+          0.9168
+        ]
+      }
+    ],
+    "group": "C2v",
+    "levels": [
+      {
+        "descriptor": {
+          "bond_energy_eV": 0.0,
+          "character": "nonbonding",
+          "dominant_fragment": "ligand_only"
+        },
+        "electrons": 2,
+        "energy_eV": -40.17,
+        "irrep": "A1",
+        "multiplicity": 1
+      },
+      {
+        "descriptor": {
+          "bond_energy_eV": -9.705717261615975,
+          "character": "bonding",
+          "dominant_fragment": "ligand_only"
+        },
+        "electrons": 2,
+        "energy_eV": -26.45100611332961,
+        "irrep": "A1",
+        "multiplicity": 1
+      },
+      {
+        "descriptor": {
+          "bond_energy_eV": 0.0,
+          "character": "nonbonding",
+          "dominant_fragment": "ligand_only"
+        },
+        "electrons": 4,
+        "energy_eV": -18.65,
+        "irrep": "B1+B2",
+        "multiplicity": 2
+      },
+      {
+        "descriptor": {
+          "bond_energy_eV": 9.705717261615975,
+          "character": "antibonding",
+          "dominant_fragment": "ligand_only"
+        },
+        "electrons": 0,
+        "energy_eV": -5.80899388667039,
+        "irrep": "A1",
+        "multiplicity": 1
+      }
+    ],
+    "topology": "all"
+  },
+  {
+    "basis": [
+      {
+        "atom_index": 0,
+        "direction": null,
+        "type": "s"
+      },
+      {
+        "atom_index": 0,
+        "direction": [
+          1.0,
+          0.0,
+          0.0
+        ],
+        "type": "p"
+      },
+      {
+        "atom_index": 0,
+        "direction": [
+          0.0,
+          1.0,
+          0.0
+        ],
+        "type": "p"
+      },
+      {
+        "atom_index": 0,
+        "direction": [
+          0.0,
+          0.0,
+          1.0
+        ],
+        "type": "p"
+      },
+      {
+        "atom_index": 1,
         "direction": [
           -1.0,
           -0.0,

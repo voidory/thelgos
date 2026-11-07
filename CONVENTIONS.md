@@ -1,9 +1,9 @@
 # CONVENTIONS.md — LGO Method Explorer
 
-**Version: 1.4 — FROZEN (owner sign-off B6, 2026-11-07)**  
+**Version: 1.5 — not frozen (applied 2026-11-07 on the owner's acceptance of `drafts/CONVENTIONS-v1.5-draft.md`; owner sign-off B7 of this text pending)**  
 **Owner / change authority: the project owner**  
 **Date: 2026-11-07, Singapore**  
-**Release 1 blockers: none. CrystOD comparison deferred until the programme is finished (B1). Diatomic fixtures (periods 2 and 3) and browser acceptance tests (C4) in place.**
+**Release 1 blockers: none. CrystOD comparison deferred until the programme is finished (B1). Diatomic fixtures (periods 2 and 3) and browser acceptance tests (C4) in place. v1.5 adds C3v, NH3, H2S, SiH4 and the hydrides NH, OH, HF.**
 
 *v1.3 record:* the owner decided B1 and B4 and the ring orientation in B3, delegated B2, B3 (in-plane axis) and B5 to Claude, and gave standing permission (2026-11-06) for Claude to apply the drafted changes to this file. Every decision and its reasons are in `DECISIONS.md`. Checker changes are in `CHECKER-CHANGES.md` (K1–K19, plus the M7 data change).
 
@@ -50,6 +50,10 @@ Generate exact symmetric positions from unit directions, not rounded coordinate 
 | H2O | O=1 at origin, yz plane, z bisector; H2 on +y, H3 on −y, both +z |
 | CH4 | C=1; H2–5 directions (1,1,1),(1,−1,−1),(−1,1,−1),(−1,−1,1), each divided by √3 |
 | BH3 | B=1; H2–4 in xy at 0°,120°,240° from +x |
+| NH3 | N=1 at origin, C3 along z, lone pair towards +z; H2–4 at azimuth 0°,120°,240° from +x, each at angle β from −z with cos(HNH)=cos²β−½sin²β (β=67.8549° for 106.67°); H2 in the xz mirror plane σv(0) |
+| H2S | As H2O, with S=1 |
+| SiH4 | As CH4, with Si=1 |
+| NH, OH, HF | Heavy atom 1 at origin, H 2 on +z (C2v finite subgroup of C∞v, as for CO) |
 | SF6 | S=1; F2–7 at +x,−x,+y,−y,+z,−z |
 | Six H Oh | Same six directions, no centre; H1–6 |
 | Cyclic H3 | xy plane, centroid origin; H1–3 at 0°,120°,240° |
@@ -78,6 +82,12 @@ Generate exact symmetric positions from unit directions, not rounded coordinate 
 | P2 | P–P 1.8934 Å | NIST CCCBDB r_e (Huber & Herzberg 1979); `evidence/cccbdb_P2.html`; owner request M5 |
 | S2 | S–S 1.8892 Å | NIST CCCBDB r_e (Huber & Herzberg 1979); `evidence/cccbdb_S2.html`; owner request M5 |
 | Cl2 | Cl–Cl 1.9879 Å | NIST CCCBDB r_e (Huber & Herzberg 1979); `evidence/cccbdb_Cl2.html`; owner request M5 |
+| NH3 | N–H 1.0124 Å; HNH 106.67° | NIST CCCBDB (reference 1966Herzberg); `evidence/cccbdb_NH3.html`; v1.5 |
+| H2S | S–H 1.3356 Å; HSH 92.11° | NIST CCCBDB (reference 1975Coo/DeL); `evidence/cccbdb_H2S.html`; v1.5 |
+| SiH4 | Si–H 1.4799 Å | NIST CCCBDB (reference 1955Boyd; listed 1.480); `evidence/cccbdb_SiH4.html`; v1.5 |
+| NH | N–H 1.0362 Å | NIST CCCBDB r_e (Huber & Herzberg 1979); `evidence/cccbdb_NH.html`; v1.5 |
+| OH | O–H 0.9697 Å | NIST CCCBDB r_e (Huber & Herzberg 1979); `evidence/cccbdb_OH.html`; v1.5 |
+| HF | H–F 0.9168 Å | NIST CCCBDB r_e (NIST diatomic); `evidence/cccbdb_HF.html`; v1.5 |
 
 Water positions are \((0,\pm R\sin(\theta/2),R\cos(\theta/2))\). The same formula defines C1/C3 for allyl. Geometry overrides live in presets, not duplicated checker constants.
 
@@ -112,6 +122,7 @@ For the hexagonal table setting, record the chosen Cartesian alignment: Bilbao's
 |---|---|---|
 | Release 1 | Oh,Td,D3h,C2v,D2h | Geometry-mapped Bilbao comparison passes; D2h includes documented label repair |
 | Later crystallographic | D4h,D2d,C2h,D6h | Geometry-mapped comparison passes; D6h uses the stated setting and B3 default |
+| v1.5 | C3v | Geometry-mapped comparison passes (`evidence/bilbao_C3v.html`, point group 3m); Bilbao's m₁₋₁₀ is in hexagonal axes, so its target is the mirror with Cartesian normal (3/2,−√3/2,0), in the class of σv(0), the xz plane (checker patch K21) |
 | Release 4 | D8h | Not crystallographic; closure and character orthogonality only, no Bilbao coverage claim |
 
 JSON contains operation matrices, generating indices, multiplication tables, conjugacy classes, characters and irrep dimensions. Snap exact values to binary representations of 0,±1,±1/2,±√2/2,±√3/2, etc., including ±√2 character values. Assert maximum snapping residual <1e−12 and record it for matrices and characters. Do not merely round near-zero trigonometric artifacts into long decimal approximations.
@@ -132,9 +143,9 @@ B5 decided under delegation (DECISIONS.md): skip a construction stage whose newl
 
 ## 7. Electron counting and warnings
 
-Neutral-atom counting over the included basis for molecules; named oxidation-state counting for advanced complexes. Save the counting convention and occupations with every result. Counts: H2=2; water=8; CH4=8; BH3=6; SF6 reduced sigma basis=12; allyl cation/radical/anion=2/3/4; H3+/H3/H3−=2/3/4. Omitted SF6 F orbitals do not silently contribute electrons to the reduced basis.
+Neutral-atom counting over the included basis for molecules; named oxidation-state counting for advanced complexes. Save the counting convention and occupations with every result. Counts: H2=2; water=8; CH4=8; BH3=6; SF6 reduced sigma basis=12; allyl cation/radical/anion=2/3/4; H3+/H3/H3−=2/3/4; NH3=8; H2S=8; SiH4=8; NH=6; OH=7; HF=8. Omitted SF6 F orbitals do not silently contribute electrons to the reduced basis.
 
-Any level of degeneracy d>1 occupied by n with 0<n<2d triggers **occupation_not_unique**, **Jahn_Teller_warning**, and **spin_state_not_determined**. This conservative warning policy flags the limits of the one-electron model; it is not a proof of a particular spin ground state or distortion (especially for linear diatomics). Distinguish explicit Hund filling from equal-occupation ensembles. Tested warning fixtures: neutral H3 e-prime¹, six-H t1u⁴, four-H t2², and the real molecules O2 (πg²) and C2 (πu²). B2 does not fire it, because the model gives B2 a closed shell; that is reported as a Spin-state fidelity disagreement (A.6), not forced.
+Any level of degeneracy d>1 occupied by n with 0<n<2d triggers **occupation_not_unique**, **Jahn_Teller_warning**, and **spin_state_not_determined**. This conservative warning policy flags the limits of the one-electron model; it is not a proof of a particular spin ground state or distortion (especially for linear diatomics). Distinguish explicit Hund filling from equal-occupation ensembles. Tested warning fixtures: neutral H3 e-prime¹, six-H t1u⁴, four-H t2², and the real molecules O2 (πg²), C2 (πu²), NH (π²) and OH (π³). B2 does not fire it, because the model gives B2 a closed shell; that is reported as a Spin-state fidelity disagreement (A.6), not forced.
 
 ## 8. Bond orders and contact ledger
 
@@ -158,14 +169,18 @@ The contact ledger counts each unordered real-basis off-diagonal pair once with 
 | Element | s / eV | p / eV |
 |---|---:|---:|
 | H (n=1) | −13.61 | absent |
-| B (n=2) | −12.54 | −6.64 |
-| C (n=2) | −17.52 | −8.97 |
-| O (n=2) | −29.14 | −14.13 |
+| B (n=2) | −14.05 | −8.30 |
+| C (n=2) | −19.43 | −10.66 |
+| N (n=2) | −25.56 | −13.18 |
+| O (n=2) | −32.38 | −15.85 |
 | F (n=2) | −40.17 | −18.65 |
-| N (n=2) | −23.04 | −11.47 |
-| S (n=3) | −20.80 | −10.27 |
+| Al (n=3) | −11.32 | −5.98 |
+| Si (n=3) | −15.89 | −7.78 |
+| P (n=3) | −18.84 | −9.65 |
+| S (n=3) | −22.71 | −11.62 |
+| Cl (n=3) | −25.23 | −13.67 |
 
-All p directions share the p on-site. No main-group d parameters. Nitrogen was added by owner decision B4.
+All p directions share the p on-site. No main-group d parameters. Nitrogen was added by owner decision B4. *v1.5 erratum (V1):* the table signed in v1.4 still showed the earlier Harrison composite for B, C, N, O and S and omitted Al, Si, P and Cl; the values above are the ones in `params/onsite.csv`, which every result used. No computed value changed.
 
 ### 9.2 pairs.csv columns and lookup
 
@@ -185,9 +200,9 @@ All p directions share the p on-site. No main-group d parameters. Nitrogen was a
 
 Precedence: **preset matrix-element override → element-pair/channel row → explicit channel default → error**. Defaults live in `params/channel_defaults.json`; the supplied default list is empty. A no-match lookup must raise an error, never silently return zero. Missing orbital channels are not requested; absence is not a fit to zero. Reverse-pair Hermiticity follows §1.
 
-For `harrison_inverse_square`, V=scale×eta×K/d². Coefficients remain ss=−1.40, sp=+1.84, pp sigma=+3.24, pp pi=−0.81: Harrison's 1980 book values as transcribed in `evidence/harrison.txt`. The same file lists a second set attributed to Shi & Papaconstantopoulos (2004), which is not used (DECISIONS.md M2). **All H-containing couplings extrapolate this scheme beyond the Harrison table's H coverage.** The 0.6 factor is a declared pedagogical correction, not a published coefficient or measured fit. The two strict ordering constraints are: BH3's empty pz (a2″) below the antibonding a1′ (lower bound); and in lecture water, the bonding 1b2 above the decoupled O 2s (upper bound). With the M7 on-sites they give 0.4234786093<sH<1.0312679542; with the earlier composite they gave 0.4914651002<sH<0.8938796155. Two further orderings hold at 0.6 and are kept on the owner's instruction to follow Miessler (DECISIONS.md B2): water's LUMO is 3a1*, below 2b2*, which holds for sH<0.666786; and CH4's LUMO is a1*, below t2*, which holds for sH<0.970429. Both are recorded as textbook orderings, from Miessler's figures as recalled, pending the owner's check against the book. They are not asserted by the checker. Together the four orderings allow 0.4235<sH<0.6668. B2 decided under delegation: 0.6 (DECISIONS.md). Because it was chosen to reproduce orderings, those orderings are not independent fidelity evidence. The audit reads the CSV rather than these prose numbers.
+For `harrison_inverse_square`, V=scale×eta×K/d². Coefficients remain ss=−1.40, sp=+1.84, pp sigma=+3.24, pp pi=−0.81: Harrison's 1980 book values as transcribed in `evidence/harrison.txt`. The same file lists a second set attributed to Shi & Papaconstantopoulos (2004), which is not used (DECISIONS.md M2). **All H-containing couplings extrapolate this scheme beyond the Harrison table's H coverage.** v1.5 adds Si–H ss and sp rows of the same form (V3). The 0.6 factor is a declared pedagogical correction, not a published coefficient or measured fit. The two strict ordering constraints are: BH3's empty pz (a2″) below the antibonding a1′ (lower bound); and in lecture water, the bonding 1b2 above the decoupled O 2s (upper bound). With the M7 on-sites they give 0.4234786093<sH<1.0312679542; with the earlier composite they gave 0.4914651002<sH<0.8938796155. Two further orderings hold at 0.6 and are kept on the owner's instruction to follow Miessler (DECISIONS.md B2): water's LUMO is 3a1*, below 2b2*, which holds for sH<0.666786; and CH4's LUMO is a1*, below t2*, which holds for sH<0.970429. Both are recorded as textbook orderings, from Miessler's figures as recalled, pending the owner's check against the book. They are not asserted by the checker. Together the four orderings allow 0.4235<sH<0.6668. B2 decided under delegation: 0.6 (DECISIONS.md). Because it was chosen to reproduce orderings, those orderings are not independent fidelity evidence. The audit reads the CSV rather than these prose numbers. The v1.5 molecules add no constraint: every ordering they show holds for any factor between 0.30 and 1.20, except NH3's two empty levels (a1* and e*), which swap near 0.80, outside the window.
 
-Neighbour lists are explicit: H2O/CH4/BH3 central-H on, H–H off; SF6 central-F and all F–F on; ligand-only H diagnostics have their declared edges on. No distance cutoff silently re-enables absent edges.
+Neighbour lists are explicit: H2O/CH4/BH3/NH3/H2S/SiH4 central-H on, H–H off; NH/OH/HF their one bond; SF6 central-F and all F–F on; ligand-only H diagnostics have their declared edges on. No distance cutoff silently re-enables absent edges.
 
 ### 9.3 presets.json schema
 
@@ -198,6 +213,7 @@ Neighbour lists are explicit: H2O/CH4/BH3 central-H on, H–H off; SF6 central-F
 | H2O | O 2s–H forced exactly zero; H scale 0.6; H–H off; O–H 0.958 Å, angle 104.4776° |
 | SF6 | Equal to model; actual inward F p basis; cis −3.166242667913 eV, trans −2.532994134331 eV at S–F 1.561 Å |
 | Six H Oh | Radius 1 Å; H scale 0.6; cis −3.200400 eV, trans −1.600200 eV |
+| NH, OH, HF (v1.5, V5) | Central s–H 1s forced exactly zero, as in H2O; H scale 0.6; geometry as §2. NH3, H2S and SiH4 have no lecture preset (V5): their textbook diagrams are the model ones |
 
 The SF6 table numbers are consequences of the row law and preset geometry, not duplicate mutable fixed overrides. With cis distance √2R and trans 2R, inward-p contraction gives tc=(Vpppi−Vppsigma)/2 and tt=−Vppsigma. The combine-two-axes symmetric-pair block has diagonal epsilon_F+tt and off-diagonal 2tc. Its split is 4|tc|=12.664970671653 eV. The v1.0 cis-zero/trans−5 override stays removed. No slide-exact calibration or aliases are asserted without slides.
 
@@ -249,6 +265,7 @@ Slides/aliases are nonblocking. Later d-channel parameters remain outside Releas
 | 1.3.2 | 2026-11-07 | Applied by Claude under the owner's standing permission. Al2 and Cl2 added (DECISIONS.md M5, checker patch K19): Al and Cl on-sites from the teaching table (snapshot packaged), CCCBDB geometries and ground states, Appendix B rows. Al2's spin disagrees with experiment and is recorded as a fidelity warning. Not frozen: owner sign-off B6 pending. |
 | 1.4 | 2026-11-07 | Applied by Claude on the owner's decision M7: all on-sites from the Miessler teaching table (§9.1); couplings unchanged (Harrison η, H scale 0.6). Every fixture involving B, C, N, O, Si, P or S has new Appendix B values. Unchanged: the H-only sets, F2, Al2, Cl2. No qualitative result changed: orderings, spin agreements and counting bond orders are as before. H-scale window updated. Not frozen: owner sign-off B6 pending. |
 | 1.4 (frozen) | 2026-11-07 | Owner sign-off B6. Signed text: commit 81cf760, sha256 `ca861a1d6f47f5fe9962eb229a3fbdf4313c22ed2e83083dcfa8fdbe71b98d36`. No content change. |
+| 1.5 | 2026-11-07 | Applied on the owner's acceptance of `drafts/CONVENTIONS-v1.5-draft.md` ("accept v1.5 as recommended"; V5 as revised by the owner). V1 erratum (§9.1 table now the Miessler values in use); C3v (K21); NH3, H2S, SiH4, NH, OH, HF fixtures with CCCBDB geometries; Si–H rows; lecture presets for NH, OH, HF; A.3, A.5, A.6 and Appendix B rows. No earlier fixture's values changed. Not frozen: owner sign-off B7 pending. |
 
 **A5 disposition:** the pairs.csv column specification is restored in §9.2. Exact legacy Appendix A.7 text was not present in the accessible attachments or earlier inline answer; it is not silently reconstructed as a quotation. The unknown legacy A.7 is **removed as an unrecoverable legacy section**, because its original content cannot be verified; it is replaced by the explicitly newly authored ledger/limit/invariance contract below. If the owner supplies the original, review whether it contains additional obligations before freezing. No claim that its exact old content has been recovered.
 
@@ -304,7 +321,16 @@ H–H off in H2O,CH4,BH3; H factors included in v.
 | H2O b2 | D(eps_Op,eps_H;−√2vsp sin(theta/2)) |
 | H2O b1 | eps_Op, central px |
 
-Lecture water sets s–H=0 explicitly, not by symmetry. For actual inward F p donors in SF6, lambda_a=eps_F+4tc+tt; lambda_t=eps_F−tt; lambda_e=eps_F−2tc+tt. a1g is D(eps_Ss,lambda_a;−√6 Vsp_sigma); t1u is D(eps_Sp,lambda_t;−√2 Vpp_sigma), three copies; eg is lambda_e, two copies, fluorine-only. No sulfur d functions.
+Lecture water sets s–H=0 explicitly, not by symmetry.
+
+| Case (v1.5) | Block |
+|---|---|
+| NH3 a1 | A(eps_Ns,eps_Np,eps_H;√3vss,√3vsp cos β), β the angle of each N–H bond from −z |
+| NH3 e | D(eps_Np,eps_H;−√(3/2)vsp sin β), two copies |
+| H2S | The H2O blocks with S on-sites and theta=92.11° |
+| SiH4 | The CH4 blocks with Si on-sites |
+| NH, OH, HF σ | (s, pz, H 1s) with rows (eps_s,0,vss), (0,eps_p,−vsp), (vss,−vsp,eps_H) for H on +z; lecture vss=0 |
+| NH, OH, HF π | eps_p, two copies, nonbonding | For actual inward F p donors in SF6, lambda_a=eps_F+4tc+tt; lambda_t=eps_F−tt; lambda_e=eps_F−2tc+tt. a1g is D(eps_Ss,lambda_a;−√6 Vsp_sigma); t1u is D(eps_Sp,lambda_t;−√2 Vpp_sigma), three copies; eg is lambda_e, two copies, fluorine-only. No sulfur d functions.
 
 ### A.4 Ligand-only and pi spectra
 
@@ -314,7 +340,7 @@ Six-H order a1g<t1u<eg requires 2tc+tt<0 and tt>tc. Spectral trace equals the su
 
 ### A.5 Bond-order oracles
 
-Allyl cation: counting 1/2 per C–C, Coulson 1/√2. H3+: counting 1/3 per H–H, Coulson 2/3. BH3,CH4,lecture water: counting 1 per bond under the stated occupations. Diatomics, counting: B2 1, C2 2, N2 3, O2 2, F2 1, CO 3, Al2 1, Si2 2, P2 3, S2 2, Cl2 1. SF6: counting 2/3 per S–F if four bonding and two ligand-only MOs are doubly occupied. Wiberg values depend on mixing and on-sites; do not set them equal to counting values. pz being BH3 LUMO requires the actual parameter ordering, not symmetry alone.
+Allyl cation: counting 1/2 per C–C, Coulson 1/√2. H3+: counting 1/3 per H–H, Coulson 2/3. BH3,CH4,lecture water: counting 1 per bond under the stated occupations. Diatomics, counting: B2 1, C2 2, N2 3, O2 2, F2 1, CO 3, Al2 1, Si2 2, P2 3, S2 2, Cl2 1. SF6: counting 2/3 per S–F if four bonding and two ligand-only MOs are doubly occupied. v1.5, counting: NH3 4/3, H2S 3/2, SiH4 1 (model; for NH3 and H2S the very slightly bonding lone pair counts as bonding, and taking it as nonbonding, as textbooks do, gives 1, V5); NH, OH, HF 2 (model) and 1 (lecture). Wiberg values depend on mixing and on-sites; do not set them equal to counting values. pz being BH3 LUMO requires the actual parameter ordering, not symmetry alone.
 
 ### A.6 Diatomic blocks
 
@@ -329,7 +355,7 @@ Bond along z; atom 1 at −R/2, atom 2 at +R/2; basis s, px, py, pz on each atom
 
 CO (C2v, C atom 1): σ (A1) is the 4×4 block in (s_C, pz_C, s_O, pz_O) with rows (eps_sC, 0, V_sss, V_sps), (0, eps_pC, −V_sps, V_pps), (V_sss, −V_sps, eps_sO, 0), (V_sps, V_pps, 0, eps_pO); π (B1+B2) is D(eps_pC, eps_pO; V_ppp), two copies. In the finite subgroup a π pair spans two irreps, so degenerate sets are labelled by their exact irrep decomposition and mapped to D∞h/C∞v names by a fixed lookup.
 
-Reference orderings: B2, C2, N2 πu below σg(2p); O2, F2 σg(2p) below πu, with σg(2p) the higher of the two σg levels. Reference ground states from the CCCBDB pages: B2 ³Σg, C2 ¹Σg⁺, N2 ¹Σg, O2 ³Σg, F2 ¹Σg, CO ¹Σ, Al2 ³Σg, Si2 ³Σg, P2 ¹Σg, S2 ³Σg, Cl2 ¹Σg (CCCBDB lists Al2's lowest level with degeneracy 4; every candidate ground state is a triplet, so the spin comparison stands). No orbital-ordering reference is sourced for the period-3 diatomics, so only their spin state is compared. A disagreement is recorded as an Orbital-ordering or Spin-state fidelity warning, never tuned away. Asserted: O2 ends in a partly filled πg with the warnings; CO has counting bond order 3 and a σ HOMO with carbon weight above 0.5.
+Reference orderings: B2, C2, N2 πu below σg(2p); O2, F2 σg(2p) below πu, with σg(2p) the higher of the two σg levels. Reference ground states from the CCCBDB pages: B2 ³Σg, C2 ¹Σg⁺, N2 ¹Σg, O2 ³Σg, F2 ¹Σg, CO ¹Σ, Al2 ³Σg, Si2 ³Σg, P2 ¹Σg, S2 ³Σg, Cl2 ¹Σg (CCCBDB lists Al2's lowest level with degeneracy 4; every candidate ground state is a triplet, so the spin comparison stands). No orbital-ordering reference is sourced for the period-3 diatomics, so only their spin state is compared. v1.5 hydrides, from the CCCBDB pages: NH ³Σ⁻, OH ²Π, HF ¹Σ; the model agrees for all three (π², π³ open; π⁴ closed). No ordering is compared. A disagreement is recorded as an Orbital-ordering or Spin-state fidelity warning, never tuned away. Asserted: O2 ends in a partly filled πg with the warnings; CO has counting bond order 3 and a σ HOMO with carbon weight above 0.5.
 
 Result under the current scheme (DECISIONS.md M1): B2, C2 and N2 disagree on ordering; B2 and C2 also on spin state; O2, F2 and CO agree. Si2, P2, S2 and Cl2 agree on spin state; Al2 disagrees (model closed shell, experiment triplet). The model puts σg(3p) below πu in all five.
 
@@ -364,5 +390,14 @@ Energies in eV; repeated levels have multiplicities shown. Values are model calc
 | S2 | σg −27.433710; σu −20.686488; σg −16.802717; πu×2 −13.349355; πg×2 −9.890645 (2 electrons, warns); σu −3.737084 |
 | Cl2 | σg −29.274860; σu −23.322165; σg −18.572273; πu×2 −15.231892; πg×2 −12.108108; σu −6.630702 |
 | CO | σ −45.350342; σ −26.597061; π×2 −18.754865; σ −17.057093 (HOMO, C weight 0.977); π×2 −7.755135; σ +10.684496 |
+| NH3 | a1 −32.346972; e×2 −22.708244; a1 −15.354182 (HOMO); a1 −4.648846 (LUMO); e×2 −4.081756 |
+| H2S | a1 −25.263728; b2 −17.519005; a1 −15.520417; b1 −11.620000 (HOMO, S 3px); b2 −7.710995 (LUMO); a1 −7.155856 |
+| SiH4 | a1 −20.705332; t2×3 −16.002506 (HOMO); a1 −8.794668 (LUMO); t2×3 −5.387494 |
+| NH model | σ −28.738041; σ −18.928837; π×2 −13.180000 (2 electrons, warns); σ −4.683121 |
+| NH lecture | σ −25.560000 (N 2s, nonbonding); σ −21.232911; π×2 −13.180000 (2 electrons, warns); σ −5.557089 |
+| OH model | σ −35.060791; σ −22.045407; π×2 −15.850000 (3 electrons, warns); σ −4.733802 |
+| OH lecture | σ −32.380000 (O 2s, nonbonding); σ −23.746253; π×2 −15.850000 (3 electrons, warns); σ −5.713747 |
+| HF model | σ −42.516934; σ −25.152810; π×2 −18.650000 (HOMO); σ −4.760256 (LUMO) |
+| HF lecture | σ −40.170000 (F 2s, nonbonding); σ −26.451006; π×2 −18.650000 (HOMO); σ −5.808994 (LUMO) |
 
-All 23 current fixtures satisfy file-driven analytic assembly, symmetry/projector labels and residual/orthonormality checks. Still open: real CrystOD comparison (deferred, B1). Browser gates (C4) closed. Later advanced d blocks, exact slide aliasing and spectral fits remain unclaimed.
+All 32 current fixtures satisfy file-driven analytic assembly, symmetry/projector labels and residual/orthonormality checks. Still open: real CrystOD comparison (deferred, B1). Browser gates (C4) closed. Later advanced d blocks, exact slide aliasing and spectral fits remain unclaimed.

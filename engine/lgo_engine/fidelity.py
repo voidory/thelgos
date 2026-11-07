@@ -13,7 +13,7 @@ def compare(system, result, curated):
         return []
     out = []
     levels = result["levels"]
-    if ref.get("ordering"):
+    if ref.get("ordering"):   # None for the hydrides: no orbital-ordering reference is sourced
         sg = [lv["energy_eV"] for lv in levels if lv.get("linear_label") == "sigma_g"]
         pu = [lv["energy_eV"] for lv in levels if lv.get("linear_label") == "pi_u"]
         model = "pi_u_below_sigma_g_2p" if pu[0] < max(sg) else "sigma_g_2p_below_pi_u"

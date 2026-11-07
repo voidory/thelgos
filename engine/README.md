@@ -28,7 +28,7 @@ The engine the app runs on (spec sections 8 and 9). It is pure NumPy, with no fi
 ## Tests
 
 Run `make test-engine`, which `make check` also runs. The suite covers:
-- all 23 Release 1 fixtures against `evidence/reference_spectra.json`;
+- all 32 fixtures (Release 1 and CONVENTIONS v1.5) against `evidence/reference_spectra.json`;
 - closed-form Appendix A blocks written independently of `hamiltonian.py`;
 - bond-order oracles (A.5) and frontier orbitals;
 - the partly-filled-shell warnings;

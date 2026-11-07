@@ -161,6 +161,21 @@ Each entry in `levels` needs `irrep`, `energy`, `multiplicity`, `canonical_level
 - *Regenerated with the pinned kernel:* `checks/crystod_cases.json`, `group_validation.json`, `release1_energies.csv` and `release1_validation.json`. Every non-numeric field is identical. The largest numeric change is 3.2e-14 (a descriptor bond energy), and no energy moves by more than 1.4e-14 eV. `groups/` and `evidence/reference_spectra.json` (compared to 1e-9) are unchanged.
 - *Not a content change to CONVENTIONS v1.4.* Its "any mismatch is a failure" rule is kept; the rule now holds across hosts.
 
+**K21. CONVENTIONS v1.5: C3v and the fixtures NH3, H2S, SiH4, NH, OH, HF** (2026-11-07, on the owner's acceptance of `drafts/CONVENTIONS-v1.5-draft.md`).
+- *Group data.* `generate_groups.py` gains the C3v job (Bilbao point group 3m, `sg=156&num=19`, snapshot `evidence/bilbao_C3v.html`). Bilbao's mirror column m₁₋₁₀ is in hexagonal axes: direction [1, −1, 0] is Cartesian (3/2, −√3/2, 0). The target is the mirror with that normal, which lies in the class of σv(0), the xz plane. Result: `PASS_GEOMETRY_MAPPED`, maximum character error 0. The ten existing group files regenerate byte-identical.
+- *Fixtures.* `check_release1.py` adds explicit analytic blocks, written independently of `P.block`:
+  - NH3: a1 3×3 (s, pz, H a1 combination) and e 2×2, with the bond's angle β from −z;
+  - H2S and SiH4: the H2O and CH4 branches of `star`, generalised to S and Si;
+  - NH, OH, HF: model and lecture; σ 3×3 (s, pz, H 1s) and the nonbonding π pair, run as linear molecules in C2v.
+  It asserts:
+  - the irrep sequences;
+  - NH3's geometry angle;
+  - that each lecture hydride's central s stays exactly nonbonding;
+  - the counting bond orders (NH3 4/3, H2S 3/2, SiH4 1; hydrides 2 model, 1 lecture).
+  It records the ground-state spin comparison (NH ³Σ⁻, OH ²Π, HF ¹Σ, from the CCCBDB snapshots) under `v15_fixtures` in `release1_validation.json`. All three agree.
+- *Hashes.* `scripts/generate_groups.py` `f83619123284a30c859476ca949ac0d48f55c09f8d5e2699d77c310f0bf4b0cb` → `fdafd8eea4285f02d6b32061a68c2f23bd82442804c0ac2f55c81b6a2727a35c`. `scripts/check_release1.py` `a056eb0b7204892809a5b7477b07d0c14e309de8407e7c82115fe09cd82e0cf8` → `f289e20c4c7cca59064a8b92195c20b591f4a7a34ebff33f004b84e387ce1795`.
+- *Regenerated.* The new files are `groups/C3v.json` and `checks/bilbao_C3v.json`. In `checks/`, new fixtures are additions only, and `preset_schema_validation.json` has the new preset count; no existing value changed. `evidence/reference_spectra.json` gains the nine new fixtures; the 23 existing entries are kept as committed. They differ from a fresh run by at most 1.4e−14 eV, within the 1e−9 comparison, because they predate K20.
+
 ## Verification
 
 **Environment.** `requirements-checker.lock` was installed with `--require-hashes` into `.venv` (CPython 3.12.3), and `pip check` passed. This is not the README's 3.12.8 host and not the production 3.12.7.

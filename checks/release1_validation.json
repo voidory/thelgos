@@ -488,6 +488,433 @@
     },
     {
       "analytic_max_error_eV": 2.1316282072803006e-14,
+      "case": "NH3",
+      "commutator_max_error_eV": 6.661338147750939e-15,
+      "levels": [
+        {
+          "case": "NH3",
+          "electrons": 2,
+          "energy_eV": -32.34697196553388,
+          "irrep": "A1",
+          "multiplicity": 1,
+          "warnings": ""
+        },
+        {
+          "case": "NH3",
+          "electrons": 4,
+          "energy_eV": -22.708244497753096,
+          "irrep": "E",
+          "multiplicity": 2,
+          "warnings": ""
+        },
+        {
+          "case": "NH3",
+          "electrons": 2,
+          "energy_eV": -15.354182275777879,
+          "irrep": "A1",
+          "multiplicity": 1,
+          "warnings": ""
+        },
+        {
+          "case": "NH3",
+          "electrons": 0,
+          "energy_eV": -4.648845758688237,
+          "irrep": "A1",
+          "multiplicity": 1,
+          "warnings": ""
+        },
+        {
+          "case": "NH3",
+          "electrons": 0,
+          "energy_eV": -4.081755502246901,
+          "irrep": "E",
+          "multiplicity": 2,
+          "warnings": ""
+        }
+      ],
+      "orthogonality_max_error": 1.2212453270876722e-15,
+      "residual_max_eV": 2.346774093602631e-14,
+      "status": "PASS",
+      "warnings": []
+    },
+    {
+      "analytic_max_error_eV": 1.0658141036401503e-14,
+      "case": "H2S",
+      "commutator_max_error_eV": 0.0,
+      "levels": [
+        {
+          "case": "H2S",
+          "electrons": 2,
+          "energy_eV": -25.263727623100394,
+          "irrep": "A1",
+          "multiplicity": 1,
+          "warnings": ""
+        },
+        {
+          "case": "H2S",
+          "electrons": 2,
+          "energy_eV": -17.51900520515259,
+          "irrep": "B2",
+          "multiplicity": 1,
+          "warnings": ""
+        },
+        {
+          "case": "H2S",
+          "electrons": 2,
+          "energy_eV": -15.520416802849315,
+          "irrep": "A1",
+          "multiplicity": 1,
+          "warnings": ""
+        },
+        {
+          "case": "H2S",
+          "electrons": 2,
+          "energy_eV": -11.619999999999996,
+          "irrep": "B1",
+          "multiplicity": 1,
+          "warnings": ""
+        },
+        {
+          "case": "H2S",
+          "electrons": 0,
+          "energy_eV": -7.710994794847394,
+          "irrep": "B2",
+          "multiplicity": 1,
+          "warnings": ""
+        },
+        {
+          "case": "H2S",
+          "electrons": 0,
+          "energy_eV": -7.1558555740502925,
+          "irrep": "A1",
+          "multiplicity": 1,
+          "warnings": ""
+        }
+      ],
+      "orthogonality_max_error": 8.881784197001252e-16,
+      "residual_max_eV": 1.3672527173305005e-14,
+      "status": "PASS",
+      "warnings": []
+    },
+    {
+      "analytic_max_error_eV": 4.440892098500626e-15,
+      "case": "SiH4",
+      "commutator_max_error_eV": 0.0,
+      "levels": [
+        {
+          "case": "SiH4",
+          "electrons": 2,
+          "energy_eV": -20.7053324515785,
+          "irrep": "A1",
+          "multiplicity": 1,
+          "warnings": ""
+        },
+        {
+          "case": "SiH4",
+          "electrons": 6,
+          "energy_eV": -16.00250647238038,
+          "irrep": "T2",
+          "multiplicity": 3,
+          "warnings": ""
+        },
+        {
+          "case": "SiH4",
+          "electrons": 0,
+          "energy_eV": -8.794667548421497,
+          "irrep": "A1",
+          "multiplicity": 1,
+          "warnings": ""
+        },
+        {
+          "case": "SiH4",
+          "electrons": 0,
+          "energy_eV": -5.387493527619625,
+          "irrep": "T2",
+          "multiplicity": 3,
+          "warnings": ""
+        }
+      ],
+      "orthogonality_max_error": 1.1102230246251565e-15,
+      "residual_max_eV": 6.700222847235393e-15,
+      "status": "PASS",
+      "warnings": []
+    },
+    {
+      "analytic_max_error_eV": 7.105427357601002e-15,
+      "case": "NH model",
+      "commutator_max_error_eV": 0.0,
+      "levels": [
+        {
+          "case": "NH model",
+          "electrons": 2,
+          "energy_eV": -28.738041475198855,
+          "irrep": "A1",
+          "multiplicity": 1,
+          "warnings": ""
+        },
+        {
+          "case": "NH model",
+          "electrons": 2,
+          "energy_eV": -18.92883743830345,
+          "irrep": "A1",
+          "multiplicity": 1,
+          "warnings": ""
+        },
+        {
+          "case": "NH model",
+          "electrons": 2,
+          "energy_eV": -13.18,
+          "irrep": "B1+B2",
+          "multiplicity": 2,
+          "warnings": "occupation_not_unique;Jahn_Teller_warning;spin_state_not_determined"
+        },
+        {
+          "case": "NH model",
+          "electrons": 0,
+          "energy_eV": -4.683121086497697,
+          "irrep": "A1",
+          "multiplicity": 1,
+          "warnings": ""
+        }
+      ],
+      "orthogonality_max_error": 1.1102230246251565e-16,
+      "residual_max_eV": 4.070144838902081e-15,
+      "status": "PASS",
+      "warnings": [
+        "Jahn_Teller_warning",
+        "occupation_not_unique",
+        "spin_state_not_determined"
+      ]
+    },
+    {
+      "analytic_max_error_eV": 0.0,
+      "case": "NH lecture",
+      "commutator_max_error_eV": 0.0,
+      "levels": [
+        {
+          "case": "NH lecture",
+          "electrons": 2,
+          "energy_eV": -25.56,
+          "irrep": "A1",
+          "multiplicity": 1,
+          "warnings": ""
+        },
+        {
+          "case": "NH lecture",
+          "electrons": 2,
+          "energy_eV": -21.23291090130815,
+          "irrep": "A1",
+          "multiplicity": 1,
+          "warnings": ""
+        },
+        {
+          "case": "NH lecture",
+          "electrons": 2,
+          "energy_eV": -13.18,
+          "irrep": "B1+B2",
+          "multiplicity": 2,
+          "warnings": "occupation_not_unique;Jahn_Teller_warning;spin_state_not_determined"
+        },
+        {
+          "case": "NH lecture",
+          "electrons": 0,
+          "energy_eV": -5.557089098691849,
+          "irrep": "A1",
+          "multiplicity": 1,
+          "warnings": ""
+        }
+      ],
+      "orthogonality_max_error": 6.827434739798296e-18,
+      "residual_max_eV": 1.7763568394002505e-15,
+      "status": "PASS",
+      "warnings": [
+        "Jahn_Teller_warning",
+        "occupation_not_unique",
+        "spin_state_not_determined"
+      ]
+    },
+    {
+      "analytic_max_error_eV": 5.329070518200751e-15,
+      "case": "OH model",
+      "commutator_max_error_eV": 0.0,
+      "levels": [
+        {
+          "case": "OH model",
+          "electrons": 2,
+          "energy_eV": -35.06079119036198,
+          "irrep": "A1",
+          "multiplicity": 1,
+          "warnings": ""
+        },
+        {
+          "case": "OH model",
+          "electrons": 2,
+          "energy_eV": -22.045406869666373,
+          "irrep": "A1",
+          "multiplicity": 1,
+          "warnings": ""
+        },
+        {
+          "case": "OH model",
+          "electrons": 3,
+          "energy_eV": -15.850000000000003,
+          "irrep": "B1+B2",
+          "multiplicity": 2,
+          "warnings": "occupation_not_unique;Jahn_Teller_warning;spin_state_not_determined"
+        },
+        {
+          "case": "OH model",
+          "electrons": 0,
+          "energy_eV": -4.7338019399716575,
+          "irrep": "A1",
+          "multiplicity": 1,
+          "warnings": ""
+        }
+      ],
+      "orthogonality_max_error": 5.551115123125783e-16,
+      "residual_max_eV": 8.01536707782416e-15,
+      "status": "PASS",
+      "warnings": [
+        "Jahn_Teller_warning",
+        "occupation_not_unique",
+        "spin_state_not_determined"
+      ]
+    },
+    {
+      "analytic_max_error_eV": 0.0,
+      "case": "OH lecture",
+      "commutator_max_error_eV": 0.0,
+      "levels": [
+        {
+          "case": "OH lecture",
+          "electrons": 2,
+          "energy_eV": -32.38,
+          "irrep": "A1",
+          "multiplicity": 1,
+          "warnings": ""
+        },
+        {
+          "case": "OH lecture",
+          "electrons": 2,
+          "energy_eV": -23.746253103824884,
+          "irrep": "A1",
+          "multiplicity": 1,
+          "warnings": ""
+        },
+        {
+          "case": "OH lecture",
+          "electrons": 3,
+          "energy_eV": -15.85,
+          "irrep": "B1+B2",
+          "multiplicity": 2,
+          "warnings": "occupation_not_unique;Jahn_Teller_warning;spin_state_not_determined"
+        },
+        {
+          "case": "OH lecture",
+          "electrons": 0,
+          "energy_eV": -5.713746896175117,
+          "irrep": "A1",
+          "multiplicity": 1,
+          "warnings": ""
+        }
+      ],
+      "orthogonality_max_error": 2.1679356491115293e-18,
+      "residual_max_eV": 3.552713678800501e-15,
+      "status": "PASS",
+      "warnings": [
+        "Jahn_Teller_warning",
+        "occupation_not_unique",
+        "spin_state_not_determined"
+      ]
+    },
+    {
+      "analytic_max_error_eV": 2.1316282072803006e-14,
+      "case": "HF model",
+      "commutator_max_error_eV": 0.0,
+      "levels": [
+        {
+          "case": "HF model",
+          "electrons": 2,
+          "energy_eV": -42.51693411692392,
+          "irrep": "A1",
+          "multiplicity": 1,
+          "warnings": ""
+        },
+        {
+          "case": "HF model",
+          "electrons": 2,
+          "energy_eV": -25.152809936088534,
+          "irrep": "A1",
+          "multiplicity": 1,
+          "warnings": ""
+        },
+        {
+          "case": "HF model",
+          "electrons": 4,
+          "energy_eV": -18.649999999999984,
+          "irrep": "B1+B2",
+          "multiplicity": 2,
+          "warnings": ""
+        },
+        {
+          "case": "HF model",
+          "electrons": 0,
+          "energy_eV": -4.760255946987537,
+          "irrep": "A1",
+          "multiplicity": 1,
+          "warnings": ""
+        }
+      ],
+      "orthogonality_max_error": 5.551115123125783e-16,
+      "residual_max_eV": 2.4871301657401973e-14,
+      "status": "PASS",
+      "warnings": []
+    },
+    {
+      "analytic_max_error_eV": 0.0,
+      "case": "HF lecture",
+      "commutator_max_error_eV": 0.0,
+      "levels": [
+        {
+          "case": "HF lecture",
+          "electrons": 2,
+          "energy_eV": -40.17,
+          "irrep": "A1",
+          "multiplicity": 1,
+          "warnings": ""
+        },
+        {
+          "case": "HF lecture",
+          "electrons": 2,
+          "energy_eV": -26.45100611332961,
+          "irrep": "A1",
+          "multiplicity": 1,
+          "warnings": ""
+        },
+        {
+          "case": "HF lecture",
+          "electrons": 4,
+          "energy_eV": -18.65,
+          "irrep": "B1+B2",
+          "multiplicity": 2,
+          "warnings": ""
+        },
+        {
+          "case": "HF lecture",
+          "electrons": 0,
+          "energy_eV": -5.80899388667039,
+          "irrep": "A1",
+          "multiplicity": 1,
+          "warnings": ""
+        }
+      ],
+      "orthogonality_max_error": 2.220446049250313e-16,
+      "residual_max_eV": 4.440892098500626e-16,
+      "status": "PASS",
+      "warnings": []
+    },
+    {
+      "analytic_max_error_eV": 2.1316282072803006e-14,
       "case": "SF6 model",
       "commutator_max_error_eV": 0.0,
       "levels": [
@@ -1447,5 +1874,73 @@
   "missing_diatomics": [],
   "reference_checked": true,
   "status": "PASS_CURRENT_FIXTURES_ONLY",
+  "v15_fixtures": [
+    {
+      "case": "NH3",
+      "counting_bond_order": 1.3333333333333333
+    },
+    {
+      "case": "H2S",
+      "counting_bond_order": 1.5
+    },
+    {
+      "case": "SiH4",
+      "counting_bond_order": 1.0
+    },
+    {
+      "case": "NH model",
+      "counting_bond_order": 2.0,
+      "spin_state": {
+        "agrees": true,
+        "model_open_shell": true,
+        "reference_ground_state": "3Sigma-"
+      }
+    },
+    {
+      "case": "NH lecture",
+      "counting_bond_order": 1.0,
+      "spin_state": {
+        "agrees": true,
+        "model_open_shell": true,
+        "reference_ground_state": "3Sigma-"
+      }
+    },
+    {
+      "case": "OH model",
+      "counting_bond_order": 2.0,
+      "spin_state": {
+        "agrees": true,
+        "model_open_shell": true,
+        "reference_ground_state": "2Pi"
+      }
+    },
+    {
+      "case": "OH lecture",
+      "counting_bond_order": 1.0,
+      "spin_state": {
+        "agrees": true,
+        "model_open_shell": true,
+        "reference_ground_state": "2Pi"
+      }
+    },
+    {
+      "case": "HF model",
+      "counting_bond_order": 2.0,
+      "spin_state": {
+        "agrees": true,
+        "model_open_shell": false,
+        "reference_ground_state": "1Sigma"
+      }
+    },
+    {
+      "case": "HF lecture",
+      "counting_bond_order": 1.0,
+      "spin_state": {
+        "agrees": true,
+        "model_open_shell": false,
+        "reference_ground_state": "1Sigma"
+      }
+    }
+  ],
   "warning_policy": "degenerate partially filled shell triggers occupation/JT/spin warning, not an assertion of an actual distorted ground state"
 }

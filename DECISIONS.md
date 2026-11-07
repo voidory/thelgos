@@ -314,7 +314,28 @@ The owner approved these defaults: the current molecules only; two question type
   - mid-construction MO rows with several levels drew stray commas between empty labels;
   - in the two-column layout the atomic column's labels sat in the gutter where the correlation lines leave the bars; they now go in the outer gutter.
 
-## CONVENTIONS v1.5 drafted (2026-11-07), awaiting owner sign-off (B7)
+## CONVENTIONS v1.5 applied (2026-11-07); sign-off B7 of the applied text pending
+
+The owner read the draft and decided V5 (bond orders for the hydrides). They asked which picture fits the module's definition, (bonding − antibonding)/2. The answer:
+- For NH, OH and HF, Miessler's picture has the central s nonbonding, which the lecture preset reproduces.
+- For NH3 and H2S, the model's diagram is already the textbook one, with a lone pair that is very slightly bonding. The owner accepted the revised V5: lecture presets for NH, OH and HF only, and a bond-order note for NH3 and H2S.
+
+The owner then wrote "accept v1.5 as recommended", which covers V1–V4. Applied:
+- V1: the §9.1 erratum;
+- V2: C3v, NH3, H2S and SiH4;
+- V3: the Si–H rows;
+- V4: NH, OH and HF;
+- V5: lecture presets for NH, OH and HF; for NH3 and H2S, notes stating why the count is 4/3 or 3/2 and that taking the lone pair as nonbonding gives 1.
+
+Checker patch K21; `make check`, engine tests (55) and browser checks (64/64) pass. v1.5 is "not frozen" until the owner signs off the applied text, as with v1.4.
+
+Built on top, the Release 2 items that waited for v1.5:
+- the BH3 → NH3 morph, as two Walsh paths labelled in C3v: "BH3: pyramidalise" (six electrons, planar lower) and "NH3: flatten" (eight electrons, pyramidal lower; the lone pair becomes pure N 2pz at 120°);
+- H2O vs H2S and CH4 vs SiH4 in the compare suggestions, with the hydride series;
+- measured first ionisation energies for NH3, H2S and SiH4 in the spectrum panel (CCCBDB);
+- NH, OH and HF ground-state spin comparisons in the About panel.
+
+### The draft, as written before sign-off
 
 `drafts/CONVENTIONS-v1.5-draft.md` proposes NH3, H2S and SiH4 (needed for the BH3 → NH3 morph and the H2O/H2S and CH4/SiH4 comparisons), the C3v group, Si–H rows, optional diatomic hydrides NH, OH and HF, and lecture presets that switch the central s–H coupling off (V5). It also records an erratum in signed v1.4. The frozen §9.1 table still shows the earlier Harrison composite values, although the text, `params/onsite.csv` and every result use Miessler; no computed number is affected. Nothing is applied until the owner signs off. The C3v group data and the new geometries come from fresh Bilbao and CCCBDB snapshots in `evidence/` (the Bilbao host was added to a new personal environment for this repository, with the owner's approval). The draft's numbers come from a scratch prototype with the unchanged engine.
 

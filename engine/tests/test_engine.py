@@ -524,7 +524,7 @@ class PracticeAndExam(unittest.TestCase):
     def test_perfect_answers_score_full_marks_on_every_case(self):
         from lgo_engine import app_api
         names = app_api.quiz_cases(P)
-        self.assertEqual(len(names), 21)
+        self.assertEqual(len(names), 30)   # 32 fixtures (CONVENTIONS v1.5) less the two ligand-only sets
         for n in names:
             r = app_api.exam_check(P, G, n, self.perfect(n))
             self.assertEqual(r["percent"], 100, (n, [s for s in r["steps"] if not s["correct"]]))
@@ -641,6 +641,55 @@ class DoubtsAndSchedules(unittest.TestCase):
         used = E.app_api.view(P, G, "SF6 model", schedule="one_step")["doubt"]["used"]
         self.assertNotIn("R5", used)
         self.assertNotIn("R7", used)
+
+
+class ConventionsV15(unittest.TestCase):
+    """CONVENTIONS v1.5: C3v, NH3, H2S, SiH4, the hydrides NH, OH, HF, and the AH3 morphs."""
+
+    def test_nh3_block_and_labels(self):
+        s = cases.ammonia(P)
+        H = hamiltonian.build_hamiltonian(s, P)
+        g = P.presets["NH3_model"]["geometry_overrides"]
+        R, c = g["bond_length_angstrom"], np.cos(np.deg2rad(g["angle_degrees"]))
+        b = np.arccos(np.sqrt((2 * c + 1) / 3))
+        vss, vsp = 0.6 * -1.40 * 7.62 / R ** 2, 0.6 * 1.84 * 7.62 / R ** 2
+        es, ep, eh = P.onsite_energy("N", "s"), P.onsite_energy("N", "p"), P.onsite_energy("H", "s")
+        A = [[es, 0, np.sqrt(3) * vss], [0, ep, np.sqrt(3) * vsp * np.cos(b)], [np.sqrt(3) * vss, np.sqrt(3) * vsp * np.cos(b), eh]]
+        Ee = E2(ep, eh, -np.sqrt(1.5) * vsp * np.sin(b))
+        want = np.sort(np.r_[np.linalg.eigvalsh(A), Ee, Ee])
+        self.assertLess(np.max(abs(np.linalg.eigvalsh(H) - want)), 1e-10)
+        r = run(s)
+        self.assertEqual([lv["irrep"] for lv in r["levels"]], ["A1", "E", "A1", "A1", "E"])
+        self.assertEqual(r["levels"][r["frontier"]["HOMO"]]["irrep"], "A1")
+
+    def test_hydride_bond_orders_and_spin(self):
+        for name, open_shell in (("NH", True), ("OH", True), ("HF", False)):
+            for var, bo in (("model", 2.0), ("lecture", 1.0)):
+                v = app_api.view(P, G, f"{name} {var}", extras=__import__("load").load_extras())
+                self.assertEqual(v["result"]["bond_orders"]["counting"]["per_bond"], bo, (name, var))
+                spin = next(c for c in v["comparisons"] if c["category"] == "Ground-state spin")
+                self.assertTrue(spin["agrees"], (name, var))
+                self.assertEqual(bool(v["result"]["warnings"]), open_shell)
+                if var == "lecture":
+                    self.assertEqual(v["result"]["levels"][0]["character"], "nonbonding")
+        self.assertEqual(app_api.view(P, G, "NH3")["result"]["bond_orders"]["counting"]["per_bond"], 4 / 3)
+        self.assertEqual(app_api.view(P, G, "H2S")["result"]["bond_orders"]["counting"]["per_bond"], 1.5)
+
+    def test_ah3_walsh_bh3_planar_nh3_pyramidal(self):
+        from lgo_engine import morph
+        def total(pid, k):
+            W = morph.walsh(P, G, pid)
+            n = W["electrons"]
+            es = sorted(((l["energies"][k], l["multiplicity"]) for l in W["lines"]))
+            t = 0.0
+            for e, m in es:
+                put = min(2 * m, n); t += put * e; n -= put
+            return t
+        self.assertLess(total("BH3: pyramidalise", 0), total("BH3: pyramidalise", -1))   # planar BH3 lower
+        self.assertLess(total("NH3: flatten", 0), total("NH3: flatten", -1))             # pyramidal NH3 lower
+        W = morph.walsh(P, G, "NH3: flatten")
+        lp = next(l for l in W["lines"] if l["irrep"] == "A1" and l["rank"] == 1)
+        self.assertAlmostEqual(lp["energies"][-1], P.onsite_energy("N", "p"), places=9)   # pure N 2pz when planar
 
 
 class InspectorViews(unittest.TestCase):

@@ -1,0 +1,108 @@
+{
+  "class_mapping": [
+    {
+      "bilbao_column": "1",
+      "operation_indices": [
+        0
+      ],
+      "representative_symbol": "E",
+      "target_matrix": [
+        [
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "bilbao_column": "3",
+      "operation_indices": [
+        1,
+        2
+      ],
+      "representative_symbol": "C_3",
+      "target_matrix": [
+        [
+          -0.5,
+          -0.8660254037844386,
+          0.0
+        ],
+        [
+          0.8660254037844386,
+          -0.5,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "bilbao_column": "m1-10",
+      "operation_indices": [
+        3,
+        4,
+        5
+      ],
+      "representative_symbol": "sigma_v(0)",
+      "target_matrix": [
+        [
+          -0.5,
+          0.8660254037844386,
+          0.0
+        ],
+        [
+          0.8660254037844386,
+          0.5,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    }
+  ],
+  "comparison": {
+    "bilbao_max_error": 0.0,
+    "bilbao_status": "PASS_GEOMETRY_MAPPED",
+    "closure_max_error": 1.1102230246251565e-16,
+    "group": "C3v",
+    "order": 6,
+    "orthogonality_max_error": 0.0,
+    "raw_library_max_error": 0.0,
+    "snap_character_max_residual": 8.881784197001252e-16,
+    "snap_matrix_max_residual": 3.3306690738754696e-16
+  },
+  "group": "C3v",
+  "source_characters": {
+    "A1": [
+      1.0,
+      1.0,
+      1.0
+    ],
+    "A2": [
+      1.0,
+      1.0,
+      -1.0
+    ],
+    "E": [
+      2.0,
+      -1.0,
+      0.0
+    ]
+  }
+}

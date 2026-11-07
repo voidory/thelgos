@@ -44,7 +44,7 @@ const check = (name, ok, detail = "") => { results.push({ name, ok, detail }); c
     const rail = await page.$$eval(".rail button.case", (bs) => bs.map((b) => b.dataset.entry));
     const entries = [...new Set(names.map((n) => n.replace(/ (model|lecture)$/, "")))];
     check("case rail lists every entry once (model/lecture merged), grouped by family",
-          JSON.stringify(rail.slice().sort()) === JSON.stringify(entries.sort()) && rail.length === names.length - 2 && (await page.$$eval(".rail h2", (h) => h.length)) === 4, `${rail.length} buttons for ${names.length} fixtures`);
+          JSON.stringify(rail.slice().sort()) === JSON.stringify(entries.sort()) && rail.length === entries.length && (await page.$$eval(".rail h2", (h) => h.length)) === 4, `${rail.length} buttons for ${names.length} fixtures`);
     // Toggle: H2O switches between its presets in place; cases without variants hide it.
     await page.$eval('.rail button.case[data-entry="H2O"]', (b) => b.click());
     await page.waitForFunction(() => document.body.dataset.rendered === "H2O model|1|");
@@ -388,6 +388,22 @@ const check = (name, ok, detail = "") => { results.push({ name, ok, detail }); c
           axes[0] === axes[1] && axes[0].length > 0 && /anion/.test(cap) && peerHotN === 1, `${cap} · axis ${axes[0] === axes[1] ? "shared" : "differs"}`);
     await page.selectOption("#compare", "");
     await page.waitForFunction(() => document.body.dataset.compare === "");
+    // CONVENTIONS v1.5: H2S vs H2O, the BH3 -> NH3 morph, the hydrides' lecture bond order.
+    await pick(page, "H2S");
+    await page.waitForFunction(() => document.body.dataset.rendered === "H2S|1|");
+    await page.selectOption("#compare", JSON.stringify(["H2O model", null]));
+    await page.waitForFunction(() => document.body.dataset.compare === "H2O model|" && document.querySelectorAll("#diagram2 [data-peer-mo]").length === 6);
+    const h2sCap = await page.textContent("#cap-peer");
+    await page.selectOption("#compare", "");
+    await page.waitForFunction(() => document.body.dataset.compare === "");
+    await pick(page, "BH3");
+    await page.waitForFunction(() => document.body.dataset.rendered === "BH3|1|" && document.querySelectorAll("#morph-path option").length > 1);
+    const bh3Paths = await page.$$eval("#morph-path option", (o) => o.map((x) => x.value));
+    await pick(page, "HF lecture");
+    await page.waitForFunction(() => document.body.dataset.rendered === "HF lecture|1|");
+    const hfBO = await page.$eval("#bonds", (b) => b.dataset.counting);
+    check("v1.5: H2S beside H2O on one axis; BH3 has the pyramidalisation morph; HF lecture bond order 1",
+          /H2O/.test(h2sCap) && bh3Paths.includes("BH3: pyramidalise") && Number(hfBO) === 1, `${h2sCap} · ${bh3Paths.length - 1} BH3 paths · HF ${hfBO}`);
     await pick(page, "H2O model");
     await page.waitForFunction(() => document.body.dataset.rendered === "H2O model|1|");
     await page.mouse.move(0, 0);

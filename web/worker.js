@@ -5,7 +5,7 @@ importScripts("https://cdn.jsdelivr.net/pyodide/v0.27.7/full/pyodide.js");
 
 const ENGINE = ["__init__.py", "model.py", "params.py", "hamiltonian.py", "solve.py", "symmetry.py",
   "analysis.py", "ledger.py", "result.py", "schedule.py", "cases.py", "diagram.py", "fidelity.py", "views.py", "exam.py", "morph.py", "doubt.py", "app_api.py"];
-const GROUPS = ["C2h", "C2v", "D2d", "D2h", "D3h", "D4h", "D6h", "D8h", "Oh", "Td"];
+const GROUPS = ["C2h", "C2v", "C3v", "D2d", "D2h", "D3h", "D4h", "D6h", "D8h", "Oh", "Td"];
 const DATA = ["params/onsite.csv", "params/pairs.csv", "params/presets.json", "params/channel_defaults.json",
   "params/case_notes.json", "params/curated_checks.json",
   "CONVENTIONS.md", "engine/load.py", ...GROUPS.map(g => `groups/${g}.json`),

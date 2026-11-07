@@ -37,6 +37,21 @@ def _ch4(params, beta):
     return s
 
 
+def _ah3(params, centre, preset, beta, electrons):
+    """AH3 with each A-H bond at angle beta (degrees) from -z; 90 is planar. Azimuths 0, 120, 240 from +x, as in
+    BH3 and NH3 (CONVENTIONS section 2), so both cases sit on the same path family."""
+    b = np.deg2rad(beta)
+    a = np.arange(3) * 2 * np.pi / 3
+    dirs = np.c_[np.sin(b) * np.cos(a), np.sin(b) * np.sin(a), -np.cos(b) * np.ones(3)]
+    R = params.presets[preset]["geometry_overrides"]["bond_length_angstrom"]
+    return cases._star("BH3" if centre == "B" else "NH3", centre, "H", dirs, R, preset, "C3v", electrons)
+
+
+def _nh3_beta(params):
+    c = np.cos(np.deg2rad(params.presets["NH3_model"]["geometry_overrides"]["angle_degrees"]))
+    return float(np.degrees(np.arccos(np.sqrt((2 * c + 1) / 3))))
+
+
 def _mask(system, a_set, b_set):
     """Basis-index mask for couplings between atom sets a_set and b_set."""
     N = len(system.basis)
@@ -78,6 +93,29 @@ def _paths(params):
                                  "nonbonding hydrogen combination. In this model (no H–H coupling, decision B5) the hydrogen one lies lower, at "
                                  "the H 1s energy, so it is occupied and C 2pz is the empty LUMO. Textbooks make C 2pz the occupied lone pair: "
                                  "H–H repulsion, absent here, pushes that hydrogen combination up."}
+
+    # BH3 -> NH3 pyramidalisation (spec D1; needs C3v, CONVENTIONS v1.5). Both directions, each with its own electrons.
+    if "NH3_model" in params.presets:
+        b0 = _nh3_beta(params)
+
+        def pyr(u, b0=b0):
+            sys_ = cases.borane(params) if u == 0 else _ah3(params, "B", "BH3_model", 90 - (90 - b0) * u, 6)
+            return sys_, build_hamiltonian(sys_, params)
+
+        def flat(u, b0=b0):
+            sys_ = cases.ammonia(params) if u == 0 else _ah3(params, "N", "NH3_model", b0 + (90 - b0) * u, 8)
+            return sys_, build_hamiltonian(sys_, params)
+        ang = lambda beta: float(np.degrees(np.arccos(np.clip(np.cos(np.deg2rad(beta)) ** 2 - 0.5 * np.sin(np.deg2rad(beta)) ** 2, -1, 1))))
+        p["BH3: pyramidalise"] = {"title": "BH3 → NH3 shape: bend BH3 into a pyramid (Walsh diagram)", "case": "BH3", "case_u": 0.0,
+                                  "param": ("H–B–H angle", lambda u, b0=b0: f"{ang(90 - (90 - b0) * u):.1f}°"), "build": pyr, "group": "C3v",
+                                  "note": "Labelled in C3v, the symmetry kept along the path. Planar BH3's empty pz (a2″) becomes a1 as the "
+                                          "molecule bends and mixes with the a1 bonding set: the Lewis-acid orbital drops but stays empty. "
+                                          "With six electrons nothing occupied is stabilised by bending, so BH3 stays planar."}
+        p["NH3: flatten"] = {"title": "Flatten NH3 (the inversion path, Walsh diagram)", "case": "NH3", "case_u": 0.0,
+                             "param": ("H–N–H angle", lambda u, b0=b0: f"{ang(b0 + (90 - b0) * u):.1f}°"), "build": flat, "group": "C3v",
+                             "note": "As NH3 flattens, the lone pair 3a1 loses its N 2s and H character and rises to a pure, nonbonding "
+                                     "N 2pz at 120° (a2″ in D3h). With eight electrons that level is occupied, so bending lowers the total: "
+                                     "NH3 is pyramidal, BH3 (six electrons, same orbitals) planar."}
 
     allyl = cases.allyl(params)
     Ha = build_hamiltonian(allyl, params)

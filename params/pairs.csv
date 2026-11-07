@@ -12,6 +12,8 @@ H,F,ss_sigma,-1.4,7.62,,eV,harrison_inverse_square,H,0.6,harrison_extrapolated_H
 H,F,sp_sigma,1.84,7.62,,eV,harrison_inverse_square,H,0.6,harrison_extrapolated_H,https://github.com/jarvist/HarrisonSolidStateTable.jl/blob/master/src/SolidStateTable.jl,"H extrapolation; pedagogical scale 0.6, not empirical fit"
 H,S,ss_sigma,-1.4,7.62,,eV,harrison_inverse_square,H,0.6,harrison_extrapolated_H,https://github.com/jarvist/HarrisonSolidStateTable.jl/blob/master/src/SolidStateTable.jl,"H extrapolation; pedagogical scale 0.6, not empirical fit"
 H,S,sp_sigma,1.84,7.62,,eV,harrison_inverse_square,H,0.6,harrison_extrapolated_H,https://github.com/jarvist/HarrisonSolidStateTable.jl/blob/master/src/SolidStateTable.jl,"H extrapolation; pedagogical scale 0.6, not empirical fit"
+H,Si,ss_sigma,-1.4,7.62,,eV,harrison_inverse_square,H,0.6,harrison_extrapolated_H,https://github.com/jarvist/HarrisonSolidStateTable.jl/blob/master/src/SolidStateTable.jl,"H extrapolation; pedagogical scale 0.6, not empirical fit"
+H,Si,sp_sigma,1.84,7.62,,eV,harrison_inverse_square,H,0.6,harrison_extrapolated_H,https://github.com/jarvist/HarrisonSolidStateTable.jl/blob/master/src/SolidStateTable.jl,"H extrapolation; pedagogical scale 0.6, not empirical fit"
 B,B,ss_sigma,-1.4,7.62,,eV,harrison_inverse_square,none,1.0,harrison,https://github.com/jarvist/HarrisonSolidStateTable.jl/blob/master/src/SolidStateTable.jl,
 B,B,sp_sigma,1.84,7.62,,eV,harrison_inverse_square,none,1.0,harrison,https://github.com/jarvist/HarrisonSolidStateTable.jl/blob/master/src/SolidStateTable.jl,
 B,B,pp_sigma,3.24,7.62,,eV,harrison_inverse_square,none,1.0,harrison,https://github.com/jarvist/HarrisonSolidStateTable.jl/blob/master/src/SolidStateTable.jl,

@@ -442,12 +442,15 @@ def pes_spec(system, result, curated=None):
         caveats.append("A degenerate level is partly filled, so the one-electron picture does not fix which band appears first.")
     if ref:
         first = min(bands, key=lambda b: b["ie_eV"])
-        caveats.append(
-            f"Measured, the first band starts at {ref['first_band_adiabatic_eV']:.2f} eV and peaks at {ref['first_band_vertical_eV']:.2f} eV "
-            f"(NIST CCCBDB); this model puts it at {first['ie_eV']:.1f} eV. This simple model binds bonding levels too strongly, "
-            "so read the number of bands and their 3:1 heights, not the positions. "
-            f"The second band lies near {ref['second_band_near_eV']:g} eV, beyond a He I lamp ({ref['he_i_eV']:.2f} eV), "
-            "so a He I spectrum shows only the first band.")
+        text = (f"Measured, the first band starts at {ref['first_band_adiabatic_eV']:.2f} eV and peaks at {ref['first_band_vertical_eV']:.2f} eV "
+                f"(NIST CCCBDB); this model puts it at {first['ie_eV']:.1f} eV. ")
+        if ref.get("second_band_near_eV") is not None:
+            text += ("This simple model binds bonding levels too strongly, so read the number of bands and their 3:1 heights, not the positions. "
+                     f"The second band lies near {ref['second_band_near_eV']:g} eV, beyond a He I lamp ({ref['he_i_eV']:.2f} eV), "
+                     "so a He I spectrum shows only the first band.")
+        else:
+            text += "Read the number of bands and their order, not the positions: no further measured band is curated for this molecule."
+        caveats.append(text)
     return {"bands": bands, "reference": ref, "caveats": caveats}
 
 

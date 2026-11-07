@@ -94,9 +94,10 @@ def run(data,out,groups,check_reference=True):
  def star(el,group,preset,name,dirs):
   R=P.presets[preset]['geometry_overrides']['bond_length_angstrom'];dirs=np.array(dirs,float);atoms=[(el,np.zeros(3))]+[('H',R*u) for u in dirs];basis=[(0,None)]+[(0,u) for u in np.eye(3)]+[(i,None) for i in range(1,len(atoms))]
   es=P.onsite(el,'s');ep=P.onsite(el,'p');eh=P.onsite('H','s');ss=P.get(el,'H','ss_sigma',R,preset);sp=P.get(el,'H','sp_sigma',R,preset)
-  if el=='O':
-   g=np.sqrt(2)*P.element('O','s','H','s',dirs[0],R,preset);exp=np.linalg.eigvalsh([[es,0,g],[0,ep,-np.sqrt(2)*sp*dirs[0,2]],[g,-np.sqrt(2)*sp*dirs[0,2],eh]]).tolist()+E2(ep,eh,-np.sqrt(2)*sp*dirs[0,1])+[ep]
-  elif el=='C':exp=E2(es,eh,2*ss)+E2(ep,eh,-2*sp/np.sqrt(3))*3
+  # [K21] H2S uses the H2O blocks (S on-sites, its own angle) and SiH4 the CH4 blocks (CONVENTIONS v1.5 A.3).
+  if el in ('O','S'):
+   g=np.sqrt(2)*P.element(el,'s','H','s',dirs[0],R,preset);exp=np.linalg.eigvalsh([[es,0,g],[0,ep,-np.sqrt(2)*sp*dirs[0,2]],[g,-np.sqrt(2)*sp*dirs[0,2],eh]]).tolist()+E2(ep,eh,-np.sqrt(2)*sp*dirs[0,1])+[ep]
+  elif el in ('C','Si'):exp=E2(es,eh,2*ss)+E2(ep,eh,-2*sp/np.sqrt(3))*3
   else:exp=E2(es,eh,np.sqrt(3)*ss)+E2(ep,eh,-np.sqrt(1.5)*sp)*2+[ep]
   return test(name,group,atoms,basis,preset,6 if el=='B' else 8,exp,topology='central')
  for preset,name in [('H2O_model','H2O model'),('H2O_lecture','H2O lecture')]:
@@ -107,6 +108,39 @@ def run(data,out,groups,check_reference=True):
  cd=np.array([[1,1,1],[1,-1,-1],[-1,1,-1],[-1,-1,1]])/np.sqrt(3);bd=np.array([[np.cos(a),np.sin(a),0] for a in np.arange(3)*2*np.pi/3])
  ch=star('C','Td','CH4_model','CH4',cd);assert ch[3][0]['irrep']=='A1' and ch[3][1]['irrep']=='T2';expect_labels('CH4',ch[3],['A1','T2','A1','T2'])
  bh=star('B','D3h','BH3_model','BH3',bd);assert [x for x in bh[3] if not x['electrons']][0]['irrep']=="A2''";expect_labels('BH3',bh[3],["A1'","E'","A2''","A1'","E'"])
+ # [K21] CONVENTIONS v1.5 fixtures (owner sign-off of the draft, 2026-11-07): NH3 (C3v), H2S, SiH4, and the hydrides NH, OH, HF.
+ def counting(lv,edges):
+  d=cases[-1]['levels'];b=sum(x['electrons'] for x,y in zip(lv,d) if y['descriptor']['character']=='bonding');a=sum(x['electrons'] for x,y in zip(lv,d) if y['descriptor']['character']=='antibonding')
+  return (b-a)/2/edges
+ v15=[]
+ R=P.presets['NH3_model']['geometry_overrides']['bond_length_angstrom'];hnh=np.deg2rad(P.presets['NH3_model']['geometry_overrides']['angle_degrees'])
+ be=np.arccos(np.sqrt((2*np.cos(hnh)+1)/3));az=np.arange(3)*2*np.pi/3   # angle of each N-H bond from -z (lone pair towards +z)
+ nd=np.c_[np.sin(be)*np.cos(az),np.sin(be)*np.sin(az),-np.cos(be)*np.ones(3)];assert abs(np.arccos(nd[0]@nd[1])-hnh)<1e-12
+ es,ep,eh=P.onsite('N','s'),P.onsite('N','p'),P.onsite('H','s');ss=P.get('N','H','ss_sigma',R,'NH3_model');sp=P.get('N','H','sp_sigma',R,'NH3_model')
+ a1=np.array([[es,0,np.sqrt(3)*ss],[0,ep,np.sqrt(3)*sp*np.cos(be)],[np.sqrt(3)*ss,np.sqrt(3)*sp*np.cos(be),eh]])
+ nh3=test('NH3','C3v',[('N',np.zeros(3))]+[('H',R*u) for u in nd],[(0,None)]+[(0,u) for u in np.eye(3)]+[(i,None) for i in range(1,4)],'NH3_model',8,
+          np.linalg.eigvalsh(a1).tolist()+E2(ep,eh,-np.sqrt(1.5)*sp*np.sin(be))*2,topology='central')
+ expect_labels('NH3',nh3[3],['A1','E','A1','A1','E']);v15.append({'case':'NH3','counting_bond_order':counting(nh3[3],3)})
+ th=np.deg2rad(P.presets['H2S_model']['geometry_overrides']['angle_degrees']);h2s=star('S','C2v','H2S_model','H2S',[[0,np.sin(th/2),np.cos(th/2)],[0,-np.sin(th/2),np.cos(th/2)]])
+ expect_labels('H2S',h2s[3],['A1','B2','A1','B1','B2','A1']);v15.append({'case':'H2S','counting_bond_order':counting(h2s[3],2)})
+ sih=star('Si','Td','SiH4_model','SiH4',cd);expect_labels('SiH4',sih[3],['A1','T2','A1','T2']);v15.append({'case':'SiH4','counting_bond_order':counting(sih[3],4)})
+ # Hydrides: heavy atom 1 at the origin, H 2 on +z, C2v finite subgroup. sigma block (s, pz, H 1s): <pz|H|s_H> = -V_sps for H on +z (section 1).
+ HREF={'NH':('3Sigma-',3,6),'OH':('2Pi',2,7),'HF':('1Sigma',1,8)}   # ground states from the CCCBDB snapshots
+ for nm,el in [('NH','N'),('OH','O'),('HF','F')]:
+  st,mult,ne=HREF[nm]
+  for var in ['model','lecture']:
+   preset=f'{nm}_{var}';R=P.presets[preset]['geometry_overrides']['bond_length_angstrom'];u=np.array([0,0,1.])
+   es,ep=P.onsite(el,'s'),P.onsite(el,'p');Vss=P.element(el,'s','H','s',u,R,preset);Vsp=P.get(el,'H','sp_sigma',R,preset)
+   sig=np.array([[es,0,Vss],[0,ep,-Vsp],[Vss,-Vsp,eh]])
+   e,c,H,lv=test(f'{nm} {var}','C2v',[(el,np.zeros(3)),('H',R*u)],[(0,None)]+[(0,v) for v in np.eye(3)]+[(1,None)],preset,ne,np.linalg.eigvalsh(sig).tolist()+[ep]*2,topology='all',linear=True)
+   expect_labels(f'{nm} {var}',lv,['A1','A1','B1+B2','A1'])
+   if var=='lecture':assert abs(e[0]-es)<1e-10 and abs(c[0,0])>1-1e-10,(nm,'lecture: central s must stay nonbonding')
+   open_shell=bool(reports[-1]['warnings']);bo=counting(lv,1)
+   v15.append({'case':f'{nm} {var}','counting_bond_order':bo,'spin_state':{'reference_ground_state':st,'model_open_shell':open_shell,'agrees':open_shell==(mult>1)}})
+   assert bo==(1 if var=='lecture' else 2),(nm,var,bo)
+ want={'NH3':4/3,'H2S':1.5,'SiH4':1.}
+ for r in v15:
+  if r['case'] in want:assert abs(r['counting_bond_order']-want[r['case']])<1e-12,r
  axis=np.array([[1,0,0],[-1,0,0],[0,1,0],[0,-1,0],[0,0,1],[0,0,-1]],float)
  for preset,name in [('SF6_model','SF6 model'),('SF6_lecture','SF6 lecture')]:
   R=P.presets[preset]['geometry_overrides']['bond_length_angstrom'];pp=P.get('F','F','pp_pi',np.sqrt(2)*R,preset);ps=P.get('F','F','pp_sigma',np.sqrt(2)*R,preset);tc=(pp-ps)/2;tt=-P.get('F','F','pp_sigma',2*R,preset);ef=P.onsite('F','p');la=ef+4*tc+tt;lt=ef-tt;le=ef-2*tc+tt
@@ -197,7 +231,7 @@ def run(data,out,groups,check_reference=True):
    for r,b in zip(levels,baseline[name]):
     assert r['irrep']==b['irrep'] and r['multiplicity']==b['multiplicity'] and r['electrons']==b['electrons'],name
     assert abs(r['energy_eV']-b['energy_eV'])<1e-9,(name,'committed reference changed',r,b)
- write_json(out/'checks'/'release1_validation.json',{'fixtures':reports,'SF6_combine_block_eV':stage.tolist(),'SF6_combine_split_eV':float(np.ptp(np.linalg.eigvalsh(stage))),'status':'PASS_CURRENT_FIXTURES_ONLY','reference_checked':check_reference,'warning_policy':'degenerate partially filled shell triggers occupation/JT/spin warning, not an assertion of an actual distorted ground state','diatomics':diatomic_reports,'missing_diatomics':[]})
+ write_json(out/'checks'/'release1_validation.json',{'fixtures':reports,'SF6_combine_block_eV':stage.tolist(),'SF6_combine_split_eV':float(np.ptp(np.linalg.eigvalsh(stage))),'status':'PASS_CURRENT_FIXTURES_ONLY','reference_checked':check_reference,'warning_policy':'degenerate partially filled shell triggers occupation/JT/spin warning, not an assertion of an actual distorted ground state','diatomics':diatomic_reports,'missing_diatomics':[],'v15_fixtures':v15})
  write_json(out/'checks'/'crystod_cases.json',cases)
  out.joinpath('checks').mkdir(exist_ok=True,parents=True)
  with (out/'checks'/'release1_energies.csv').open('w',newline='') as f:w=csv.DictWriter(f,fieldnames=list(rows[0]));w.writeheader();w.writerows(rows)

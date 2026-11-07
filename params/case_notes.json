@@ -2,31 +2,215 @@
   "schema_version": "1.3",
   "note": "Reading notes shown in the app's 'About this diagram' panel. Explanatory text written for the app (Claude, 2026-11-06), not curated data; each note says where its claim comes from.",
   "all": [
-    {"title": "What the energies are", "text": "Two ingredients go in. Each atom's starting orbital energies are the values in Miessler, Fischer & Tarr's table, the same numbers as your textbook. How strongly two orbitals interact is not in that table: it comes from Harrison's distance rule (stronger when atoms are closer), a separate rule of thumb from solid-state physics. The molecular-orbital energies are computed from these two. They give the order and rough size of the splittings, not measured ionisation energies or a spectrum."},
-    {"title": "What the star means", "text": "A star (σ*, π*) marks a level whose atom–atom contacts add up to destabilising in this model. It is computed from the orbital, not copied from a textbook, so it can differ from the usual label for levels that are nearly nonbonding."},
-    {"title": "Bonding goes down as much as antibonding goes up", "text": "This model leaves out orbital overlap. So when two orbitals of equal energy combine, the bonding level drops by exactly as much as the antibonding level rises: for H2, −13.61 eV ± 6.40 eV. Miessler's diagrams show the antibonding level raised more than the bonding level is lowered. That asymmetry comes from overlap, which this model does not include. Symmetry labels do not depend on it; levels that lie close together could come out in a different order in a model with overlap."}
+    {
+      "title": "What the energies are",
+      "text": "Two ingredients go in. Each atom's starting orbital energies are the values in Miessler, Fischer & Tarr's table, the same numbers as your textbook. How strongly two orbitals interact is not in that table: it comes from Harrison's distance rule (stronger when atoms are closer), a separate rule of thumb from solid-state physics. The molecular-orbital energies are computed from these two. They give the order and rough size of the splittings, not measured ionisation energies or a spectrum."
+    },
+    {
+      "title": "What the star means",
+      "text": "A star (σ*, π*) marks a level whose atom–atom contacts add up to destabilising in this model. It is computed from the orbital, not copied from a textbook, so it can differ from the usual label for levels that are nearly nonbonding."
+    },
+    {
+      "title": "Bonding goes down as much as antibonding goes up",
+      "text": "This model leaves out orbital overlap. So when two orbitals of equal energy combine, the bonding level drops by exactly as much as the antibonding level rises: for H2, −13.61 eV ± 6.40 eV. Miessler's diagrams show the antibonding level raised more than the bonding level is lowered. That asymmetry comes from overlap, which this model does not include. Symmetry labels do not depend on it; levels that lie close together could come out in a different order in a model with overlap."
+    }
   ],
   "has_hydrogen": [
-    {"title": "Couplings to hydrogen", "text": "Harrison's coupling formula was never fitted to hydrogen. Couplings involving H are scaled by 0.6 so that the textbook level orderings come out right (DECISIONS.md B2). Without the scale, water's and methane's lowest empty orbitals would differ from Miessler's diagrams. Treat those orderings as built in, not as independent evidence."}
+    {
+      "title": "Couplings to hydrogen",
+      "text": "Harrison's coupling formula was never fitted to hydrogen. Couplings involving H are scaled by 0.6 so that the textbook level orderings come out right (DECISIONS.md B2). Without the scale, water's and methane's lowest empty orbitals would differ from Miessler's diagrams. Treat those orderings as built in, not as independent evidence."
+    }
   ],
   "cases": {
-    "H2O lecture": [{"title": "Lecture simplification", "text": "As in the lecture, O 2s is not allowed to mix with the hydrogens, so it stays nonbonding. Switch the Parameters toggle to Model to see what changes when it is allowed to mix: the lowest level drops and gains H character."}],
-    "H2O model": [{"title": "Compare with the lecture", "text": "Here O 2s is allowed to mix with the hydrogens. The Lecture setting of the Parameters toggle shows the slide's simplification, with O 2s nonbonding."}],
-    "CH4": [{"title": "No H–H coupling", "text": "The model has no coupling between hydrogens, so the hydrogen combinations (a1 and t2) start at the same energy and the pairing stages of the construction are skipped."}],
-    "BH3": [{"title": "The empty p orbital", "text": "B 2pz has no partner among the hydrogen combinations, so it stays nonbonding and empty. It is the LUMO: the Lewis-acid orbital."}, {"title": "Miessler vs Harrison energies", "text": "With the Miessler energies the boron 2s (−14.05 eV) starts just below the hydrogen 1s set (−13.61 eV). With Harrison's table it started just above (−12.54 eV). A bonding orbital looks most like the lower of the two orbitals it is built from, so the lowest a1′ is now slightly more boron 2s (51 %) than hydrogen, where it used to be 53 % hydrogen; the antibonding a1′* swaps the other way. The two starting energies are within half an eV, so either way the bonding a1′ is close to an even mix. The order of the finished levels is the same with both tables."}],
-    "SF6 model": [{"title": "Fluorine–fluorine contacts", "text": "Neighbouring fluorines (2.21 Å apart) and opposite fluorines (3.12 Å) both couple. The neighbouring contacts are what separate the eg combination from a1g. No sulfur d orbitals are used."}, {"title": "Miessler vs Harrison energies", "text": "At the first construction step (opposite fluorines paired), sulfur 3s (−22.71 eV) now sits below the lower set of three fluorine pair combinations (−21.18 eV). With Harrison's sulfur 3s (−20.80 eV) it sat just above them. Only this intermediate step changes: the finished diagram has the same order with both tables, and the eg level (fluorine only) does not move at all."}],
-    "SF6 lecture": [{"title": "Same as the model", "text": "For SF6 the lecture preset is identical to the model; there is no separate simplification to switch off."}, {"title": "Miessler vs Harrison energies", "text": "At the first construction step (opposite fluorines paired), sulfur 3s (−22.71 eV) now sits below the lower set of three fluorine pair combinations (−21.18 eV). With Harrison's sulfur 3s (−20.80 eV) it sat just above them. Only this intermediate step changes: the finished diagram has the same order with both tables, and the eg level (fluorine only) does not move at all."}],
-    "neutral H3": [{"title": "Partly filled degenerate level", "text": "Three electrons leave the e′ pair half-filled. The one-electron picture cannot say how they arrange, and the triangle would distort (Jahn–Teller). The diagram draws one arrangement only."}],
-    "six H Oh": [{"title": "Teaching construction", "text": "Six hydrogens on the axes of an octahedron, with no central atom, to show the ligand group orbitals on their own. Four electrons partly fill t1u, so the occupation is not unique."}],
-    "four H Td": [{"title": "Teaching construction", "text": "CH4's four hydrogens without the carbon, with H–H coupling on, to show the a1 and t2 combinations and their split. Two electrons partly fill t2."}],
-    "O2": [{"title": "Two unpaired electrons", "text": "The last two electrons go into the πg* pair, one in each, as Hund's rule draws it. This matches O2's triplet ground state, but the one-electron model itself does not decide spin."}],
-    "CO": [{"title": "The highest occupied level", "text": "The HOMO is a σ level sitting mostly on carbon (98 %). Textbooks usually call it nonbonding, a carbon lone pair. In this model its contacts are very slightly destabilising (+0.38 eV), so it is drawn with a star. Both describe the same orbital."}],
-    "allyl cation pi": [{"title": "Node on the middle carbon", "text": "The middle π level has zero coefficient on C2, so it is exactly nonbonding: the LUMO of the cation."}],
-    "Si2": [{"title": "Period 3: what is compared", "text": "Only the ground-state spin is compared with experiment here (NIST CCCBDB). No orbital-ordering reference for period-3 diatomics is in the curated data yet, so the σg/πu order shown is the model's own. Only valence 3s and 3p orbitals are included; there are no 3d orbitals in this model."}],
-    "P2": [{"title": "Period 3: what is compared", "text": "Only the ground-state spin is compared with experiment here (NIST CCCBDB). No orbital-ordering reference for period-3 diatomics is in the curated data yet, so the σg/πu order shown is the model's own. Only valence 3s and 3p orbitals are included; there are no 3d orbitals in this model."}],
-    "S2": [{"title": "Period 3: what is compared", "text": "Only the ground-state spin is compared with experiment here (NIST CCCBDB). No orbital-ordering reference for period-3 diatomics is in the curated data yet, so the σg/πu order shown is the model's own. Only valence 3s and 3p orbitals are included; there are no 3d orbitals in this model."}],
-    "Al2": [{"title": "Period 3: what is compared", "text": "Only the ground-state spin is compared with experiment here (NIST CCCBDB). No orbital-ordering reference for period-3 diatomics is in the curated data yet, so the σg/πu order shown is the model's own. Only valence 3s and 3p orbitals are included; there are no 3d orbitals in this model."}, {"title": "Spin disagrees", "text": "Experiment gives Al2 a triplet ground state: the σg(3p) and πu levels lie so close that the two highest electrons stay unpaired. In this model σg(3p) sits about 1.7 eV below πu, so all six valence electrons pair up and the model predicts a closed shell. This is recorded as a disagreement, not adjusted (the same kind of failure as B2)."}],
-    "Cl2": [{"title": "Period 3: what is compared", "text": "Only the ground-state spin is compared with experiment here (NIST CCCBDB). No orbital-ordering reference for period-3 diatomics is in the curated data yet, so the σg/πu order shown is the model's own. Only valence 3s and 3p orbitals are included; there are no 3d orbitals in this model."}],
-    "N2": [{"title": "Miessler vs Harrison energies", "text": "The 1σg and 2σg levels are each an almost even mix of 2s and 2p in this model; that is strong s–p mixing. With the Miessler energies 1σg is 52 % 2s and 2σg 52 % 2p; with Harrison's they were 50 % 2p and 50 % 2s. Miessler's 2s–2p gap is wider (12.38 eV against 11.57 eV), which weakens s–p mixing slightly. That is the same mechanism that decides the σg/πu order across period 2."}]
+    "H2O lecture": [
+      {
+        "title": "Lecture simplification",
+        "text": "As in the lecture, O 2s is not allowed to mix with the hydrogens, so it stays nonbonding. Switch the Parameters toggle to Model to see what changes when it is allowed to mix: the lowest level drops and gains H character."
+      }
+    ],
+    "H2O model": [
+      {
+        "title": "Compare with the lecture",
+        "text": "Here O 2s is allowed to mix with the hydrogens. The Lecture setting of the Parameters toggle shows the slide's simplification, with O 2s nonbonding."
+      }
+    ],
+    "CH4": [
+      {
+        "title": "No H–H coupling",
+        "text": "The model has no coupling between hydrogens, so the hydrogen combinations (a1 and t2) start at the same energy and the pairing stages of the construction are skipped."
+      }
+    ],
+    "BH3": [
+      {
+        "title": "The empty p orbital",
+        "text": "B 2pz has no partner among the hydrogen combinations, so it stays nonbonding and empty. It is the LUMO: the Lewis-acid orbital."
+      },
+      {
+        "title": "Miessler vs Harrison energies",
+        "text": "With the Miessler energies the boron 2s (−14.05 eV) starts just below the hydrogen 1s set (−13.61 eV). With Harrison's table it started just above (−12.54 eV). A bonding orbital looks most like the lower of the two orbitals it is built from, so the lowest a1′ is now slightly more boron 2s (51 %) than hydrogen, where it used to be 53 % hydrogen; the antibonding a1′* swaps the other way. The two starting energies are within half an eV, so either way the bonding a1′ is close to an even mix. The order of the finished levels is the same with both tables."
+      }
+    ],
+    "SF6 model": [
+      {
+        "title": "Fluorine–fluorine contacts",
+        "text": "Neighbouring fluorines (2.21 Å apart) and opposite fluorines (3.12 Å) both couple. The neighbouring contacts are what separate the eg combination from a1g. No sulfur d orbitals are used."
+      },
+      {
+        "title": "Miessler vs Harrison energies",
+        "text": "At the first construction step (opposite fluorines paired), sulfur 3s (−22.71 eV) now sits below the lower set of three fluorine pair combinations (−21.18 eV). With Harrison's sulfur 3s (−20.80 eV) it sat just above them. Only this intermediate step changes: the finished diagram has the same order with both tables, and the eg level (fluorine only) does not move at all."
+      }
+    ],
+    "SF6 lecture": [
+      {
+        "title": "Same as the model",
+        "text": "For SF6 the lecture preset is identical to the model; there is no separate simplification to switch off."
+      },
+      {
+        "title": "Miessler vs Harrison energies",
+        "text": "At the first construction step (opposite fluorines paired), sulfur 3s (−22.71 eV) now sits below the lower set of three fluorine pair combinations (−21.18 eV). With Harrison's sulfur 3s (−20.80 eV) it sat just above them. Only this intermediate step changes: the finished diagram has the same order with both tables, and the eg level (fluorine only) does not move at all."
+      }
+    ],
+    "neutral H3": [
+      {
+        "title": "Partly filled degenerate level",
+        "text": "Three electrons leave the e′ pair half-filled. The one-electron picture cannot say how they arrange, and the triangle would distort (Jahn–Teller). The diagram draws one arrangement only."
+      }
+    ],
+    "six H Oh": [
+      {
+        "title": "Teaching construction",
+        "text": "Six hydrogens on the axes of an octahedron, with no central atom, to show the ligand group orbitals on their own. Four electrons partly fill t1u, so the occupation is not unique."
+      }
+    ],
+    "four H Td": [
+      {
+        "title": "Teaching construction",
+        "text": "CH4's four hydrogens without the carbon, with H–H coupling on, to show the a1 and t2 combinations and their split. Two electrons partly fill t2."
+      }
+    ],
+    "O2": [
+      {
+        "title": "Two unpaired electrons",
+        "text": "The last two electrons go into the πg* pair, one in each, as Hund's rule draws it. This matches O2's triplet ground state, but the one-electron model itself does not decide spin."
+      }
+    ],
+    "CO": [
+      {
+        "title": "The highest occupied level",
+        "text": "The HOMO is a σ level sitting mostly on carbon (98 %). Textbooks usually call it nonbonding, a carbon lone pair. In this model its contacts are very slightly destabilising (+0.38 eV), so it is drawn with a star. Both describe the same orbital."
+      }
+    ],
+    "allyl cation pi": [
+      {
+        "title": "Node on the middle carbon",
+        "text": "The middle π level has zero coefficient on C2, so it is exactly nonbonding: the LUMO of the cation."
+      }
+    ],
+    "Si2": [
+      {
+        "title": "Period 3: what is compared",
+        "text": "Only the ground-state spin is compared with experiment here (NIST CCCBDB). No orbital-ordering reference for period-3 diatomics is in the curated data yet, so the σg/πu order shown is the model's own. Only valence 3s and 3p orbitals are included; there are no 3d orbitals in this model."
+      }
+    ],
+    "P2": [
+      {
+        "title": "Period 3: what is compared",
+        "text": "Only the ground-state spin is compared with experiment here (NIST CCCBDB). No orbital-ordering reference for period-3 diatomics is in the curated data yet, so the σg/πu order shown is the model's own. Only valence 3s and 3p orbitals are included; there are no 3d orbitals in this model."
+      }
+    ],
+    "S2": [
+      {
+        "title": "Period 3: what is compared",
+        "text": "Only the ground-state spin is compared with experiment here (NIST CCCBDB). No orbital-ordering reference for period-3 diatomics is in the curated data yet, so the σg/πu order shown is the model's own. Only valence 3s and 3p orbitals are included; there are no 3d orbitals in this model."
+      }
+    ],
+    "Al2": [
+      {
+        "title": "Period 3: what is compared",
+        "text": "Only the ground-state spin is compared with experiment here (NIST CCCBDB). No orbital-ordering reference for period-3 diatomics is in the curated data yet, so the σg/πu order shown is the model's own. Only valence 3s and 3p orbitals are included; there are no 3d orbitals in this model."
+      },
+      {
+        "title": "Spin disagrees",
+        "text": "Experiment gives Al2 a triplet ground state: the σg(3p) and πu levels lie so close that the two highest electrons stay unpaired. In this model σg(3p) sits about 1.7 eV below πu, so all six valence electrons pair up and the model predicts a closed shell. This is recorded as a disagreement, not adjusted (the same kind of failure as B2)."
+      }
+    ],
+    "Cl2": [
+      {
+        "title": "Period 3: what is compared",
+        "text": "Only the ground-state spin is compared with experiment here (NIST CCCBDB). No orbital-ordering reference for period-3 diatomics is in the curated data yet, so the σg/πu order shown is the model's own. Only valence 3s and 3p orbitals are included; there are no 3d orbitals in this model."
+      }
+    ],
+    "N2": [
+      {
+        "title": "Miessler vs Harrison energies",
+        "text": "The 1σg and 2σg levels are each an almost even mix of 2s and 2p in this model; that is strong s–p mixing. With the Miessler energies 1σg is 52 % 2s and 2σg 52 % 2p; with Harrison's they were 50 % 2p and 50 % 2s. Miessler's 2s–2p gap is wider (12.38 eV against 11.57 eV), which weakens s–p mixing slightly. That is the same mechanism that decides the σg/πu order across period 2."
+      }
+    ],
+    "NH3": [
+      {
+        "title": "Bond order: why the count is not 1",
+        "text": "The counting bond order, (bonding − antibonding)/2, comes out at 4/3 per bond here, not the textbook 1. The highest occupied level, the lone pair, is very slightly bonding in this model, so it is counted as bonding. Take it as nonbonding, as textbooks do, and the count is 1. The density-matrix value (about 0.99) is shown beside it. Both are conventions, not measurements (owner decision V5)."
+      },
+      {
+        "title": "Pyramidal, not planar",
+        "text": "The lone pair 3a1 is mostly N 2pz mixed with N 2s and the hydrogens. It is nonbonding only in a planar molecule: the Morph menu's flattening path shows it rise to a pure, nonbonding N 2pz as the molecule flattens."
+      }
+    ],
+    "H2S": [
+      {
+        "title": "Bond order: why the count is not 1",
+        "text": "The counting bond order, (bonding − antibonding)/2, comes out at 3/2 per bond here, not the textbook 1. The highest occupied level, the lone pair, is very slightly bonding in this model, so it is counted as bonding. Take it as nonbonding, as textbooks do, and the count is 1. The density-matrix value (about 0.98) is shown beside it. Both are conventions, not measurements (owner decision V5)."
+      },
+      {
+        "title": "Compared with water",
+        "text": "Sulfur's 3s and 3p lie higher than oxygen's 2s and 2p, and closer to H 1s, so they mix more with the hydrogens. The angle is near 90°, so the two S–H bonds use mostly S 3p. Compare with H2O to see the same symmetry pattern on a shifted energy scale."
+      }
+    ],
+    "SiH4": [
+      {
+        "title": "Compared with methane",
+        "text": "Same symmetry pattern as CH4 (a1, t2 bonding; a1*, t2* empty). Silicon's 3p lies well above H 1s, so the occupied t2 level is mostly hydrogen (about three quarters): the Si–H bond is polarised towards hydrogen. There is no lecture variant: switching Si 3s off breaks the diagram (decision V5)."
+      }
+    ],
+    "NH lecture": [
+      {
+        "title": "Lecture simplification",
+        "text": "As in Miessler's HF diagram, N 2s is taken as too deep to interact with H 1s, so it stays nonbonding. One bonding σ and a nonbonding π pair give bond order 1. Switch to Model to see N 2s allowed to mix: the lowest level then counts as bonding and the counting bond order becomes 2 (owner decision V5)."
+      }
+    ],
+    "NH model": [
+      {
+        "title": "Bond order in the model",
+        "text": "Here N 2s mixes with H 1s, so the lowest σ level, although mostly N 2s, is bonding by its contacts, and the counting bond order is 2. Miessler's picture, with N 2s nonbonding, is the Lecture setting (bond order 1)."
+      },
+      {
+        "title": "Exam hint vs Miessler",
+        "text": "An exam hint may say H 1s lies slightly above N 2p. Miessler's values put H 1s (−13.61 eV) just below N 2p (−13.18 eV); the app follows Miessler (decision M8). Either way the two π electrons sit in a nonbonding pair, so NH is a triplet."
+      }
+    ],
+    "OH lecture": [
+      {
+        "title": "Lecture simplification",
+        "text": "As in Miessler's HF diagram, O 2s is taken as too deep to interact with H 1s, so it stays nonbonding. One bonding σ and a nonbonding π pair give bond order 1. Switch to Model to see O 2s allowed to mix: the lowest level then counts as bonding and the counting bond order becomes 2 (owner decision V5)."
+      }
+    ],
+    "OH model": [
+      {
+        "title": "Bond order in the model",
+        "text": "Here O 2s mixes with H 1s, so the lowest σ level, although mostly O 2s, is bonding by its contacts, and the counting bond order is 2. Miessler's picture, with O 2s nonbonding, is the Lecture setting (bond order 1)."
+      }
+    ],
+    "HF lecture": [
+      {
+        "title": "Lecture simplification",
+        "text": "As in Miessler's HF diagram, F 2s is taken as too deep to interact with H 1s, so it stays nonbonding. One bonding σ and a nonbonding π pair give bond order 1. Switch to Model to see F 2s allowed to mix: the lowest level then counts as bonding and the counting bond order becomes 2 (owner decision V5)."
+      }
+    ],
+    "HF model": [
+      {
+        "title": "Bond order in the model",
+        "text": "Here F 2s mixes with H 1s, so the lowest σ level, although mostly F 2s, is bonding by its contacts, and the counting bond order is 2. Miessler's picture, with F 2s nonbonding, is the Lecture setting (bond order 1)."
+      }
+    ]
   }
 }

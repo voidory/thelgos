@@ -5,7 +5,7 @@ from bs4 import BeautifulSoup
 from molsym.symtext.general_irrep_mats import pg_to_symels
 from molsym.symtext.multiplication_table import build_mult_table
 from common import ROOT,write_json,sha
-JOBS={'Oh':(221,32),'Td':(215,31),'D3h':(187,26),'C2v':(25,7),'D2h':(47,8),'D4h':(123,15),'D2d':(111,14),'C2h':(10,5),'D6h':(191,27),'D8h':None}
+JOBS={'Oh':(221,32),'Td':(215,31),'D3h':(187,26),'C2v':(25,7),'D2h':(47,8),'D4h':(123,15),'D2d':(111,14),'C2h':(10,5),'D6h':(191,27),'C3v':(156,19),'D8h':None}
 I=np.eye(3);X=np.array([1,0,0]);Y=np.array([0,1,0]);Z=np.array([0,0,1])
 def rot(u,t):
  u=np.array(u,float);u/=np.linalg.norm(u);t=np.deg2rad(t);x,y,z=u;A=np.array([[0,-z,y],[z,0,-x],[-y,x,0]])
@@ -23,6 +23,8 @@ TARGETS={
 'Td':{'1':I,'3':rot([1,1,1],120),'2100':rot(X,180),'-4':-rot(Z,90),'m110':mirror([1,1,0])},
 'D3h':{'1':I,'m':mirror(Z),'3':rot(Z,120),'-6':-rot(Z,60),'2120':rot(X,180),'m100':mirror(Y)},
 'C2v':{'1':I,'2z':rot(Z,180),'my':mirror(Y),'mx':mirror(X)},
+# [K21] C3v (CONVENTIONS v1.5). Bilbao's m1-10 is in hexagonal axes: direction [1,-1,0] = Cartesian (3/2,-sqrt3/2,0); its mirror lies in the class of sigma_v(0), the xz plane.
+'C3v':{'1':I,'3':rot(Z,120),'m1-10':mirror([np.sqrt(3)/2,-0.5,0])},
 'D2h':{'1':I,'2z':rot(Z,180),'2y':rot(Y,180),'2x':rot(X,180),'-1':-I,'mz':mirror(Z),'my':mirror(Y),'mx':mirror(X)},
 'D4h':{'1':I,'2':rot(Z,180),'4':rot(Z,90),'2100':rot(X,180),'21-10':rot([1,-1,0],180),'-1':-I,'mz':mirror(Z),'-4':-rot(Z,90),'m100':mirror(X),'m1-10':mirror([1,-1,0])},
 'D2d':{'1':I,'2':rot(Z,180),'-4':-rot(Z,90),'2100':rot(X,180),'m1-10':mirror([1,-1,0])},

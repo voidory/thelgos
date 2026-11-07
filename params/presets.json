@@ -376,6 +376,185 @@
       "id": "Cl2_model",
       "note": "r_e from NIST CCCBDB (evidence/cccbdb_Cl2.html), primary reference Huber-Herzberg 1979. Period-3 diatomic added at the owner's request (DECISIONS.md M5). Defaults pending owner approval; no slide calibration claim.",
       "provenance_tag": "model"
+    },
+    {
+      "coupling_overrides": [],
+      "edge_policy": {
+        "edges_off": [
+          "ligand_ligand"
+        ],
+        "edges_on": [
+          "central_ligand"
+        ]
+      },
+      "geometry_overrides": {
+        "bond_length_angstrom": 1.0124,
+        "angle_degrees": 106.67
+      },
+      "hydrogen_scale": 0.6,
+      "id": "NH3_model",
+      "note": "Geometry from NIST CCCBDB (evidence/cccbdb_NH3.html), reference 1966Herzberg. CONVENTIONS v1.5.",
+      "provenance_tag": "model"
+    },
+    {
+      "coupling_overrides": [],
+      "edge_policy": {
+        "edges_off": [
+          "ligand_ligand"
+        ],
+        "edges_on": [
+          "central_ligand"
+        ]
+      },
+      "geometry_overrides": {
+        "bond_length_angstrom": 1.3356,
+        "angle_degrees": 92.11
+      },
+      "hydrogen_scale": 0.6,
+      "id": "H2S_model",
+      "note": "Geometry from NIST CCCBDB (evidence/cccbdb_H2S.html), reference 1975Coo/DeL. CONVENTIONS v1.5.",
+      "provenance_tag": "model"
+    },
+    {
+      "coupling_overrides": [],
+      "edge_policy": {
+        "edges_off": [
+          "ligand_ligand"
+        ],
+        "edges_on": [
+          "central_ligand"
+        ]
+      },
+      "geometry_overrides": {
+        "bond_length_angstrom": 1.4799
+      },
+      "hydrogen_scale": 0.6,
+      "id": "SiH4_model",
+      "note": "Geometry from NIST CCCBDB (evidence/cccbdb_SiH4.html), reference 1955Boyd. CONVENTIONS v1.5.",
+      "provenance_tag": "model"
+    },
+    {
+      "coupling_overrides": [],
+      "edge_policy": {
+        "edges_off": [],
+        "edges_on": [
+          "all"
+        ]
+      },
+      "geometry_overrides": {
+        "bond_length_angstrom": 1.0362
+      },
+      "hydrogen_scale": 0.6,
+      "id": "NH_model",
+      "note": "r_e from NIST CCCBDB (evidence/cccbdb_NH.html), reference 1979HUB/HER. CONVENTIONS v1.5.",
+      "provenance_tag": "model"
+    },
+    {
+      "coupling_overrides": [
+        {
+          "element_a": "N",
+          "element_b": "H",
+          "orbital_a": "s",
+          "orbital_b": "s",
+          "provenance_kind": "lecture_decoupling",
+          "value_eV": 0.0
+        }
+      ],
+      "edge_policy": {
+        "edges_off": [],
+        "edges_on": [
+          "all"
+        ]
+      },
+      "geometry_overrides": {
+        "bond_length_angstrom": 1.0362
+      },
+      "hydrogen_scale": 0.6,
+      "id": "NH_lecture",
+      "note": "r_e from NIST CCCBDB (evidence/cccbdb_NH.html), reference 1979HUB/HER. CONVENTIONS v1.5. Lecture: central s - H 1s coupling off, as in H2O_lecture (decision V5).",
+      "provenance_tag": "lecture"
+    },
+    {
+      "coupling_overrides": [],
+      "edge_policy": {
+        "edges_off": [],
+        "edges_on": [
+          "all"
+        ]
+      },
+      "geometry_overrides": {
+        "bond_length_angstrom": 0.9697
+      },
+      "hydrogen_scale": 0.6,
+      "id": "OH_model",
+      "note": "r_e from NIST CCCBDB (evidence/cccbdb_OH.html), reference 1979HUB/HER. CONVENTIONS v1.5.",
+      "provenance_tag": "model"
+    },
+    {
+      "coupling_overrides": [
+        {
+          "element_a": "O",
+          "element_b": "H",
+          "orbital_a": "s",
+          "orbital_b": "s",
+          "provenance_kind": "lecture_decoupling",
+          "value_eV": 0.0
+        }
+      ],
+      "edge_policy": {
+        "edges_off": [],
+        "edges_on": [
+          "all"
+        ]
+      },
+      "geometry_overrides": {
+        "bond_length_angstrom": 0.9697
+      },
+      "hydrogen_scale": 0.6,
+      "id": "OH_lecture",
+      "note": "r_e from NIST CCCBDB (evidence/cccbdb_OH.html), reference 1979HUB/HER. CONVENTIONS v1.5. Lecture: central s - H 1s coupling off, as in H2O_lecture (decision V5).",
+      "provenance_tag": "lecture"
+    },
+    {
+      "coupling_overrides": [],
+      "edge_policy": {
+        "edges_off": [],
+        "edges_on": [
+          "all"
+        ]
+      },
+      "geometry_overrides": {
+        "bond_length_angstrom": 0.9168
+      },
+      "hydrogen_scale": 0.6,
+      "id": "HF_model",
+      "note": "r_e from NIST CCCBDB (evidence/cccbdb_HF.html), reference NISTdiatomic. CONVENTIONS v1.5.",
+      "provenance_tag": "model"
+    },
+    {
+      "coupling_overrides": [
+        {
+          "element_a": "F",
+          "element_b": "H",
+          "orbital_a": "s",
+          "orbital_b": "s",
+          "provenance_kind": "lecture_decoupling",
+          "value_eV": 0.0
+        }
+      ],
+      "edge_policy": {
+        "edges_off": [],
+        "edges_on": [
+          "all"
+        ]
+      },
+      "geometry_overrides": {
+        "bond_length_angstrom": 0.9168
+      },
+      "hydrogen_scale": 0.6,
+      "id": "HF_lecture",
+      "note": "r_e from NIST CCCBDB (evidence/cccbdb_HF.html), reference NISTdiatomic. CONVENTIONS v1.5. Lecture: central s - H 1s coupling off, as in H2O_lecture (decision V5).",
+      "provenance_tag": "lecture"
     }
   ],
   "schema_version": "1.2"

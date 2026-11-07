@@ -116,6 +116,17 @@
     "snap_matrix_max_residual": 5.551115123125783e-16
   },
   {
+    "bilbao_max_error": 0.0,
+    "bilbao_status": "PASS_GEOMETRY_MAPPED",
+    "closure_max_error": 1.1102230246251565e-16,
+    "group": "C3v",
+    "order": 6,
+    "orthogonality_max_error": 0.0,
+    "raw_library_max_error": 0.0,
+    "snap_character_max_residual": 8.881784197001252e-16,
+    "snap_matrix_max_residual": 3.3306690738754696e-16
+  },
+  {
     "bilbao_status": "NOT_COVERED_NONCRYSTALLOGRAPHIC",
     "closure_max_error": 2.220446049250313e-16,
     "group": "D8h",

@@ -157,12 +157,20 @@ function levelKey(lv) {
 function peerHot(key, on) {
   for (const h of document.querySelectorAll(`#diagram .mo-hit[data-key="${CSS.escape(key)}"], #diagram2 .mo-hit[data-key="${CSS.escape(key)}"]`)) h.parentNode.classList.toggle("peer-hot", on);
 }
-// Suggested comparisons for each case (D9). The spec's H2O vs H2S and CH4 vs SiH4 need CONVENTIONS v1.5.
+// Suggested comparisons for each case (D9), including the spec's H2O vs H2S and CH4 vs SiH4 (CONVENTIONS v1.5).
 const COMPARE_SUGGEST = {
+  H2S: [["H2O model", null, "H2O (period 2)"]], SiH4: [["CH4", null, "CH4 (period 2)"]],
+  NH3: [["BH3", null, "BH3 (two fewer electrons, planar)"]], BH3: [["NH3", null, "NH3 (two more electrons, pyramidal)"]],
+  "NH model": [["OH model", null, "OH"], ["HF model", null, "HF"], ["NH lecture", null, "NH lecture (N 2s nonbonding)"]],
+  "OH model": [["NH model", null, "NH"], ["HF model", null, "HF"], ["OH lecture", null, "OH lecture (O 2s nonbonding)"]],
+  "HF model": [["NH model", null, "NH"], ["OH model", null, "OH"], ["HF lecture", null, "HF lecture (F 2s nonbonding)"]],
+  "NH lecture": [["OH lecture", null, "OH lecture"], ["HF lecture", null, "HF lecture"], ["NH model", null, "NH model"]],
+  "OH lecture": [["NH lecture", null, "NH lecture"], ["HF lecture", null, "HF lecture"], ["OH model", null, "OH model"]],
+  "HF lecture": [["NH lecture", null, "NH lecture"], ["OH lecture", null, "OH lecture"], ["HF model", null, "HF model"]],
   "allyl cation pi": [["allyl cation pi", 4, "allyl anion (4 π electrons)"], ["allyl cation pi", 3, "allyl radical (3 π electrons)"]],
   "H3+": [["neutral H3", null, "neutral H3 (one more electron)"]], "neutral H3": [["H3+", null, "H3+"]],
-  "H2O model": [["H2O lecture", null, "H2O lecture (the lecture's simplification)"]], "H2O lecture": [["H2O model", null, "H2O model"]],
-  CH4: [["four H Td", null, "its four hydrogens alone"]], "SF6 model": [["SF6 lecture", null, "SF6 lecture"]],
+  "H2O model": [["H2S", null, "H2S (period 3)"], ["H2O lecture", null, "H2O lecture (the lecture's simplification)"]], "H2O lecture": [["H2O model", null, "H2O model"], ["H2S", null, "H2S (period 3)"]],
+  CH4: [["SiH4", null, "SiH4 (period 3)"], ["four H Td", null, "its four hydrogens alone"]], "SF6 model": [["SF6 lecture", null, "SF6 lecture"]],
   N2: [["P2", null, "P2 (period 3)"], ["CO", null, "CO (isoelectronic)"]], CO: [["N2", null, "N2 (isoelectronic)"]],
   B2: [["Al2", null, "Al2 (period 3)"]], C2: [["Si2", null, "Si2 (period 3)"]], O2: [["S2", null, "S2 (period 3)"]], F2: [["Cl2", null, "Cl2 (period 3)"]],
   Al2: [["B2", null, "B2 (period 2)"]], Si2: [["C2", null, "C2 (period 2)"]], P2: [["N2", null, "N2 (period 2)"]], S2: [["O2", null, "O2 (period 2)"]], Cl2: [["F2", null, "F2 (period 2)"]],
@@ -521,7 +529,7 @@ function pes(view) {
   const P = view.pes, W = 360, H = 190, L = 34, R = 12, T = 18, B = 34;
   svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
   const ref = P.reference;
-  const xs = P.bands.map((b) => b.ie_eV).concat(ref ? [ref.first_band_adiabatic_eV, ref.second_band_near_eV, ref.he_i_eV] : []);
+  const xs = P.bands.map((b) => b.ie_eV).concat(ref ? [ref.first_band_adiabatic_eV, ref.second_band_near_eV, ref.he_i_eV].filter((v) => v != null) : []);
   const lo = Math.floor(Math.min(...xs) / 5) * 5 - 2, hi = Math.ceil(Math.max(...xs) / 5) * 5 + 2;
   const x = (e) => L + (e - lo) / (hi - lo) * (W - L - R);
   const maxE = Math.max(...P.bands.map((b) => b.electrons), 1);
@@ -535,14 +543,14 @@ function pes(view) {
   if (ref) {
     const he = x(ref.he_i_eV);
     svg.append(el("line", { x1: he, x2: he, y1: T, y2: H - B, class: "pes-hei" }));
-    for (const e of [ref.first_band_vertical_eV, ref.second_band_near_eV]) {
+    for (const e of [ref.first_band_vertical_eV, ref.second_band_near_eV].filter((v) => v != null)) {
       const xe = x(e);
       svg.append(el("line", { x1: xe, x2: xe, y1: T, y2: H - B, class: "pes-ref" }));
     }
   }
   const leg = $("pes-legend");
   if (leg) leg.textContent = ref
-    ? `Black bars: model bands. Orange dashed: measured band positions (${ref.first_band_vertical_eV.toFixed(2)} eV, NIST CCCBDB; near ${ref.second_band_near_eV} eV). Grey dotted: He I limit (${ref.he_i_eV.toFixed(2)} eV).`
+    ? `Black bars: model bands. Orange dashed: measured band position${ref.second_band_near_eV != null ? "s" : ""} (${ref.first_band_vertical_eV.toFixed(2)} eV, NIST CCCBDB${ref.second_band_near_eV != null ? `; near ${ref.second_band_near_eV} eV` : ""}). Grey dotted: He I limit (${ref.he_i_eV.toFixed(2)} eV).`
     : "Black bars: model bands. No measured spectrum is curated for this case yet.";
   for (const b of P.bands) {
     const lv = view.diagram.centre[b.level];

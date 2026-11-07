@@ -1,6 +1,6 @@
 # CONVENTIONS v1.5 — draft for owner sign-off
 
-**Status: draft, not applied.** `CONVENTIONS.md` v1.4 stays frozen until the owner signs this off. Prepared 2026-11-07 by Claude. Nothing in `params/`, `groups/`, `checks/` or the engine has changed. The numbers below come from a scratch prototype: the unchanged engine, run on a copy of `params/` and `groups/` with the additions listed here.
+**Status: accepted by the owner ("accept v1.5 as recommended", 2026-11-07) and applied to `CONVENTIONS.md` v1.5.** This file is kept as the record of what was proposed. The text below is as drafted. Prepared 2026-11-07 by Claude. Nothing in `params/`, `groups/`, `checks/` or the engine has changed. The numbers below come from a scratch prototype: the unchanged engine, run on a copy of `params/` and `groups/` with the additions listed here.
 
 ## One-page summary: what you are asked to decide
 

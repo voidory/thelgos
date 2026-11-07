@@ -2,21 +2,139 @@
   "schema_version": "1.3",
   "note": "Curated reference data for the in-app comparison panel (groundwork for the spec section 7 fidelity bar). Every entry cites its source. Orderings follow CONVENTIONS A.6; ground states are as listed on the NIST CCCBDB pages snapshotted in evidence/.",
   "diatomics": {
-    "B2": {"ordering": "pi_u_below_sigma_g_2p", "ground_state": "³Σg", "multiplicity": 3, "source": "CONVENTIONS A.6; NIST CCCBDB (evidence/cccbdb_B2.html)"},
-    "C2": {"ordering": "pi_u_below_sigma_g_2p", "ground_state": "¹Σg⁺", "multiplicity": 1, "source": "CONVENTIONS A.6; NIST CCCBDB (evidence/cccbdb_C2.html)"},
-    "N2": {"ordering": "pi_u_below_sigma_g_2p", "ground_state": "¹Σg⁺", "multiplicity": 1, "source": "CONVENTIONS A.6; NIST CCCBDB (evidence/cccbdb_N2.html)"},
-    "O2": {"ordering": "sigma_g_2p_below_pi_u", "ground_state": "³Σg⁻", "multiplicity": 3, "source": "CONVENTIONS A.6; NIST CCCBDB (evidence/cccbdb_O2.html)"},
-    "F2": {"ordering": "sigma_g_2p_below_pi_u", "ground_state": "¹Σg⁺", "multiplicity": 1, "source": "CONVENTIONS A.6; NIST CCCBDB (evidence/cccbdb_F2.html)"},
-    "CO": {"ordering": null, "ground_state": "¹Σ⁺", "multiplicity": 1, "source": "NIST CCCBDB (evidence/cccbdb_CO.html)"},
-    "Al2": {"ordering": null, "ground_state": "³Σg", "multiplicity": 3, "source": "NIST CCCBDB (evidence/cccbdb_Al2.html; listed with degeneracy 4, but every candidate ground state is a triplet); no sourced orbital-ordering reference for period 3"},
-    "Si2": {"ordering": null, "ground_state": "³Σg", "multiplicity": 3, "source": "NIST CCCBDB (evidence/cccbdb_Si2.html); no sourced orbital-ordering reference for period 3"},
-    "P2": {"ordering": null, "ground_state": "¹Σg", "multiplicity": 1, "source": "NIST CCCBDB (evidence/cccbdb_P2.html); no sourced orbital-ordering reference for period 3"},
-    "S2": {"ordering": null, "ground_state": "³Σg", "multiplicity": 3, "source": "NIST CCCBDB (evidence/cccbdb_S2.html); no sourced orbital-ordering reference for period 3"},
-    "Cl2": {"ordering": null, "ground_state": "¹Σg", "multiplicity": 1, "source": "NIST CCCBDB (evidence/cccbdb_Cl2.html); no sourced orbital-ordering reference for period 3"}
+    "B2": {
+      "ordering": "pi_u_below_sigma_g_2p",
+      "ground_state": "³Σg",
+      "multiplicity": 3,
+      "source": "CONVENTIONS A.6; NIST CCCBDB (evidence/cccbdb_B2.html)"
+    },
+    "C2": {
+      "ordering": "pi_u_below_sigma_g_2p",
+      "ground_state": "¹Σg⁺",
+      "multiplicity": 1,
+      "source": "CONVENTIONS A.6; NIST CCCBDB (evidence/cccbdb_C2.html)"
+    },
+    "N2": {
+      "ordering": "pi_u_below_sigma_g_2p",
+      "ground_state": "¹Σg⁺",
+      "multiplicity": 1,
+      "source": "CONVENTIONS A.6; NIST CCCBDB (evidence/cccbdb_N2.html)"
+    },
+    "O2": {
+      "ordering": "sigma_g_2p_below_pi_u",
+      "ground_state": "³Σg⁻",
+      "multiplicity": 3,
+      "source": "CONVENTIONS A.6; NIST CCCBDB (evidence/cccbdb_O2.html)"
+    },
+    "F2": {
+      "ordering": "sigma_g_2p_below_pi_u",
+      "ground_state": "¹Σg⁺",
+      "multiplicity": 1,
+      "source": "CONVENTIONS A.6; NIST CCCBDB (evidence/cccbdb_F2.html)"
+    },
+    "CO": {
+      "ordering": null,
+      "ground_state": "¹Σ⁺",
+      "multiplicity": 1,
+      "source": "NIST CCCBDB (evidence/cccbdb_CO.html)"
+    },
+    "Al2": {
+      "ordering": null,
+      "ground_state": "³Σg",
+      "multiplicity": 3,
+      "source": "NIST CCCBDB (evidence/cccbdb_Al2.html; listed with degeneracy 4, but every candidate ground state is a triplet); no sourced orbital-ordering reference for period 3"
+    },
+    "Si2": {
+      "ordering": null,
+      "ground_state": "³Σg",
+      "multiplicity": 3,
+      "source": "NIST CCCBDB (evidence/cccbdb_Si2.html); no sourced orbital-ordering reference for period 3"
+    },
+    "P2": {
+      "ordering": null,
+      "ground_state": "¹Σg",
+      "multiplicity": 1,
+      "source": "NIST CCCBDB (evidence/cccbdb_P2.html); no sourced orbital-ordering reference for period 3"
+    },
+    "S2": {
+      "ordering": null,
+      "ground_state": "³Σg",
+      "multiplicity": 3,
+      "source": "NIST CCCBDB (evidence/cccbdb_S2.html); no sourced orbital-ordering reference for period 3"
+    },
+    "Cl2": {
+      "ordering": null,
+      "ground_state": "¹Σg",
+      "multiplicity": 1,
+      "source": "NIST CCCBDB (evidence/cccbdb_Cl2.html); no sourced orbital-ordering reference for period 3"
+    },
+    "NH model": {
+      "ordering": null,
+      "ground_state": "³Σ⁻",
+      "multiplicity": 3,
+      "source": "NIST CCCBDB (evidence/cccbdb_NH.html); CONVENTIONS v1.5"
+    },
+    "NH lecture": {
+      "ordering": null,
+      "ground_state": "³Σ⁻",
+      "multiplicity": 3,
+      "source": "NIST CCCBDB (evidence/cccbdb_NH.html); CONVENTIONS v1.5"
+    },
+    "OH model": {
+      "ordering": null,
+      "ground_state": "²Π",
+      "multiplicity": 2,
+      "source": "NIST CCCBDB (evidence/cccbdb_OH.html); CONVENTIONS v1.5"
+    },
+    "OH lecture": {
+      "ordering": null,
+      "ground_state": "²Π",
+      "multiplicity": 2,
+      "source": "NIST CCCBDB (evidence/cccbdb_OH.html); CONVENTIONS v1.5"
+    },
+    "HF model": {
+      "ordering": null,
+      "ground_state": "¹Σ⁺",
+      "multiplicity": 1,
+      "source": "NIST CCCBDB (evidence/cccbdb_HF.html); CONVENTIONS v1.5"
+    },
+    "HF lecture": {
+      "ordering": null,
+      "ground_state": "¹Σ⁺",
+      "multiplicity": 1,
+      "source": "NIST CCCBDB (evidence/cccbdb_HF.html); CONVENTIONS v1.5"
+    }
   },
   "photoelectron": {
-    "CH4": {"first_band_adiabatic_eV": 12.61, "first_band_vertical_eV": 13.60, "first_band_source": "NIST CCCBDB (evidence/cccbdb_CH4.html), from the NIST WebBook",
-            "second_band_near_eV": 23, "second_band_source": "Functional specification, Release 1 case list (owner); no packaged measurement yet",
-            "he_i_eV": 21.22, "he_i_source": "He I resonance line, 58.4 nm (standard value)"}
+    "CH4": {
+      "first_band_adiabatic_eV": 12.61,
+      "first_band_vertical_eV": 13.6,
+      "first_band_source": "NIST CCCBDB (evidence/cccbdb_CH4.html), from the NIST WebBook",
+      "second_band_near_eV": 23,
+      "second_band_source": "Functional specification, Release 1 case list (owner); no packaged measurement yet",
+      "he_i_eV": 21.22,
+      "he_i_source": "He I resonance line, 58.4 nm (standard value)"
+    },
+    "NH3": {
+      "first_band_adiabatic_eV": 10.07,
+      "first_band_vertical_eV": 10.82,
+      "first_band_source": "NIST CCCBDB (evidence/cccbdb_NH3.html), from the NIST WebBook",
+      "he_i_eV": 21.22,
+      "he_i_source": "He I resonance line, 58.4 nm (standard value)"
+    },
+    "H2S": {
+      "first_band_adiabatic_eV": 10.457,
+      "first_band_vertical_eV": 10.5,
+      "first_band_source": "NIST CCCBDB (evidence/cccbdb_H2S.html), from the NIST WebBook",
+      "he_i_eV": 21.22,
+      "he_i_source": "He I resonance line, 58.4 nm (standard value)"
+    },
+    "SiH4": {
+      "first_band_adiabatic_eV": 11.0,
+      "first_band_vertical_eV": 12.3,
+      "first_band_source": "NIST CCCBDB (evidence/cccbdb_SiH4.html), from the NIST WebBook",
+      "he_i_eV": 21.22,
+      "he_i_source": "He I resonance line, 58.4 nm (standard value)"
+    }
   }
 }

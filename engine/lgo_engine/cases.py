@@ -105,9 +105,48 @@ def diatomic(params, name):
                   group="D2h" if a == b else "C2v", linear=True, preset=preset)
 
 
+# ---- CONVENTIONS v1.5 (owner sign-off of the draft, 2026-11-07) ----
+
+def ammonia(params, preset="NH3_model"):
+    """N=1 at the origin, C3 along z, lone pair towards +z; H2-4 at azimuth 0, 120, 240 degrees, each at angle b
+    from -z with cos(HNH) = cos^2 b - sin^2 b / 2. H2 lies in the xz mirror plane."""
+    g = params.presets[preset]["geometry_overrides"]
+    c = np.cos(np.deg2rad(g["angle_degrees"]))
+    b = np.arccos(np.sqrt((2 * c + 1) / 3))
+    a = np.arange(3) * 2 * np.pi / 3
+    dirs = np.c_[np.sin(b) * np.cos(a), np.sin(b) * np.sin(a), -np.cos(b) * np.ones(3)]
+    return _star("NH3", "N", "H", dirs, g["bond_length_angstrom"], preset, "C3v", 8)
+
+
+def hydrogen_sulfide(params, preset="H2S_model"):
+    g = params.presets[preset]["geometry_overrides"]
+    t = np.deg2rad(g["angle_degrees"]) / 2
+    return _star("H2S", "S", "H", [(0, np.sin(t), np.cos(t)), (0, -np.sin(t), np.cos(t))], g["bond_length_angstrom"], preset, "C2v", 8)
+
+
+def silane(params, preset="SiH4_model"):
+    dirs = np.array([[1, 1, 1], [1, -1, -1], [-1, 1, -1], [-1, -1, 1]]) / np.sqrt(3)
+    return _star("SiH4", "Si", "H", dirs, params.presets[preset]["geometry_overrides"]["bond_length_angstrom"], preset, "Td", 8)
+
+
+HYDRIDES = {"NH": ("N", 6), "OH": ("O", 7), "HF": ("F", 8)}
+
+
+def hydride(params, name, variant="model"):
+    """Diatomic hydride: heavy atom 1 at the origin, H 2 on +z (C2v finite subgroup of Cinf-v, as for CO)."""
+    el, ne = HYDRIDES[name]
+    preset = f"{name}_{variant}"
+    R = params.presets[preset]["geometry_overrides"]["bond_length_angstrom"]
+    atoms = [Atom(el, (0.0, 0.0, 0.0)), Atom("H", (0.0, 0.0, R))]
+    return System(f"{name} {variant}", atoms, _sp(0, el + "1") + [BasisFunction(1, "s", None, "H2s")], [(0, 1)], ne,
+                  group="C2v", linear=True, preset=preset)
+
+
 def release1(params):
-    """All Release 1 fixtures, in the order of checks/release1_energies.csv."""
+    """All fixtures (Release 1 and CONVENTIONS v1.5), in the order of checks/release1_energies.csv."""
     return [water(params, "H2O_model"), water(params, "H2O_lecture"), methane(params), borane(params),
+            ammonia(params), hydrogen_sulfide(params), silane(params)] + [
+        hydride(params, n, v) for n in HYDRIDES for v in ("model", "lecture")] + [
             sf6(params, "SF6_model"), sf6(params, "SF6_lecture"), h2(params),
             ring_h(params, 2, "H3+"), ring_h(params, 3, "neutral H3"), allyl(params), six_h(params), four_h(params)] + [
         diatomic(params, n) for n in ["B2", "C2", "N2", "O2", "F2", "CO", "Al2", "Si2", "P2", "S2", "Cl2"]]
