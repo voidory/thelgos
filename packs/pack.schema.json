@@ -1,0 +1,63 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://voidory.github.io/thelgos/packs/pack.schema.json",
+  "title": "LGO Explorer molecule pack (spec section 14)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "id", "identity", "template", "structure", "basis", "electrons", "group", "parameters"],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "id": {"type": "string", "pattern": "^[A-Za-z0-9+\\-]+$"},
+    "identity": {
+      "type": "object", "additionalProperties": false, "required": ["name", "formula", "charge"],
+      "properties": {
+        "name": {"type": "string"},
+        "formula": {"type": "string"},
+        "charge": {"type": "integer"},
+        "smiles": {"type": "string"},
+        "aliases": {"type": "array", "items": {"type": "string"}}
+      }
+    },
+    "template": {"enum": ["T0", "T1", "T2", "T3", "T4", "T5", "T6", "T7", "T8"]},
+    "structure": {
+      "type": "object", "additionalProperties": false, "required": ["shape", "central", "terminals", "bond_lengths_angstrom", "source"],
+      "properties": {
+        "shape": {"enum": ["AX2_bent", "AXY_bent", "AX3_planar", "AX4_tetrahedral", "AX3Y_C3v", "AX6_octahedral"]},
+        "central": {"type": "string"},
+        "terminals": {"type": "array", "items": {"type": "string"}, "minItems": 2},
+        "bond_lengths_angstrom": {"type": "array", "items": {"type": "number", "exclusiveMinimum": 0.3, "maximum": 4.0}, "minItems": 1},
+        "angle_degrees": {"type": "number", "exclusiveMinimum": 60, "maximum": 180},
+        "source": {"type": "string", "minLength": 10},
+        "evidence": {"type": "string"}
+      }
+    },
+    "basis": {
+      "type": "object", "additionalProperties": false, "required": ["central", "terminal"],
+      "properties": {
+        "central": {"const": "sp"},
+        "terminal": {"enum": ["sigma"]}
+      }
+    },
+    "edges": {
+      "type": "object", "additionalProperties": false,
+      "properties": {"ligand_ligand": {"type": "boolean"}}
+    },
+    "electrons": {
+      "type": "object", "additionalProperties": false, "required": ["count", "convention"],
+      "properties": {"count": {"type": "integer", "minimum": 0}, "convention": {"const": "neutral_atom"}}
+    },
+    "group": {
+      "type": "object", "additionalProperties": false, "required": ["declared"],
+      "properties": {"declared": {"type": "string"}, "source": {"type": "string"}}
+    },
+    "parameters": {
+      "type": "object", "additionalProperties": false, "required": ["use"],
+      "properties": {"use": {"const": "scheme"}}
+    },
+    "notes": {
+      "type": "array",
+      "items": {"type": "object", "additionalProperties": false, "required": ["title", "text"],
+                "properties": {"title": {"type": "string"}, "text": {"type": "string"}}}
+    }
+  }
+}

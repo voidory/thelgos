@@ -53,14 +53,31 @@ def _variant_note(params, preset, other):
     return "In the lecture version " + "; ".join(bits) + "."
 
 
+def _pack_systems(params):
+    from . import packs as packs_mod
+    return [(p, packs_mod.build(params, p, getattr(params, "group_names", None))) for p in getattr(params, "packs", [])]
+
+
+def all_systems(params):
+    """The CONVENTIONS fixtures, then the molecule packs (Release 3)."""
+    return cases.release1(params) + [s for _, s in _pack_systems(params)]
+
+
+def pack_for(params, name):
+    return next((p for p in getattr(params, "packs", []) if p["identity"]["name"] == name), None)
+
+
 def case_list(params):
     out = []
-    systems = cases.release1(params)
+    systems = all_systems(params)
     presets = {s.name: s.preset for s in systems}
     for s in systems:
         entry, variant = _entry(s.name)
+        pk = pack_for(params, s.name)
         row = {"name": s.name, "preset": s.preset, "provenance_tag": params.presets[s.preset]["provenance_tag"],
-               "group": s.group, "electrons": s.electrons, "family": _family(s), "entry": entry, "variant": variant}
+               "group": s.group if not pk else (s.group if s.group != "C1" else f"{pk['group']['declared']}→C1"),
+               "electrons": s.electrons, "family": _family(s), "entry": entry, "variant": variant,
+               "source": "pack" if pk else "fixture"}
         if variant:
             other = f"{entry} {'lecture' if variant == 'model' else 'model'}"
             if other in presets:
@@ -73,6 +90,10 @@ def _system(params, name):
     for s in cases.release1(params):
         if s.name == name:
             return s
+    pk = pack_for(params, name)
+    if pk is not None:
+        from . import packs as packs_mod
+        return packs_mod.build(params, pk, getattr(params, "group_names", None))
     raise ValueError(f"unknown case {name!r}")
 
 
@@ -324,6 +345,13 @@ def view(params, groups, name, s=1.0, level=None, conventions_sha256=None, extra
         if any(a.element == "H" for a in system.atoms):
             notes += n.get("has_hydrogen", [])
         notes += n.get("cases", {}).get(name, [])
+    pk = pack_for(params, name)
+    if pk is not None:
+        from . import packs as packs_mod
+        fb = packs_mod.fallback_note(pk, getattr(params, "group_names", set()))
+        notes += ([{"title": "C1 fallback", "text": fb}] if fb else []) + list(pk.get("notes", []))
+        notes.append({"title": "Molecule pack", "text": f"Added as a molecule pack (packs/{pk['id']}.json). Geometry: {pk['structure']['source']}. "
+                      "Parameters from the scheme (Miessler on-sites, Harrison couplings, hydrogen factor 0.6); not a CONVENTIONS fixture."})
     comparisons = fidelity.compare(system, result, extras["curated"]) if extras else []
     return {
         "case": name,

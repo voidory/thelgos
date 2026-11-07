@@ -1,0 +1,52 @@
+{
+  "schema_version": "1.0",
+  "id": "BF3",
+  "identity": {
+    "name": "BF3",
+    "formula": "BF3",
+    "charge": 0,
+    "smiles": "FB(F)F",
+    "aliases": [
+      "boron trifluoride"
+    ]
+  },
+  "template": "T2",
+  "structure": {
+    "shape": "AX3_planar",
+    "central": "B",
+    "terminals": [
+      "F",
+      "F",
+      "F"
+    ],
+    "bond_lengths_angstrom": [
+      1.307
+    ],
+    "source": "NIST CCCBDB experimental geometry, reference 1998Kuc (r B–F 1.307 Å)",
+    "evidence": "evidence/cccbdb_BF3.html"
+  },
+  "basis": {
+    "central": "sp",
+    "terminal": "sigma"
+  },
+  "edges": {
+    "ligand_ligand": true
+  },
+  "electrons": {
+    "count": 6,
+    "convention": "neutral_atom"
+  },
+  "group": {
+    "declared": "D3h",
+    "source": "NIST CCCBDB (evidence/cccbdb_BF3.html)"
+  },
+  "parameters": {
+    "use": "scheme"
+  },
+  "notes": [
+    {
+      "title": "σ only",
+      "text": "σ only: each fluorine contributes one inward-pointing 2p σ orbital, as in SF6. Its other 2p orbitals (the π set and lone pairs) are left out, so this diagram shows the σ framework only. In real BF3 the fluorine π orbitals also donate into boron's empty 2pz, which this σ-only diagram cannot show (the matcher's 'π from terminal atoms' case)."
+    }
+  ]
+}

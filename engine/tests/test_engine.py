@@ -244,8 +244,8 @@ class DiagramSpec(unittest.TestCase):
                 if ln["layer"] == "mixing":
                     self.assertGreaterEqual(ln["weight"], 0.05)
             frag = d["left"] + d["right"]
-            if d["columns"][0] == "left" and d["column_titles"]["right"] == "Ligand group orbitals":
-                self.assertTrue(all(x["irrep"] != "—" for x in frag), c["name"])
+            if d["columns"][0] == "left" and d["column_titles"]["right"] == "Ligand group orbitals" and not c["group"].endswith("C1"):
+                self.assertTrue(all(x["irrep"] != "—" for x in frag), c["name"])   # C1 fallback (F2.14) labels are — by design
             self.assertAlmostEqual(v["ledger"]["total_eV"], v["ledger"]["eigenvalue_eV"], delta=1e-10)
 
     def test_diatomic_textbook_layout(self):
@@ -524,7 +524,7 @@ class PracticeAndExam(unittest.TestCase):
     def test_perfect_answers_score_full_marks_on_every_case(self):
         from lgo_engine import app_api
         names = app_api.quiz_cases(P)
-        self.assertEqual(len(names), 30)   # 32 fixtures (CONVENTIONS v1.5) less the two ligand-only sets
+        self.assertEqual(len(names), 30 + len(P.packs))   # 32 fixtures less the two ligand-only sets, plus the packs
         for n in names:
             r = app_api.exam_check(P, G, n, self.perfect(n))
             self.assertEqual(r["percent"], 100, (n, [s for s in r["steps"] if not s["correct"]]))
@@ -690,6 +690,46 @@ class ConventionsV15(unittest.TestCase):
         W = morph.walsh(P, G, "NH3: flatten")
         lp = next(l for l in W["lines"] if l["irrep"] == "A1" and l["rank"] == 1)
         self.assertAlmostEqual(lp["energies"][-1], P.onsite_energy("N", "p"), places=9)   # pure N 2pz when planar
+
+
+class MoleculePacks(unittest.TestCase):
+    """Release 3 Milestone A: molecule packs, the C1 fallback (F2.14) and the consistency test (F2.15)."""
+
+    def test_every_pack_passes_the_gate(self):
+        from lgo_engine import packs
+        self.assertGreaterEqual(len(P.packs), 3)
+        for pk in P.packs:
+            bad = [(n, d) for n, ok, d in packs.gate(P, G, pk) if not ok]
+            self.assertEqual(bad, [], pk["id"])
+            app_api.view(P, G, pk["identity"]["name"])          # and the app view runs
+            app_api.view(P, G, pk["identity"]["name"], s=0.5, level=0)
+
+    def test_c1_fallback(self):
+        v = app_api.view(P, G, "HOF", extras=__import__("load").load_extras())
+        self.assertTrue(all(lv["irrep"] == "—" for lv in v["result"]["levels"]))
+        self.assertTrue(any(n["title"] == "C1 fallback" for n in v["notes"]))
+        self.assertEqual(next(c for c in app_api.case_list(P) if c["name"] == "HOF")["group"], "Cs→C1")
+
+    def test_gate_refuses_bad_packs_with_reasons(self):
+        import copy
+        import json
+        from lgo_engine import packs
+        bf3 = next(p for p in P.packs if p["id"] == "BF3")
+        def failed(pk):
+            return [n for n, ok, _ in packs.gate(P, G, pk) if not ok]
+        wrong_group = copy.deepcopy(bf3); wrong_group["id"] = "BF3x"; wrong_group["group"]["declared"] = "Td"
+        self.assertEqual(failed(wrong_group), ["geometry has the declared symmetry Td"])
+        wrong_e = copy.deepcopy(bf3); wrong_e["id"] = "BF3e"; wrong_e["electrons"]["count"] = 8
+        self.assertEqual(failed(wrong_e), ["electron count follows neutral-atom counting"])
+        ch3cl = {"schema_version": "1.0", "id": "CH3Cl", "identity": {"name": "CH3Cl test", "formula": "CH3Cl", "charge": 0},
+                 "template": "T3", "structure": {"shape": "AX3Y_C3v", "central": "C", "terminals": ["H", "H", "H", "Cl"],
+                 "bond_lengths_angstrom": [1.0900, 1.7854], "angle_degrees": 110.75, "source": "NIST CCCBDB, reference 1973Dun/McK"},
+                 "basis": {"central": "sp", "terminal": "sigma"}, "electrons": {"count": 8, "convention": "neutral_atom"},
+                 "group": {"declared": "C3v"}, "parameters": {"use": "scheme"}}
+        self.assertEqual(failed(ch3cl), ["parameters exist for every element, orbital and pair (R3-1)"])
+        reason = next(d for n, ok, d in packs.gate(P, G, ch3cl) if not ok)
+        self.assertIn("C-Cl", reason.replace("Cl-C", "C-Cl"))
+        P.presets.pop("pack:CH3Cl", None); P.presets.pop("pack:BF3x", None); P.presets.pop("pack:BF3e", None)
 
 
 class InspectorViews(unittest.TestCase):

@@ -1686,7 +1686,8 @@ function proposalSetup(cases) {
       if (seen.has(c.entry)) continue;
       seen.add(c.entry);
       const b = document.createElement("button"); b.className = "case"; b.type = "button"; b.dataset.entry = c.entry;
-      b.innerHTML = `${c.entry}<small>${c.group}</small>`;
+      b.innerHTML = `${c.entry}<small>${c.group}${c.source === "pack" ? " · pack" : ""}</small>`;
+      if (c.source === "pack") b.title = "Added as a molecule pack (Release 3): sourced geometry, parameters from the scheme";
       b.addEventListener("click", () => pickEntry(c.entry));
       list.append(b);
     }

@@ -343,6 +343,42 @@ Built on top, the Release 2 items that waited for v1.5:
 
 `drafts/CONVENTIONS-v1.5-draft.md` proposes NH3, H2S and SiH4 (needed for the BH3 → NH3 morph and the H2O/H2S and CH4/SiH4 comparisons), the C3v group, Si–H rows, optional diatomic hydrides NH, OH and HF, and lecture presets that switch the central s–H coupling off (V5). It also records an erratum in signed v1.4. The frozen §9.1 table still shows the earlier Harrison composite values, although the text, `params/onsite.csv` and every result use Miessler; no computed number is affected. Nothing is applied until the owner signs off. The C3v group data and the new geometries come from fresh Bilbao and CCCBDB snapshots in `evidence/` (the Bilbao host was added to a new personal environment for this repository, with the owner's approval). The draft's numbers come from a scratch prototype with the unchanged engine.
 
+## Release 3, Milestone A: molecule packs, C1 fallback, consistency test (2026-11-07)
+
+- **Packs** (`packs/<id>.json`, schema `packs/pack.schema.json`, listed in `packs/index.json`). A pack gives:
+  - identity: name, formula, charge, SMILES, aliases;
+  - a template (T0–T8) and a shape (AX2 bent, AXY bent, AX3 planar, AX4 tetrahedral, AX3Y, AX6 octahedral);
+  - sourced bond lengths and angles, with the source text and evidence file;
+  - the basis (central s and p; terminals H 1s or one inward σ p, as for SF6);
+  - the electron count, the declared point group, and notes.
+  The engine builds each molecule in its template's CONVENTIONS §2 orientation from the sourced bond lengths and angles, so the stored group files apply. CCCBDB's own Cartesian frames differ: for example, BF3 has a fluorine on +y. Packs are data beside the CONVENTIONS fixtures, not part of them; their regression check is the gate, not Appendix B.
+- **First packs:**
+  - CF4 (Td) and BF3 (D3h), σ only and warned as such; BF3's note says its π donation is missing;
+  - HOF (Cs, not in the library), the C1-fallback example.
+  All three geometries come from CCCBDB snapshots in `evidence/`. CH3Cl and HOCl snapshots are stored too, but those molecules cannot run yet: no C–Cl, O–Cl or H–Cl coupling row exists (see the v1.6 draft).
+- **The gate** (`make add-molecule PACK=…`, `scripts/add_molecule.py`) checks, naming any failure:
+  - the schema;
+  - that the formula matches the structure;
+  - that parameters exist (R3-1);
+  - the neutral-atom electron count;
+  - the declared symmetry against the geometry, or the C1 fallback if the group is missing;
+  - R4;
+  - the ledger totals;
+  - that the pairing schedule partitions the couplings and ends at H;
+  - morph invariants.
+  The matcher-fixture check is reported as pending until Milestone B.
+- **C1 fallback (F2.14).** A declared group missing from the library gives group C1. Labels show "—", an automatic note explains why, the case list shows "Cs→C1", and the construction runs in one stage, because no equivalent atoms are detected.
+- **Consistency (F2.15).** The engine tests run the gate on every pack and open each in the app view. They also confirm that the gate refuses bad packs with the right reason: BF3 declared Td, a wrong electron count, and CH3Cl with its missing C–Cl pair. Practice and Exam include the packs; perfect answers score 100 % on each.
+- **App.** Packs appear in the case rail, tagged "pack", and the worker fetches them with the other files.
+
+## Release 3: owner decisions (2026-11-07)
+
+- **R3-1 Elements.** Parameters come only from the Miessler table (H–Ca; Li, Be, Na, Mg, K and Ca have an s energy only). A molecule needing any other element, or a missing orbital such as Mg 3p, gets the verdict "not built yet: element without parameters". No second table is mixed in.
+- **R3-2 SMILES.** A small built-in reader for the subset the course needs (atoms, bonds, rings, charges, brackets). RDKit is not in Pyodide 0.27.7.
+- **R3-3 Geometry.** A molecule is drawn only with a sourced geometry, from a molecule pack or the curated library. A formula with no sourced geometry gets "not built yet: no sourced geometry". No estimated bond lengths are used.
+- **R3-4 Fidelity sources.** NIST CCCBDB first; a chip with no citation stays amber or grey.
+- **R3-5 Order.** Milestone A (packs, C1 fallback, matcher–engine consistency), then B (matcher), C (template builder), D (fidelity bar and method fit), E (case map).
+
 ## D10 measured on the reference phone (2026-11-07)
 
 The owner ran the in-app speed test on their phone, which is now the reference device: an iPhone running iOS 18.7, Safari, 414×896 at 3×, reported with 4 cores. The result is in `evidence/d10_speed_reference_phone.txt`. Every case's warm full update (engine plus redraw) took at most 57 ms, the slowest being SF6 lecture, with a median of 15 ms. Warm engine recompute alone took at most 53 ms. That is under the spec's 100 ms, so **D10's warm budget is met.**

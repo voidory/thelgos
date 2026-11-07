@@ -66,9 +66,11 @@ const check = (name, ok, detail = "") => { results.push({ name, ok, detail }); c
     await page.waitForFunction(() => document.body.dataset.rendered === "SF6 model|1|");
     const fonts = await page.evaluate(async () => { await document.fonts.ready; return document.fonts.check('17px "STIX Two Text"'); });
     check("diagram labels use STIX Two Text", fonts);
-    check("all reference fixtures offered", JSON.stringify([...names].sort()) === JSON.stringify(Object.keys(REF).sort()), `${names.length} cases`);
+    // Molecule packs (Release 3) have no committed reference spectrum: the pack gate checks them (F2.15).
+    const fixtures = names.filter((n) => n in REF);
+    check("all reference fixtures offered", JSON.stringify([...fixtures].sort()) === JSON.stringify(Object.keys(REF).sort()), `${fixtures.length} fixtures, ${names.length - fixtures.length} packs`);
     let worst = 0, timings = [];
-    for (const n of names) {
+    for (const n of fixtures) {
       await pick(page, n);
       await page.waitForFunction((n) => document.body.dataset.rendered === `${n}|1|`, n);
       const got = await page.$$eval("[data-mo]", (hs) => hs.map((h) => Number(h.dataset.energy)));
@@ -83,7 +85,7 @@ const check = (name, ok, detail = "") => { results.push({ name, ok, detail }); c
     // the ledger identity (contacts + on-sites = eigenvalue) at s = 1 and mid-construction; counting bond orders (A.5).
     const setS = (v) => page.$eval("#s", (el, v) => { el.value = v; el.dispatchEvent(new Event("input")); }, v);
     let s0worst = 0, s0bad = [], ledgerWorst = 0, ledgerBad = [], boBad = [];
-    for (const n of names) {
+    for (const n of fixtures) {
       await pick(page, n);
       await page.waitForFunction((n) => document.body.dataset.rendered === `${n}|1|`, n);
       const bo = await page.$eval("#bonds", (b) => b.dataset.counting);
@@ -421,6 +423,14 @@ const check = (name, ok, detail = "") => { results.push({ name, ok, detail }); c
     check("D7 linked highlighting: a level lights its fragment orbitals, mixing lines, spectrum band and matching cells; an atom lights its ledger rows",
           lk.frags === 2 && lk.lines === 2 && lk.pes === 1 && lk.match > 0 && rowsLit > 0, JSON.stringify({ ...lk, rowsLit }));
     await page.mouse.move(0, 0);
+
+    // ---- Release 3, Milestone A: molecule packs and the C1 fallback (F2.14). ----
+    await pick(page, "HOF");
+    await page.waitForFunction(() => document.body.dataset.rendered === "HOF|1|");
+    const hof = await page.evaluate(() => ({ labels: [...document.querySelectorAll("#diagram [data-mo]")].length,
+      notes: document.querySelector("#notes").textContent, rail: [...document.querySelectorAll(".rail button.case")].filter((b) => /pack/.test(b.textContent)).length }));
+    check("Release 3 packs: HOF (Cs, not in the library) draws with the C1 fallback; packs are marked in the rail",
+          hof.labels === 6 && /C1 fallback/.test(hof.notes) && hof.rail >= 3, JSON.stringify({ ...hof, notes: hof.notes.length }));
 
     // ---- Release 2, Milestone C: node markers (L5), rule check (L4), phase painting (D3). ----
     await pick(page, "allyl cation pi");

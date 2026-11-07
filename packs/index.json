@@ -1,0 +1,8 @@
+{
+  "schema_version": "1.0",
+  "packs": [
+    "CF4",
+    "BF3",
+    "HOF"
+  ]
+}

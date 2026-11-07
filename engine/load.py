@@ -17,9 +17,21 @@ def _csv(p):
 
 def load_params(root=ROOT):
     root = Path(root)
-    return ParameterSet(_csv(root / "params/onsite.csv"), _csv(root / "params/pairs.csv"),
-                        json.loads((root / "params/presets.json").read_text())["presets"],
-                        json.loads((root / "params/channel_defaults.json").read_text())["defaults"])
+    P = ParameterSet(_csv(root / "params/onsite.csv"), _csv(root / "params/pairs.csv"),
+                     json.loads((root / "params/presets.json").read_text())["presets"],
+                     json.loads((root / "params/channel_defaults.json").read_text())["defaults"])
+    # Release 3: molecule packs (packs/index.json) and the names of the group files, so a pack whose group
+    # is missing can fall back to C1 (F2.14). Packs are data beside the CONVENTIONS fixtures.
+    P.packs = load_packs(root)
+    P.group_names = {p.stem for p in Path(root, "groups").glob("*.json")}
+    return P
+
+
+def load_packs(root=ROOT):
+    idx = Path(root, "packs/index.json")
+    if not idx.exists():
+        return []
+    return [json.loads(Path(root, "packs", f"{i}.json").read_text()) for i in json.loads(idx.read_text())["packs"]]
 
 
 def load_groups(root=ROOT):

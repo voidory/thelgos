@@ -1,0 +1,58 @@
+{
+  "schema_version": "1.0",
+  "id": "CF4",
+  "identity": {
+    "name": "CF4",
+    "formula": "CF4",
+    "charge": 0,
+    "smiles": "FC(F)(F)F",
+    "aliases": [
+      "carbon tetrafluoride",
+      "tetrafluoromethane"
+    ]
+  },
+  "template": "T3",
+  "structure": {
+    "shape": "AX4_tetrahedral",
+    "central": "C",
+    "terminals": [
+      "F",
+      "F",
+      "F",
+      "F"
+    ],
+    "bond_lengths_angstrom": [
+      1.3151
+    ],
+    "source": "NIST CCCBDB experimental geometry, reference 1998Kuc (r C–F 1.315 Å; Cartesian distance 1.3151 Å)",
+    "evidence": "evidence/cccbdb_CF4.html"
+  },
+  "basis": {
+    "central": "sp",
+    "terminal": "sigma"
+  },
+  "edges": {
+    "ligand_ligand": true
+  },
+  "electrons": {
+    "count": 8,
+    "convention": "neutral_atom"
+  },
+  "group": {
+    "declared": "Td",
+    "source": "NIST CCCBDB (evidence/cccbdb_CF4.html)"
+  },
+  "parameters": {
+    "use": "scheme"
+  },
+  "notes": [
+    {
+      "title": "σ only",
+      "text": "σ only: each fluorine contributes one inward-pointing 2p σ orbital, as in SF6. Its other 2p orbitals (the π set and lone pairs) are left out, so this diagram shows the σ framework only."
+    },
+    {
+      "title": "Compared with CH4",
+      "text": "Same tetrahedral pattern as CH4 (a1, t2), but the terminal orbital is fluorine's 2p σ (−18.65 eV), close to carbon's 2s (−19.43 eV) and well below carbon's 2p (−10.66 eV), instead of H 1s (−13.61 eV). The fluorine–fluorine contacts are on, as in SF6."
+    }
+  ]
+}

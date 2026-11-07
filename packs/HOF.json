@@ -1,0 +1,57 @@
+{
+  "schema_version": "1.0",
+  "id": "HOF",
+  "identity": {
+    "name": "HOF",
+    "formula": "HOF",
+    "charge": 0,
+    "smiles": "OF",
+    "aliases": [
+      "hypofluorous acid"
+    ]
+  },
+  "template": "T1",
+  "structure": {
+    "shape": "AXY_bent",
+    "central": "O",
+    "terminals": [
+      "H",
+      "F"
+    ],
+    "bond_lengths_angstrom": [
+      0.96,
+      1.442
+    ],
+    "source": "NIST CCCBDB experimental geometry, reference Gurvich (r O–H 0.960 Å, r O–F 1.442 Å, angle H–O–F 97.2°)",
+    "evidence": "evidence/cccbdb_HOF.html",
+    "angle_degrees": 97.2
+  },
+  "basis": {
+    "central": "sp",
+    "terminal": "sigma"
+  },
+  "edges": {
+    "ligand_ligand": false
+  },
+  "electrons": {
+    "count": 8,
+    "convention": "neutral_atom"
+  },
+  "group": {
+    "declared": "Cs",
+    "source": "NIST CCCBDB (evidence/cccbdb_HOF.html)"
+  },
+  "parameters": {
+    "use": "scheme"
+  },
+  "notes": [
+    {
+      "title": "Construction without symmetry",
+      "text": "With no symmetry group to pair atoms, the construction slider switches on every coupling to oxygen in one step."
+    },
+    {
+      "title": "Inequivalent terminal atoms",
+      "text": "H and F are different, so fix-and-flip pairing does not apply: there is no equal-energy pair to combine."
+    }
+  ]
+}
