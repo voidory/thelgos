@@ -224,3 +224,23 @@ body[data-mode="practice"] .timeline, body[data-mode="exam"] .timeline { display
 #walsh .axis-num, #walsh .axis-title { font-size: 11px; fill: var(--muted); }
 body[data-morph] .timeline, body[data-morph] #narration, body[data-morph] #badges { display: none !important; }
 #walsh .leader { stroke: var(--muted); stroke-width: 0.7; fill: none; }
+
+/* ---- Release 2, Milestone E: doubt toggles (P4) and alternative schedules (P5). ---- */
+.doubtbar { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 14px; margin: 6px 0; font-size: 0.85rem; }
+.doubtbar .doubt-chip { margin-left: 4px; }
+.doubtbar .doubt-chip[aria-pressed="true"] { background: var(--warn); border-color: var(--warn); color: var(--on-accent); }
+.doubtbar select { font: inherit; max-width: 100%; }
+#sched-box { min-width: 0; max-width: 100%; }
+.ticks .doubt-tick { position: absolute; transform: translateX(-50%); top: 14px; font: inherit; font-size: 0.7rem; padding: 0 4px; border: 1px solid var(--warn); color: var(--warn); background: var(--bg); border-radius: 4px; cursor: pointer; }
+body.proposal .timeline .step.doubt-step { border-color: var(--warn); color: var(--warn); border-style: dashed; }
+body.proposal .timeline .step.doubt-step[aria-current="true"] { background: var(--warn); color: var(--on-accent); border-style: solid; }
+.doubtbox { margin: 8px 0; padding: 10px 12px; border: 1px solid var(--warn); border-left-width: 4px; border-radius: 8px; background: var(--panel); font-size: 0.88rem; }
+.doubtbox h3 { margin: 0 0 6px; font-size: 1rem; font-weight: 600; display: flex; flex-wrap: wrap; gap: 6px; align-items: baseline; }
+.doubtbox .verdict { font-size: 0.78rem; font-weight: 400; color: var(--muted, #6b6a64); border: 1px solid var(--rule); border-radius: 999px; padding: 0 8px; }
+.doubtbox p { margin: 4px 0; }
+.doubtbox .table-wrap { overflow-x: auto; max-width: 100%; }
+.doubtbox .doubt-table { border-collapse: collapse; font-size: 0.8rem; margin: 6px 0; }
+.doubtbox .doubt-table th, .doubtbox .doubt-table td { border-bottom: 1px solid var(--rule); padding: 2px 8px 2px 0; text-align: left; vertical-align: top; }
+.doubtbox .doubt-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+.doubtbox .doubt-actions .chipbtn { margin-left: 0; }
+.doubtbox .doubt-actions .alt { border-color: var(--accent); color: var(--accent); }

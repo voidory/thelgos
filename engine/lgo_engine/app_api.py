@@ -6,7 +6,7 @@ import numpy as np
 from . import cases
 from .hamiltonian import build_hamiltonian
 from .result import run
-from .schedule import build_schedule, hamiltonian_at, checkpoints, lambdas
+from .schedule import build_schedule, hamiltonian_at, checkpoints, lambdas, schedule_options, NAMES as STAGE_NAMES
 from .symmetry import Group
 from .diagram import diagram_spec
 from .ledger import contact_ledger
@@ -138,12 +138,13 @@ def approx_pair(params, name):
 
 
 def view(params, groups, name, s=1.0, level=None, conventions_sha256=None, extras=None, fragment=None,
-         electrons=None, approx=None, dial=0.0, lone_pair_angle=None, paint=None, morph=None, morph_u=None):
+         electrons=None, approx=None, dial=0.0, lone_pair_angle=None, paint=None, morph=None, morph_u=None, schedule=None, doubt=None):
     """Everything one screen needs: result, diagram, schedule, slider state and ledger.
 
     Release 2 dials: electrons (D6, electron stepper), approx (D2, 0 = lecture preset .. 1 = model
     preset, linear in the couplings that differ), dial (D4, rotation within a selected degenerate set)
-    and lone_pair_angle (D5, water's nonbonding pair)."""
+    and lone_pair_angle (D5, water's nonbonding pair). Milestone E: schedule (P5, a variant id from
+    schedule_options) and doubt (P4, the rule ids the user is not convinced by)."""
     morph_info, Hmorph = None, None
     if morph is not None:
         # D1: a frame on a morph path. The path's builder gives the system and its Hamiltonian at morph_u.
@@ -177,8 +178,13 @@ def view(params, groups, name, s=1.0, level=None, conventions_sha256=None, extra
     if morph_info is not None:
         s = 1.0   # a morph frame is a finished diagram at a point on the path, not a construction
         sched = {"H0": H, "stages": [], "skipped": []}
+        options = []
     else:
-        sched = build_schedule(system, Group(groups[system.group]) if system.group != "C1" else None, H)
+        grp = Group(groups[system.group]) if system.group != "C1" else None
+        options = schedule_options(system, grp, H)
+        if schedule not in (None, "lecture") and schedule not in {o["id"] for o in options}:
+            raise ValueError(f"schedule: {schedule!r} is not offered for {name!r}")
+        sched = build_schedule(system, grp, H, schedule or "lecture")
     Hs = hamiltonian_at(sched, s)
     diagram = diagram_spec(system, H, result, groups, H_now=Hs, params=params)
     frag_vectors = diagram.pop("_fragment_vectors", {})
@@ -285,6 +291,29 @@ def view(params, groups, name, s=1.0, level=None, conventions_sha256=None, extra
     origin = views.origins(sched, result["levels"])
     for st in sched["stages"]:
         st["rules"] = views.STAGE_RULES.get(st["kind"], [])
+    # ---- Milestone E: alternative schedules (P5) and doubt toggles (P4).
+    endpoint_dev = float(np.max(abs(np.linalg.eigvalsh(hamiltonian_at(sched, 1.0)) - np.array(result["energies_eV"])))) if sched["stages"] else 0.0
+    doubt_out = None
+    if morph_info is None:
+        from . import doubt as doubt_mod
+        from . import morph as morph_mod
+        mp = morph_mod.path_list(params, name)
+        oset_labels = []
+        if oset is not None:
+            for info_, _V in set_names:
+                lab = views.mo_display_name(info_) if two_col else (info_.get("label") or "")
+                oset_labels.append(lab)
+        dctx = {"system": system, "params": params, "groups": groups, "H": H, "sched": sched, "result": result, "diagram": diagram,
+                "matching": diagram.get("matching"), "oset": oset, "two_col": two_col, "set_levels": set_levels, "set_names": oset_labels,
+                "rule_checks": (lambda v: views.rule_checks(system, oset, v, set_levels)), "options": options,
+                "paint": oset is not None, "approx": approx_pair(params, name) is not None,
+                "sweep": next((p_["id"] for p_ in mp if "sweep" in p_["id"]), None),
+                "ring": next((p_["id"] for p_ in mp if "close the ring" in p_["id"]), None)}
+        dctx["ao_name"] = lambda f: views.ao_display_name(system, params, f)
+        dctx["mo_names"] = [views.mo_display_name(x) for x in diagram["centre"]]
+        dctx["set_vecs"] = [canonical_components(V) for _, V in set_names] if oset is not None else []
+        dctx["uses"] = doubt_mod.uses(system, sched, H, oset, two_col, diagram.get("matching"))
+        doubt_out = doubt_mod.doubt_payload(views.RULES, dctx, doubt or [])
     fr = result["frontier"]
     notes = []
     if extras:
@@ -303,7 +332,10 @@ def view(params, groups, name, s=1.0, level=None, conventions_sha256=None, extra
         "diagram": diagram,
         "schedule": {"stages": [{"kind": st["kind"], "edges": st["edges"], "narration": st["narration"], "rules": st.get("rules", [])} for st in sched["stages"]],
                      "skipped": [{"kind": st["kind"], "edges": st["edges"], "narration": st["narration"], "note": st["note"]} for st in sched["skipped"]],
-                     "checkpoints": checkpoints(sched), "s": s, "lambdas": lam, "active_stage": active},
+                     "checkpoints": checkpoints(sched), "s": s, "lambdas": lam, "active_stage": active,
+                     "variant": sched.get("variant", "lecture"), "options": options, "names": STAGE_NAMES,
+                     "endpoint_max_deviation_eV": endpoint_dev},
+        "doubt": doubt_out,
         "ledger": ledger,
         "structure": structure,
         "origins": origin,

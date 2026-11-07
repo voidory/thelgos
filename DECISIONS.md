@@ -270,6 +270,31 @@ The owner approved these defaults: the current molecules only; two question type
 - **A morph frame is a finished diagram.** The construction slider and timeline are hidden during a morph. The Lecture/Model slider is hidden too, because the two cannot be combined.
 - **Model vs textbook: planar CH4.** In this model the occupied nonbonding orbital of planar CH4 is a hydrogen-only combination, at the H 1s energy, and C 2pz is the empty LUMO. Textbooks make C 2pz the occupied lone pair, because H–H repulsion (absent here, B5) raises the hydrogen combination. The path's note says so.
 
+## Release 2, Milestone E: doubt toggles and alternative schedules, design choices (delegated, 2026-11-07)
+
+- **Alternative schedules (P5)** (`engine/lgo_engine/schedule.py`). Besides the lecture order, a case may offer:
+  - *a different pairing:* another symmetry operation that pairs as many atoms. Pairings related by a symmetry operation give the same plateaus, so only one per class is kept. SF6 gets the cis pairing (2-6, 3-7, 4-5) beside the lecture's trans pairs; H3+'s three choices are all equivalent, so it gets none;
+  - *central atom first*, then the ligand stages;
+  - *every coupling at once*;
+  - *atom by atom*, in numbering order.
+  Options that give the same stages as an earlier one are dropped: with ligand–ligand couplings off (B5), CH4's "central first" is the lecture order. Every option partitions the same couplings, so the endpoint is the same Hamiltonian; the app shows the largest endpoint difference, about 1e−14 eV, and the tests require 1e−10.
+- **Doubt toggles (P4)** (`engine/lgo_engine/doubt.py`). "Not convinced by" chips list the rules the case uses on the selected schedule. A doubted rule becomes a checkpoint: a step on the timeline that Watch stops at, carrying the engine's check of the rule and something to try. Doubts persist across cases, since they are about the rules, not the molecule.
+  - *Where each rule sits:* R5, R6, R9 when the ligand set is finished (for a one-set molecule such as H3+ or allyl, at the end); R7 at the start of the central-atom stage; R2 at the end of the last stage that couples orbitals of different energy; R3 where the omitted couplings would have switched on; R1, R4, R8 on the finished diagram.
+  - *When a rule counts as used:* R5 and R7 belong to the symmetry route, so "every coupling at once" and "atom by atom" do not use them. R2 needs a coupling across an energy gap, so H3+ and allyl do not use it. R3 needs an atom pair left uncoupled, R6 and R9 a one-orbital-per-atom set. R10 (sandwiches) is used by no case yet.
+  - *What each check shows:*
+    - R1: the same-colour and opposite-colour contact totals per level;
+    - R2: for each coupled pair, the gap, coupling and their ratio, with the perturbative shift and admixture against the two-level exact values. Where |t| exceeds half the gap, the estimate is reported as failing (water, CH4, SF6, N2 s–p: every pair here). The full-calculation spread of each central orbital is also shown;
+    - R3: the omitted pairs with their distances, and what switching them on at their distance-law values would do. Water's level order changes; CH4's and allyl's do not;
+    - R4: the orbital count;
+    - R5: the LGOs from projection;
+    - R6: the counting rule against the exact energy for every combination. For a degenerate set it reports agreement if a ±1 member agrees, and keeps the reason for the member shown elsewhere. So H3+'s e′ is exact, as L4's done-when requires, while SF6's (2, 2, −1, −1, −1, −1) reason stays visible;
+    - R7: the non-zero matching tallies and that all join equal irreps;
+    - R8: counting and density-matrix bond orders side by side;
+    - R9: node counts against the exact order.
+  - *Alternatives:* paint phases, another schedule, the lecture/model slider, a morph (central sweep; closing the allyl ring), the symmetry-allowed lines, or the electron stepper, whichever exists for the case.
+- **Speed (D10).** The schedule options depend only on geometry, symmetry, edges and which couplings are non-zero, so they are cached on those, and the pairing search keeps only the best involutions per set. A cold first view of SF6 costs about 30 ms in CPython, and the browser's worst warm recompute stayed at 47 ms.
+- **Fixed along the way:** mid-construction MO rows with several levels drew stray commas between empty labels.
+
 ## B6. Sign-off (owner only)
 
 Not delegated. On 2026-11-06 the owner gave standing permission for Claude to apply the drafted changes. They are now in `CONVENTIONS.md` v1.3 and the spec, and the drafts in `drafts/` remain as the record. Applying them is not sign-off: v1.3 stays "not frozen" until the owner reviews it.

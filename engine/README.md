@@ -14,9 +14,13 @@ The engine the app runs on (spec sections 8 and 9). It is pure NumPy, with no fi
 | `analysis.py` | F2.6–F2.8, F2.10, F2.11 | Composition, bonding character, filling and warnings, HOMO/LUMO, both bond-order definitions |
 | `ledger.py` | L1 | Contact ledger whose total equals the eigenvalue |
 | `result.py` | F2.9 | `run(system, params, groups)` returns a JSON-serialisable Result |
-| `schedule.py` | P1, P2, P5, F2.13 | Construction-slider stages from symmetry pairing ("fix one, flip its partner", then combine), B5 skipping of zero-coupling stages, H(s) and checkpoints |
+| `schedule.py` | P1, P2, P5, F2.13 | Construction-slider stages from symmetry pairing ("fix one, flip its partner", then combine), B5 skipping of zero-coupling stages, H(s) and checkpoints; alternative pairings and orders (P5) |
+| `doubt.py` | P4 | The rules each case uses on the selected schedule, where each sits on the slider, and the engine's check of a doubted rule |
 | `diagram.py` | F3.1–F3.4 | DiagramSpec: symmetry-adapted fragment columns, MO column, the two line layers (dashed allowed, solid mixing ≥ 5 %), slider levels |
-| `app_api.py` | — | The two entry points the browser worker calls: `case_list` and `view` |
+| `views.py` | L2–L5, P3, P6, F5.1, F5.2 | Structure, matching tallies, origins, rule badges, node counts, rule checks, explanation and provenance |
+| `exam.py` | Practice, Exam | Practice and Exam tasks and their checking |
+| `morph.py` | D1, F3.8 | Morph paths through the worked cases and Walsh correlation plots |
+| `app_api.py` | — | The entry points the browser worker calls: `case_list`, `view` and the Release 2 commands (quiz, exam, morph, Walsh) |
 | `cases.py` | F1.1 | Release 1 geometries from CONVENTIONS §2, with lengths and angles taken from `params/presets.json` |
 
 `load.py`, outside the package, is the only code that reads files: `params/`, `groups/`, and the CONVENTIONS hash.

@@ -340,6 +340,40 @@ const check = (name, ok, detail = "") => { results.push({ name, ok, detail }); c
     await page.selectOption("#morph-path", "");
     await page.waitForFunction(() => JSON.parse(document.body.dataset.dials).morph === null);
 
+    // ---- Release 2, Milestone E: doubt toggles (P4) and alternative schedules (P5). ----
+    const dl = () => page.evaluate(() => JSON.parse(document.body.dataset.dials));
+    await pick(page, "H2O lecture");
+    await page.waitForFunction(() => document.body.dataset.rendered === "H2O lecture|1|");
+    for (const r of ["R2", "R3"]) {
+      await page.click(`#doubt-chips button[data-rule="${r}"]`);
+      await page.waitForFunction((r) => (JSON.parse(document.body.dataset.dials).doubt || []).includes(r), r);
+    }
+    const dsteps = await page.$$eval("#steps .doubt-step", (x) => x.map((y) => y.dataset.rule));
+    await page.click("#watch");
+    await page.waitForFunction(() => JSON.parse(document.body.dataset.dials).open === "R3", null, { timeout: 20000 });
+    const r3s = Number(await page.$eval("#s", (x) => x.value));
+    const r3txt = await page.textContent("#doubtbox");
+    await page.click("#doubt-continue");
+    await page.waitForFunction(() => JSON.parse(document.body.dataset.dials).open === "R2", null, { timeout: 20000 });
+    const r2txt = await page.textContent("#doubtbox");
+    await page.click("#doubt-continue");
+    await page.waitForFunction(() => document.body.dataset.watchDone === "1" && JSON.parse(document.body.dataset.dials).open === null, null, { timeout: 20000 });
+    check("P4 doubt toggles: doubting R2 and R3 adds exactly those checkpoints; Watch stops at each with the engine's check",
+          JSON.stringify(dsteps) === JSON.stringify(["R3", "R2"]) && r3s === 0 && /B5/.test(r3txt) && /fails/.test(r2txt) && /O 2pz–LGO1/.test(r2txt),
+          `${dsteps} · R3 at s=${r3s}`);
+    for (const r of ["R2", "R3"]) await page.click(`#doubt-chips button[data-rule="${r}"]`);
+    await page.waitForFunction(() => (JSON.parse(document.body.dataset.dials).doubt || []).length === 0);
+    await pick(page, "SF6 model");
+    await page.waitForFunction(() => document.body.dataset.rendered === "SF6 model|1|");
+    const sopts = await page.$$eval("#sched option", (o) => o.map((x) => x.value));
+    await page.selectOption("#sched", "pair:1");
+    await page.waitForFunction(() => JSON.parse(document.body.dataset.dials).schedule === "pair:1");
+    const snote = await page.textContent("#sched-note");
+    check("P5 alternative schedules: SF6 offers other pairings and orders; the endpoint is unchanged",
+          sopts.length >= 4 && sopts[0] === "lecture" && /same endpoint/.test(snote) && /e-1[0-9]|0\.0e\+0/.test(snote), `${sopts.length} options · ${snote}`);
+    await page.selectOption("#sched", "lecture");
+    await page.waitForFunction(() => JSON.parse(document.body.dataset.dials).schedule === "lecture");
+
     // ---- Release 2, Milestone C: node markers (L5), rule check (L4), phase painting (D3). ----
     await pick(page, "allyl cation pi");
     await page.waitForFunction(() => document.body.dataset.rendered === "allyl cation pi|1|");

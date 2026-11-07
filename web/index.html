@@ -27,6 +27,12 @@
     <p id="narration" class="narration" aria-live="polite"></p>
     <div id="badges" class="badges"></div>
     <div id="rule-detail" class="rule-detail" hidden></div>
+    <div id="doubtbar" class="doubtbar" hidden>
+      <div role="group" aria-labelledby="doubt-label"><span id="doubt-label">Not convinced by</span> <span id="doubt-chips"></span></div>
+      <label id="sched-box" hidden>Order <select id="sched"></select></label>
+      <span id="sched-note" class="muted-text"></span>
+    </div>
+    <section id="doubtbox" class="doubtbox" hidden aria-live="polite" aria-label="Rule check at this step"></section>
     <fieldset class="toggles">
       <legend>Show</legend>
       <label><input type="checkbox" id="t-mixing" checked> Mixing lines</label>

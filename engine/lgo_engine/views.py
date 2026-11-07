@@ -30,6 +30,28 @@ RULES = {
 STAGE_RULES = {"within_set": ["R5"], "combine": ["R5"], "between_sets": ["R7", "R2"]}
 
 
+def ao_display_name(system, params, f):
+    """'O 2py', 'N1 2s', 'F3 2p (inward)': element (with its number when the basis label carries one) and orbital."""
+    import re
+    el = system.atoms[f.atom].element
+    m = re.match(r"^(\d*)(.*)$", f.label[len(el):]) if f.label.startswith(el) else None
+    num, rest = (m.group(1), m.group(2)) if m else ("", f.label)
+    tail = rest[len(f.kind):].replace("_inward", " (inward)")
+    return f"{el}{num} {params.orbital_name.get((el, f.kind), f.kind)}{tail}"
+
+
+def mo_display_name(x):
+    """'2a1', '1σg', '3t1u' from a diagram MO entry; 'level k' when it has no symmetry label."""
+    lab = x.get("linear_label") or (x.get("irrep") if x.get("irrep") not in (None, "—") else None)
+    if not lab:
+        return f"MO at {x['energy_eV']:.2f} eV".replace("-", "−")
+    if x.get("linear_label"):
+        g = {"sigma": "σ", "pi": "π", "delta": "δ"}
+        base, _, par = lab.partition("_")
+        return f"{x.get('number', '')}{g.get(base, base)}{par}"
+    return f"{x.get('number', '')}{lab.lower()}"
+
+
 def rules_payload():
     return {k: {"rule": a, "model": b, "badge": c} for k, (a, b, c) in RULES.items()}
 

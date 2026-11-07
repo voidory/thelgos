@@ -18,7 +18,7 @@ const call = (cmd, args) => new Promise((resolve, reject) => {
 const $ = (id) => document.getElementById(id);
 const NS = "http://www.w3.org/2000/svg";
 const state = { case: null, s: 1, level: null, fragment: null, view: null, info: null, watching: false,
-  electrons: null, approx: null, dial: 0, lp: 0, paint: null, morph: null };
+  electrons: null, approx: null, dial: 0, lp: 0, paint: null, morph: null, schedule: null, doubt: [], doubtOpen: null };
 
 function el(tag, attrs = {}, text) {
   const e = document.createElementNS(NS, tag);
@@ -233,7 +233,7 @@ function draw(view) {
       const oneBase = !isMO && !(col === "right" && d.column_titles.right === "Ligand group orbitals") && bases.every((b) => b === bases[0]) && bases[0];
       if (oneBase) parts.push(...orbitalNameParts(bases[0]));
       else r.items.forEach(([lv], i) => {
-        if (i) parts.push([", ", "base"]);
+        if (i && !(isMO && !(atEnd && $("t-irreps").checked))) parts.push([", ", "base"]);  // no separator between empty labels
         if (isMO) { if (atEnd && $("t-irreps").checked) parts.push(...labelParts(lv)); }
         else if (col === "right" && d.column_titles.right === "Ligand group orbitals") parts.push(...labelParts(lv, { number: false }));
         else parts.push(...orbitalNameParts(lv.label));
@@ -950,15 +950,15 @@ async function refresh() {
   const mine = ++latest;
   const view = await call("view", { case: state.case, s: state.s, level: state.level, fragment: state.fragment, electrons: state.electrons,
     approx: state.approx, dial: state.dial, lone_pair_angle: state.case && state.case.startsWith("H2O") ? state.lp : null, paint: state.paint,
-    morph: state.morph ? state.morph.id : null, morph_u: state.morph ? state.morph.u : null });
+    morph: state.morph ? state.morph.id : null, morph_u: state.morph ? state.morph.u : null, schedule: state.schedule, doubt: state.doubt });
   if (mine !== latest) return state.view;  // a newer request superseded this one
   state.view = view;
   draw(view); levelTable(view); narrate(view); ledger(view); bonds(view); pes(view); dials(view); ruleCheck(view); paintPanel(view); morphUpdate(view); banner(view); about(view);
-  structure(view); matching(view); slotBadges(view);
+  structure(view); matching(view); slotBadges(view); doubtUpdate(view);
   if (proposal) proposalUpdate(view);
   if ($("t-3d").checked) view3d.render(view);
   document.body.dataset.computeMs = view.compute_ms.toFixed(1);
-  document.body.dataset.dials = JSON.stringify({ electrons: view.electrons.count, approx: view.approx.value, dial: view.dial ? view.dial.angle_deg : null, lp: view.lone_pairs ? view.lone_pairs.angle_deg : null, paint: view.paint ? view.paint.signs : null, morph: view.morph ? view.morph.u : null });
+  document.body.dataset.dials = JSON.stringify({ electrons: view.electrons.count, approx: view.approx.value, dial: view.dial ? view.dial.angle_deg : null, lp: view.lone_pairs ? view.lone_pairs.angle_deg : null, paint: view.paint ? view.paint.signs : null, morph: view.morph ? view.morph.u : null, schedule: view.schedule.variant || null, doubt: view.doubt ? view.doubt.checkpoints.map((c) => c.rule) : null, open: state.doubtOpen });
   document.body.dataset.rendered = `${view.case}|${view.schedule.s}|${view.ledger ? (view.ledger.fragment ?? view.ledger.level) : ""}`;
   return view;
 }
@@ -994,12 +994,26 @@ async function glide(target, level = null, ms = 420) {
   return refresh();
 }
 
+let doubtContinue = null;
 async function watch() {
-  if (state.watching) { state.watching = false; return; }
+  if (state.watching) { state.watching = false; if (doubtContinue) doubtContinue(); return; }
   state.watching = true;
   $("watch").textContent = "Stop";
   const K = state.view.schedule.stages.length;
   state.level = null;
+  // P4: a rule marked "not convinced" turns its moment into a stop; Watch waits there until Continue.
+  const cps = state.view.doubt ? [...state.view.doubt.checkpoints] : [];
+  const stopsUpTo = async (s) => {
+    while (state.watching && cps.length && cps[0].s <= s + 1e-9) {
+      const cp = cps.shift();
+      state.s = cp.s; $("s").value = cp.s; state.doubtOpen = cp.rule;
+      await refresh();
+      await new Promise((r) => { doubtContinue = r; });
+      state.doubtOpen = null;
+    }
+  };
+  state.s = 0; $("s").value = 0; await refresh();
+  await stopsUpTo(0);
   for (let k = 0; k < K && state.watching; k++) {
     for (let f = 0; f <= 20 && state.watching; f++) {
       state.s = (k + f / 20) / K;
@@ -1007,8 +1021,10 @@ async function watch() {
       await refresh();
       await new Promise((r) => setTimeout(r, 30));
     }
-    await new Promise((r) => setTimeout(r, 700));
+    await stopsUpTo((k + 1) / K);
+    if (state.watching) await new Promise((r) => setTimeout(r, 700));
   }
+  doubtContinue = null; state.doubtOpen = null;
   state.s = 1; $("s").value = 1;
   await refresh();
   state.watching = false;
@@ -1016,6 +1032,83 @@ async function watch() {
   document.body.dataset.watchDone = "1";
 }
 
+
+// ---- Doubt toggles (P4) and alternative schedules (P5). ----
+// Each rule the case uses can be marked "not convinced". Its moment on the construction then becomes a
+// checkpoint: a tick and a step button that open the engine's own check of the rule, with something to try.
+function doubtUpdate(view) {
+  const bar = $("doubtbar"), D = view.doubt, sc = view.schedule;
+  bar.hidden = !D;
+  if (!D) { $("doubtbox").hidden = true; return; }
+  const chips = $("doubt-chips"); chips.replaceChildren();
+  for (const id of D.used) {
+    const b = document.createElement("button"); b.type = "button"; b.className = "chipbtn doubt-chip"; b.dataset.rule = id;
+    const on = state.doubt.includes(id);
+    b.setAttribute("aria-pressed", on); b.textContent = id;
+    b.title = `${id}. ${view.rules[id].rule}. ${on ? "Marked not convinced: click to accept it." : "Click if you are not convinced: the construction will stop where it is used."}`;
+    b.addEventListener("click", () => {
+      state.doubt = on ? state.doubt.filter((x) => x !== id) : [...state.doubt, id];
+      if (on && state.doubtOpen === id) state.doubtOpen = null;
+      refresh();
+    });
+    chips.append(b);
+  }
+  const unused = Object.keys(view.rules).filter((r) => !D.used.includes(r));
+  if (unused.length) { const u = document.createElement("span"); u.className = "muted-text"; u.textContent = ` (not used here: ${unused.join(", ")})`; chips.append(u); }
+  const sel = $("sched"), opts = sc.options || [];
+  $("sched-box").hidden = opts.length < 2;
+  if (sel.options.length !== opts.length || [...sel.options].some((o, i) => o.value !== opts[i].id)) {
+    sel.replaceChildren(...opts.map((o) => new Option(o.title, o.id)));
+  }
+  sel.value = sc.variant || "lecture";
+  $("sched-note").textContent = sc.variant && sc.variant !== "lecture"
+    ? `Different path, same endpoint: the finished levels differ from the lecture order's by at most ${sc.endpoint_max_deviation_eV.toExponential(1)} eV.` : "";
+  // Ticks on the classic slider (the proposal layout adds step buttons instead, in proposalUpdate).
+  const ticks = $("ticks");
+  for (const cp of D.checkpoints) {
+    const t = document.createElement("button"); t.type = "button"; t.className = "doubt-tick"; t.style.left = `${cp.s * 100}%`;
+    t.textContent = `${cp.rule}?`; t.title = `Check ${cp.rule}: ${cp.claim}`; t.addEventListener("click", () => openDoubt(cp.rule));
+    ticks.append(t);
+  }
+  const cp = D.checkpoints.find((c) => c.rule === state.doubtOpen);
+  const box = $("doubtbox");
+  if (!cp) { box.hidden = true; box.replaceChildren(); return; }
+  box.hidden = false; box.replaceChildren(); box.dataset.rule = cp.rule;
+  const h = document.createElement("h3");
+  h.innerHTML = `<span class="badge">${cp.rule}</span> ${esc(cp.claim)} <span class="verdict">${esc(cp.verdict)}</span>`;
+  box.append(h);
+  for (const line of cp.lines) { const p = document.createElement("p"); p.textContent = line; box.append(p); }
+  if (cp.table) {
+    const t = document.createElement("table"); t.className = "doubt-table";
+    t.innerHTML = `<thead><tr>${cp.table.head.map((x) => `<th>${esc(x)}</th>`).join("")}</tr></thead>` +
+      `<tbody>${cp.table.rows.map((r) => `<tr>${r.map((x) => `<td>${esc(x)}</td>`).join("")}</tr>`).join("")}</tbody>`;
+    const wrap = document.createElement("div"); wrap.className = "table-wrap"; wrap.append(t); box.append(wrap);
+  }
+  const row = document.createElement("div"); row.className = "doubt-actions";
+  if (cp.alternative) {
+    const a = document.createElement("button"); a.type = "button"; a.className = "chipbtn alt"; a.textContent = cp.alternative.label;
+    a.addEventListener("click", () => tryAlternative(cp.alternative)); row.append(a);
+  }
+  const go = document.createElement("button"); go.type = "button"; go.className = "chipbtn"; go.id = "doubt-continue";
+  go.textContent = doubtContinue ? "Continue" : "Close";
+  go.addEventListener("click", () => { if (doubtContinue) { const r = doubtContinue; doubtContinue = null; r(); } else { state.doubtOpen = null; refresh(); } });
+  row.append(go); box.append(row);
+}
+function esc(x) { return String(x).replace(/&/g, "&amp;").replace(/</g, "&lt;"); }
+async function openDoubt(rule) {
+  const cp = state.view.doubt.checkpoints.find((c) => c.rule === rule); if (!cp) return;
+  state.doubtOpen = rule;
+  if (Math.abs(state.s - cp.s) > 1e-9) await glide(cp.s); else await refresh();
+}
+function tryAlternative(alt) {
+  const tab = (name) => { for (const t of document.querySelectorAll(".tabs button")) if (t.textContent.startsWith(name)) t.click(); };
+  if (alt.kind === "paint") { tab("Structure"); if (!state.paint) $("paint-toggle").click(); }
+  else if (alt.kind === "schedule") $("sched").focus();
+  else if (alt.kind === "approx") { const a = $("approx"); if (a) { a.value = 0; a.dispatchEvent(new Event("input")); a.focus(); } }
+  else if (alt.kind === "morph") { state.doubtOpen = null; $("morph-path").value = alt.target; $("morph-path").dispatchEvent(new Event("change")); }
+  else if (alt.kind === "toggle") { $(alt.target).checked = true; draw(state.view); }
+  else if (alt.kind === "electrons") $("e-plus").focus();
+}
 
 // ---- Rule badges (L3): each step carries the rule it uses and the badge that rule earns. ----
 function badgesFor(box, ids, rules) {
@@ -1034,7 +1127,7 @@ function badgesFor(box, ids, rules) {
       const same = !d.hidden && d.dataset.rule === id;
       d.hidden = same;
       d.dataset.rule = id;
-      d.textContent = `${id}. ${r.rule}. In the model: ${r.model}. Badge: ${r.badge}. Switches that remove approximations arrive in Release 2.`;
+      d.textContent = `${id}. ${r.rule}. In the model: ${r.model}. Badge: ${r.badge}.${state.view && state.view.doubt && state.view.doubt.used.includes(id) ? ' Not convinced? Mark it under the timeline and the construction stops where it is used, with the engine\'s check.' : ""}`;
     });
     box.append(b);
   }
@@ -1427,7 +1520,7 @@ function proposalSetup(cases) {
   const left = document.createElement("div"); left.append(play);
   const right = document.createElement("div"); right.append(steps, document.querySelector(".slider"));
   tl.append(left, right);
-  document.querySelector(".diagram").prepend(variantSetup(), tl, $("narration"), $("badges"), $("rule-detail"), document.querySelector(".toggles"));
+  document.querySelector(".diagram").prepend(variantSetup(), tl, $("narration"), $("badges"), $("rule-detail"), $("doubtbar"), $("doubtbox"), document.querySelector(".toggles"));
   // Inspector as tabs, one per h2 section.
   const insp = document.querySelector(".inspector");
   const kids = [...insp.children]; const tabs = document.createElement("div"); tabs.className = "tabs"; tabs.setAttribute("role", "tablist");
@@ -1515,13 +1608,16 @@ function proposalUpdate(view) {
   variantUpdate(view);
   const steps = $("steps"); if (!steps) return;
   const sc = view.schedule, K = sc.stages.length;
-  const names = { within_set: "Fix one, flip partner", combine: "Combine equal-energy sets", between_sets: "Put the central atom back" };
-  const items = [["Separate atoms", 0], ...sc.stages.map((st, k) => [names[st.kind] || st.kind, (k + 1) / K])];
+  const names = sc.names || {};
+  const items = [["Separate atoms", 0, null], ...sc.stages.map((st, k) => [names[st.kind] || st.kind, (k + 1) / K, null])];
+  // P4: each doubted rule is its own step, right after the stage it belongs to.
+  for (const cp of (view.doubt ? view.doubt.checkpoints : [])) items.push([`Check ${cp.rule}`, cp.s, cp.rule]);
+  items.sort((a, b) => a[1] - b[1] || (a[2] ? 1 : 0) - (b[2] ? 1 : 0));
   steps.replaceChildren();
-  for (const [label, s] of items) {
-    const b = document.createElement("button"); b.type = "button"; b.className = "step"; b.textContent = label;
-    b.setAttribute("aria-current", Math.abs(view.schedule.s - s) < 1e-9);
-    b.addEventListener("click", () => glide(s));
+  for (const [label, s, rule] of items) {
+    const b = document.createElement("button"); b.type = "button"; b.className = rule ? "step doubt-step" : "step"; b.textContent = label;
+    if (rule) { b.dataset.rule = rule; b.setAttribute("aria-current", state.doubtOpen === rule); b.addEventListener("click", () => openDoubt(rule)); }
+    else { b.setAttribute("aria-current", !state.doubtOpen && Math.abs(view.schedule.s - s) < 1e-9); b.addEventListener("click", () => { state.doubtOpen = null; glide(s); }); }
     steps.append(b);
   }
 }
@@ -1540,8 +1636,9 @@ function proposalUpdate(view) {
     state.case = cases.find((c) => c.name === "SF6 model").name;
     if (await fromLink()) $("s").value = state.s;
     sel.value = state.case;
-    sel.addEventListener("change", () => { if (quiz.mode !== "explore") { state.case = sel.value; state.level = null; state.fragment = null; state.electrons = null; state.approx = null; refresh(); newAttempt(); return; } glideToken++; state.case = sel.value; state.level = null; state.fragment = null; state.electrons = null; state.approx = null; state.dial = 0; state.lp = 0; state.paint = null; state.morph = null; morphMenu(); state.s = 1; $("s").value = 1; refresh(); });
-    $("s").addEventListener("input", () => { glideToken++; state.s = Number($("s").value); state.level = null; state.fragment = null; refresh(); });
+    sel.addEventListener("change", () => { if (quiz.mode !== "explore") { state.case = sel.value; state.level = null; state.fragment = null; state.electrons = null; state.approx = null; refresh(); newAttempt(); return; } glideToken++; state.case = sel.value; state.level = null; state.fragment = null; state.electrons = null; state.approx = null; state.dial = 0; state.lp = 0; state.paint = null; state.morph = null; state.schedule = null; state.doubtOpen = null; morphMenu(); state.s = 1; $("s").value = 1; refresh(); });
+    $("s").addEventListener("input", () => { glideToken++; state.s = Number($("s").value); state.level = null; state.fragment = null; state.doubtOpen = null; refresh(); });
+    $("sched").addEventListener("change", (e) => { glideToken++; state.schedule = e.target.value === "lecture" ? null : e.target.value; state.level = null; state.fragment = null; state.doubtOpen = null; refresh(); });
     $("whyjump").addEventListener("click", () => {
       const o = state.view.origins[state.level];
       glide(o.s, o.level_index_there).then((v) => v && status(`Jumped to where this level appeared: ${o.label}`));

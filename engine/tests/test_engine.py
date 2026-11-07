@@ -11,7 +11,7 @@ HERE = Path(__file__).resolve()
 sys.path[:0] = [str(HERE.parents[1])]
 from load import ROOT, load_params, load_groups, conventions_sha256  # noqa: E402
 import lgo_engine as E  # noqa: E402
-from lgo_engine import cases, hamiltonian  # noqa: E402
+from lgo_engine import cases, hamiltonian, app_api  # noqa: E402
 
 P = load_params()
 G = load_groups()
@@ -562,6 +562,85 @@ class PracticeAndExam(unittest.TestCase):
         self.assertIn("nonbonding", fb); self.assertIn("not a whole number", fb); self.assertIn("0.667", fb)
         with self.assertRaises(ValueError):
             app_api.exam_task(P, G, "six H Oh")
+
+
+class DoubtsAndSchedules(unittest.TestCase):
+    """Release 2, Milestone E: alternative schedules (P5) and doubt toggles (P4), each spec done-when."""
+
+    def test_every_schedule_reaches_the_same_endpoint(self):
+        """P5: endpoint energies identical to 1e-10 for every schedule; the paths themselves differ."""
+        from lgo_engine.schedule import schedule_options, build_schedule, hamiltonian_at
+        from lgo_engine.symmetry import Group
+        for s in cases.release1(P):
+            H = hamiltonian.build_hamiltonian(s, P)
+            g = Group(G[s.group]) if s.group != "C1" else None
+            e = np.linalg.eigvalsh(H)
+            opts = schedule_options(s, g, H)
+            self.assertEqual(opts[0]["id"], "lecture")
+            sigs = set()
+            for o in opts:
+                sc = build_schedule(s, g, H, o["id"])
+                self.assertLess(np.max(abs(np.linalg.eigvalsh(hamiltonian_at(sc, 1.0)) - e)), 1e-10, (s.name, o["id"]))
+                sig = tuple(tuple(map(tuple, st["edges"])) for st in sc["stages"])
+                self.assertNotIn(sig, sigs, f"{s.name}: duplicate schedule {o['id']}")
+                sigs.add(sig)
+
+    def test_sf6_cis_pairing_takes_another_path(self):
+        from lgo_engine.schedule import build_schedule, hamiltonian_at
+        from lgo_engine.symmetry import Group
+        s = cases.sf6(P)
+        H = hamiltonian.build_hamiltonian(s, P)
+        g = Group(G["Oh"])
+        v = E.app_api.view(P, G, "SF6 model", schedule="pair:1", s=0.25)
+        self.assertIn("2-6, 3-7, 4-5", v["schedule"]["stages"][0]["narration"])
+        a = np.linalg.eigvalsh(hamiltonian_at(build_schedule(s, g, H), 0.25))
+        b = np.linalg.eigvalsh(hamiltonian_at(build_schedule(s, g, H, "pair:1"), 0.25))
+        self.assertGreater(np.max(abs(a - b)), 0.1)
+        self.assertLess(v["schedule"]["endpoint_max_deviation_eV"], 1e-10)
+        with self.assertRaises(ValueError):
+            E.app_api.view(P, G, "H2", schedule="central_first")
+
+    def test_expanded_checkpoints_equal_doubted_rules_used(self):
+        """P4: expanded checkpoints equal the distrusted rules the case uses, each on a stage boundary."""
+        from lgo_engine.views import RULES
+        allr = list(RULES)
+        for c in E.app_api.case_list(P):
+            used = E.app_api.view(P, G, c["name"])["doubt"]["used"]
+            self.assertNotIn("R10", used)
+            for doubt in ([], ["R2"], ["R3", "R6"], allr):
+                v = E.app_api.view(P, G, c["name"], doubt=doubt)
+                cps = v["doubt"]["checkpoints"]
+                self.assertEqual(sorted(x["rule"] for x in cps), sorted(set(doubt) & set(used)), (c["name"], doubt))
+                K = len(v["schedule"]["stages"])
+                for x in cps:
+                    self.assertTrue(x["lines"] and x["verdict"], (c["name"], x["rule"]))
+                    self.assertAlmostEqual(x["s"] * K, round(x["s"] * K), 9)
+
+    def test_doubt_checks_carry_the_engine_numbers(self):
+        def cp(name, rule, **kw):
+            return next(x for x in E.app_api.view(P, G, name, doubt=[rule], **kw)["doubt"]["checkpoints"] if x["rule"] == rule)
+        # R2: water's O 2s-LGO1 pair, |t|/gap > 0.5, so the perturbative estimate is reported as failing.
+        r2 = cp("H2O model", "R2")
+        row = next(r for r in r2["table"]["rows"] if r[0] == "O 2s–LGO1")
+        self.assertGreater(float(row[3]), 0.5)
+        self.assertTrue(row[4].startswith("fails"))
+        self.assertEqual(r2["alternative"]["kind"], "approx")
+        # R3: allyl's missing C1-C3 contact, with the ring-closing morph as the thing to try.
+        r3 = cp("allyl cation pi", "R3")
+        self.assertIn("C1–C3", r3["lines"][0])
+        self.assertEqual(r3["alternative"]["target"], "allyl cation pi: close the ring")
+        # R6: exact for H3+ (a ±1 member of e'), approximate for allyl (unequal coefficients); L4's eg reason kept.
+        self.assertEqual(cp("H3+", "R6")["verdict"], "exact here")
+        self.assertEqual(cp("allyl cation pi", "R6")["verdict"], "approximate here")
+        eg = next(r for r in cp("SF6 model", "R6")["table"]["rows"] if r[0] == "LGO3")
+        self.assertIn("(2, 2, −1, −1, −1, −1)", eg[3])
+        # R8: counting vs density matrix side by side; R4 exact count.
+        self.assertIn("0.667", " ".join(cp("SF6 model", "R8")["lines"]))
+        self.assertIn("10 valence basis functions in, 10 molecular orbitals out", cp("SF6 model", "R4")["lines"][0])
+        # On another schedule R5 and R7 are not part of the route.
+        used = E.app_api.view(P, G, "SF6 model", schedule="one_step")["doubt"]["used"]
+        self.assertNotIn("R5", used)
+        self.assertNotIn("R7", used)
 
 
 class InspectorViews(unittest.TestCase):
