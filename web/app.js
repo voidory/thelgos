@@ -198,7 +198,7 @@ function draw(view) {
           g.append(el("title", {}, `${view.provenance.level_energy} ${atEnd ? view.provenance.level_label : ""} E = ${fmt(lv.energy_eV, 3)} eV`.trim()));
           const hit = el("rect", { x: x0 - 4, y: yy - 9, width: x1 - x0 + 8, height: 18, class: "mo-hit", tabindex: 0,
                                    role: "button", "aria-pressed": state.level === k, "aria-label": levelName(lv, k, atEnd, view),
-                                   [atEnd ? "data-mo" : "data-slider-level"]: k, "data-energy": lv.energy_eV });
+                                   [atEnd ? "data-mo" : "data-slider-level"]: k, "data-energy": lv.energy_eV, "data-multiplicity": lv.multiplicity });
           hit.addEventListener("click", () => select(k));
           hit.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") select(k); });
           g.append(hit);
@@ -397,6 +397,7 @@ function bonds(view) {
   const c = bo.counting, dm = bo.density_matrix;
   const vals = Object.values(dm.per_bond);
   const dmText = vals.length ? `${Math.min(...vals).toFixed(3)}${Math.max(...vals) - Math.min(...vals) > 1e-9 ? `–${Math.max(...vals).toFixed(3)}` : ""}` : "—";
+  $("bonds").dataset.counting = c.per_bond === null ? "" : c.per_bond;
   $("bonds").innerHTML = `<p>Counting: <b>${c.per_bond === null ? "—" : c.per_bond.toFixed(3)}</b> per bond ` +
     `(${c.bonding_electrons} bonding, ${c.antibonding_electrons} antibonding electrons over ${c.bonds} bonds).<br>` +
     `${dm.definition}: ${dmText}. These are different definitions and need not agree.</p>`;

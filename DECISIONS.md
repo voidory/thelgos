@@ -38,7 +38,7 @@ Status key: **owner** = decided by the owner; **delegated** = decided by Claude 
 
 **Plain terms.** Couplings involving hydrogen use Harrison's formula, which was never fitted to hydrogen. They are multiplied by 0.6 so that the textbook level orderings come out right.
 
-**Decision.** Keep 0.6.
+**Decision.** Keep 0.6. Re-confirmed by the owner on 2026-11-07 ("do whatever aligns with Miessler"). Dropping the scale (1.0) would flip two textbook LUMOs: water's would become 2b2* instead of 3a1*, and CH4's t2* instead of a1*. Miessler's figures, as I recall them, show a1* as the LUMO in both, which 0.6 reproduces. This should be checked against the book. The value range that keeps all four orderings is 0.4235–0.6668.
 
 **Why.**
 - Any value from 0.4235 to 1.0313 gives the required orderings, so the number is not fine-tuned within that range. (The range was 0.4915–0.8939 before the on-site switch, M7.)

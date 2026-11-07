@@ -1,11 +1,11 @@
 # CONVENTIONS.md — LGO Method Explorer
 
-**Version: 1.3 — APPLIED UNDER OWNER PERMISSION; NOT FROZEN (owner sign-off B6 pending)**  
+**Version: 1.4 — APPLIED UNDER OWNER PERMISSION; NOT FROZEN (owner sign-off B6 pending)**  
 **Owner / change authority: the project owner**  
 **Date: 2026-11-07, Singapore**  
-**Release 1 blockers: browser engine/slider/ledger/Watch acceptance tests (C4); owner sign-off (B6). CrystOD comparison deferred until the programme is finished (B1). Diatomic fixtures in place.**
+**Release 1 blockers: owner sign-off (B6). CrystOD comparison deferred until the programme is finished (B1). Diatomic fixtures (periods 2 and 3) and browser acceptance tests (C4) in place.**
 
-*v1.3 record:* the owner decided B1 and B4 and the ring orientation in B3, delegated B2, B3 (in-plane axis) and B5 to Claude, and gave standing permission (2026-11-06) for Claude to apply the drafted changes to this file. Every decision and its reasons are in `DECISIONS.md`. Checker changes are in `CHECKER-CHANGES.md` (K1–K16).
+*v1.3 record:* the owner decided B1 and B4 and the ring orientation in B3, delegated B2, B3 (in-plane axis) and B5 to Claude, and gave standing permission (2026-11-06) for Claude to apply the drafted changes to this file. Every decision and its reasons are in `DECISIONS.md`. Checker changes are in `CHECKER-CHANGES.md` (K1–K19, plus the M7 data change).
 
 ## Review and evidence record
 
@@ -185,7 +185,7 @@ All p directions share the p on-site. No main-group d parameters. Nitrogen was a
 
 Precedence: **preset matrix-element override → element-pair/channel row → explicit channel default → error**. Defaults live in `params/channel_defaults.json`; the supplied default list is empty. A no-match lookup must raise an error, never silently return zero. Missing orbital channels are not requested; absence is not a fit to zero. Reverse-pair Hermiticity follows §1.
 
-For `harrison_inverse_square`, V=scale×eta×K/d². Coefficients remain ss=−1.40, sp=+1.84, pp sigma=+3.24, pp pi=−0.81: Harrison's 1980 book values as transcribed in `evidence/harrison.txt`. The same file lists a second set attributed to Shi & Papaconstantopoulos (2004), which is not used (DECISIONS.md M2). **All H-containing couplings extrapolate this scheme beyond the Harrison table's H coverage.** The 0.6 factor is a declared pedagogical correction, not a published coefficient or measured fit. The two strict ordering constraints are: BH3's empty pz (a2″) below the antibonding a1′ (lower bound); and in lecture water, the bonding 1b2 above the decoupled O 2s (upper bound). With the M7 on-sites they give 0.4234786093<sH<1.0312679542; with the earlier composite they gave 0.4914651002<sH<0.8938796155. Not a constraint: water's 3a1*/2b2* pair crosses at sH≈0.667, and at 0.6 the two levels sit 0.12 eV apart. B2 decided under delegation: 0.6 (DECISIONS.md). Because it was chosen to reproduce orderings, those orderings are not independent fidelity evidence. The audit reads the CSV rather than these prose numbers.
+For `harrison_inverse_square`, V=scale×eta×K/d². Coefficients remain ss=−1.40, sp=+1.84, pp sigma=+3.24, pp pi=−0.81: Harrison's 1980 book values as transcribed in `evidence/harrison.txt`. The same file lists a second set attributed to Shi & Papaconstantopoulos (2004), which is not used (DECISIONS.md M2). **All H-containing couplings extrapolate this scheme beyond the Harrison table's H coverage.** The 0.6 factor is a declared pedagogical correction, not a published coefficient or measured fit. The two strict ordering constraints are: BH3's empty pz (a2″) below the antibonding a1′ (lower bound); and in lecture water, the bonding 1b2 above the decoupled O 2s (upper bound). With the M7 on-sites they give 0.4234786093<sH<1.0312679542; with the earlier composite they gave 0.4914651002<sH<0.8938796155. Two further orderings hold at 0.6 and are kept on the owner's instruction to follow Miessler (DECISIONS.md B2): water's LUMO is 3a1*, below 2b2*, which holds for sH<0.666786; and CH4's LUMO is a1*, below t2*, which holds for sH<0.970429. Both are recorded as textbook orderings, from Miessler's figures as recalled, pending the owner's check against the book. They are not asserted by the checker. Together the four orderings allow 0.4235<sH<0.6668. B2 decided under delegation: 0.6 (DECISIONS.md). Because it was chosen to reproduce orderings, those orderings are not independent fidelity evidence. The audit reads the CSV rather than these prose numbers.
 
 Neighbour lists are explicit: H2O/CH4/BH3 central-H on, H–H off; SF6 central-F and all F–F on; ligand-only H diagnostics have their declared edges on. No distance cutoff silently re-enables absent edges.
 
@@ -230,8 +230,8 @@ The adapter protocol is implemented and unit-tested with explicitly mock inputs,
 Release 1 remains blocked by:
 
 - C1 (deferred by B1): original archive identity, tested real default-EHT adapter and executed qualitative comparisons.
-- C2: closed. Source-backed B2, C2, N2, O2, F2 and CO geometries, explicit blocks (A.6) and regression rows (Appendix B) are in place.
-- C4: Pyodide 0.27.7 browser endpoint/slider, counting-ledger and Watch-mode acceptance tests; CPython Hamiltonian checks do not satisfy these.
+- C2: closed. Source-backed B2, C2, N2, O2, F2, CO, Al2, Si2, P2, S2 and Cl2 geometries, explicit blocks (A.6) and regression rows (Appendix B) are in place.
+- C4: closed 2026-11-07. `web/tests/web_test.js` runs in Pyodide 0.27.7 in Chromium and checks every case: both slider end points (s = 1 against `evidence/reference_spectra.json` to 1e−9 eV; s = 0 against the on-site table to 1e−12 eV, with multiplicities); the ledger identity at s = 1 and s = 0.5 (1e−10 eV); counting bond orders against A.5; and Watch mode playing to the finished diagram. It is not part of `make check`, because it needs the network.
 - Owner sign-off B6. B2, B3 (in-plane axis) and B5 are decided under delegation and documented for review, not inferred consent.
 
 Slides/aliases are nonblocking. Later d-channel parameters remain outside Release 1. Spec-document edits in tier D are reserved for the reviewer after approval, not silently applied here.
@@ -364,4 +364,4 @@ Energies in eV; repeated levels have multiplicities shown. Values are model calc
 | Cl2 | σg −29.274860; σu −23.322165; σg −18.572273; πu×2 −15.231892; πg×2 −12.108108; σu −6.630702 |
 | CO | σ −45.350342; σ −26.597061; π×2 −18.754865; σ −17.057093 (HOMO, C weight 0.977); π×2 −7.755135; σ +10.684496 |
 
-All 23 current fixtures satisfy file-driven analytic assembly, symmetry/projector labels and residual/orthonormality checks. Still open: real CrystOD comparison (deferred, B1) and browser engine/UI gates (C4). Later advanced d blocks, exact slide aliasing and spectral fits remain unclaimed.
+All 23 current fixtures satisfy file-driven analytic assembly, symmetry/projector labels and residual/orthonormality checks. Still open: real CrystOD comparison (deferred, B1). Browser gates (C4) closed. Later advanced d blocks, exact slide aliasing and spectral fits remain unclaimed.

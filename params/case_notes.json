@@ -7,7 +7,7 @@
     {"title": "Bonding goes down as much as antibonding goes up", "text": "This model leaves out orbital overlap. So when two orbitals of equal energy combine, the bonding level drops by exactly as much as the antibonding level rises: for H2, −13.61 eV ± 6.40 eV. Miessler's diagrams show the antibonding level raised more than the bonding level is lowered. That asymmetry comes from overlap, which this model does not include. Symmetry labels do not depend on it; levels that lie close together could come out in a different order in a model with overlap."}
   ],
   "has_hydrogen": [
-    {"title": "Couplings to hydrogen", "text": "Harrison's coupling formula was never fitted to hydrogen. Couplings involving H are scaled by 0.6 so that the textbook level orderings come out right (DECISIONS.md B2). Treat those orderings as built in, not as independent evidence."}
+    {"title": "Couplings to hydrogen", "text": "Harrison's coupling formula was never fitted to hydrogen. Couplings involving H are scaled by 0.6 so that the textbook level orderings come out right (DECISIONS.md B2). Without the scale, water's and methane's lowest empty orbitals would differ from Miessler's diagrams. Treat those orderings as built in, not as independent evidence."}
   ],
   "cases": {
     "H2O lecture": [{"title": "Lecture simplification", "text": "As in the lecture, O 2s is not allowed to mix with the hydrogens, so it stays nonbonding. Switch the Parameters toggle to Model to see what changes when it is allowed to mix: the lowest level drops and gains H character."}],

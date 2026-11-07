@@ -6,6 +6,15 @@ const fs = require("fs");
 const path = require("path");
 const ROOT = path.resolve(__dirname, "../..");
 const REF = JSON.parse(fs.readFileSync(path.join(ROOT, "evidence/reference_spectra.json")));
+// Gate C4 inputs: each fixture's basis (checks/crystod_cases.json) and the on-site table, for the s = 0 endpoint;
+// counting bond orders from CONVENTIONS A.5.
+const CASES = Object.fromEntries(JSON.parse(fs.readFileSync(path.join(ROOT, "checks/crystod_cases.json"))).map((c) => [c.case, c]));
+const ONSITE = {};
+for (const line of fs.readFileSync(path.join(ROOT, "params/onsite.csv"), "utf8").trim().split(/\r?\n/).slice(1)) {
+  const [el, orb, e] = line.split(","); ONSITE[`${el}|${orb.slice(-1)}`] = Number(e);
+}
+const COUNTING = { "allyl cation pi": 0.5, "H3+": 1 / 3, BH3: 1, CH4: 1, "H2O lecture": 1, "SF6 model": 2 / 3, "SF6 lecture": 2 / 3,
+  B2: 1, C2: 2, N2: 3, O2: 2, F2: 1, CO: 3, Al2: 1, Si2: 2, P2: 3, S2: 2, Cl2: 1 };
 const shots = process.argv[2];
 const results = [];
 // The case list is a rail of buttons; the underlying <select> stays the single source of state.
@@ -66,6 +75,43 @@ const check = (name, ok, detail = "") => { results.push({ name, ok, detail }); c
       timings.push(Number(await page.evaluate(() => document.body.dataset.computeMs)));
     }
     check("browser energies equal committed reference spectra (1e-9 eV)", worst < 1e-9, `max error ${worst.toExponential(2)}`);
+
+    // Gate C4: slider end point s = 0 (separate atoms) equals the on-site table, every case, with multiplicities;
+    // the ledger identity (contacts + on-sites = eigenvalue) at s = 1 and mid-construction; counting bond orders (A.5).
+    const setS = (v) => page.$eval("#s", (el, v) => { el.value = v; el.dispatchEvent(new Event("input")); }, v);
+    let s0worst = 0, s0bad = [], ledgerWorst = 0, ledgerBad = [], boBad = [];
+    for (const n of names) {
+      await pick(page, n);
+      await page.waitForFunction((n) => document.body.dataset.rendered === `${n}|1|`, n);
+      const bo = await page.$eval("#bonds", (b) => b.dataset.counting);
+      if (n in COUNTING && Math.abs(Number(bo) - COUNTING[n]) > 1e-12) boBad.push(`${n}: ${bo}`);
+      const top = await page.$$eval("[data-mo]", (hs) => hs.length - 1);
+      await page.$eval(`[data-mo="${top}"]`, (h) => h.dispatchEvent(new Event("click")));
+      await page.waitForFunction(([n, k]) => document.body.dataset.rendered === `${n}|1|${k}`, [n, top]);
+      for (const [label, sel] of [["s=1", "#ledger table"]]) {
+        const [t, e] = await page.$eval(sel, (t) => [Number(t.dataset.total), Number(t.dataset.eigen)]);
+        ledgerWorst = Math.max(ledgerWorst, Math.abs(t - e)); if (!(Math.abs(t - e) < 1e-10)) ledgerBad.push(`${n} ${label}`);
+      }
+      await setS(0.5);
+      await page.waitForFunction((n) => document.body.dataset.rendered === `${n}|0.5|`, n);
+      await page.$eval('[data-slider-level="0"]', (h) => h.dispatchEvent(new Event("click")));
+      await page.waitForFunction((n) => document.body.dataset.rendered === `${n}|0.5|0`, n);
+      const [t2, e2] = await page.$eval("#ledger table", (t) => [Number(t.dataset.total), Number(t.dataset.eigen)]);
+      ledgerWorst = Math.max(ledgerWorst, Math.abs(t2 - e2)); if (!(Math.abs(t2 - e2) < 1e-10)) ledgerBad.push(`${n} s=0.5`);
+      await setS(0);
+      await page.waitForFunction((n) => document.body.dataset.rendered === `${n}|0|`, n);
+      const got = (await page.$$eval("[data-slider-level]", (hs) => hs.map((h) => [Number(h.dataset.energy), Number(h.dataset.multiplicity)])))
+        .flatMap(([e, m]) => Array(m).fill(e)).sort((a, b) => a - b);
+      const c = CASES[n];
+      const want = c.basis.map((b) => ONSITE[`${c.geometry_angstrom[b.atom_index].element}|${b.type}`]).sort((a, b) => a - b);
+      const err = got.length === want.length ? Math.max(...got.map((g, i) => Math.abs(g - want[i]))) : Infinity;
+      s0worst = Math.max(s0worst, err); if (!(err < 1e-12)) s0bad.push(`${n} (${got.length} vs ${want.length} levels)`);
+      await setS(1);
+      await page.waitForFunction((n) => document.body.dataset.rendered === `${n}|1|`, n);
+    }
+    check("C4 slider: s = 0 end point equals the on-site table, every case (1e-12 eV)", s0bad.length === 0, s0bad.join("; ") || `max error ${s0worst.toExponential(2)}`);
+    check("C4 ledger: contacts + on-sites = eigenvalue at s = 1 and s = 0.5, every case (1e-10 eV)", ledgerBad.length === 0, ledgerBad.join("; ") || `max error ${ledgerWorst.toExponential(2)}`);
+    check("C4 counting bond orders equal CONVENTIONS A.5", boBad.length === 0, boBad.join("; ") || `${Object.keys(COUNTING).length} cases`);
     check("warm recompute under 100 ms (this machine, not the reference phone)", Math.max(...timings) < 100, `max ${Math.max(...timings).toFixed(1)} ms`);
 
     await pick(page, "SF6 model");

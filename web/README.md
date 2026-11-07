@@ -43,6 +43,7 @@ The approved layout (case rail, construction timeline, tabbed inspector) is the 
 - JSON export, re-import and rejection of an invalid file (failing field named); a share link opened in a new page; the 3D view painting;
 - the reading panel: N2's ordering disagreement and CO's note on its starred HOMO; Si2 keeps its element symbol in the column titles and compares spin only; Al2 shows its spin disagreement and its reading note;
 - the rail lists H2O and SF6 once each; the model/lecture toggle switches presets, is remembered, and hides for single-preset cases;
+- gate C4, on every case: the s = 0 end point equals the on-site table (1e−12 eV); the ledger identity holds at s = 1 and s = 0.5 (1e−10 eV); counting bond orders equal CONVENTIONS A.5;
 - Watch mode plays through; step jumps glide, and with reduced motion they do not;
 - the selected level's sketch card sits clear of bars and labels;
 - accessibility: every level is a named button and is listed in the screen-reader table; the inspector tabs answer to the arrow keys; Enter selects a focused level and keeps focus on it;
