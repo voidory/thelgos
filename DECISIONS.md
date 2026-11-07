@@ -253,6 +253,23 @@ The owner approved these defaults: the current molecules only; two question type
 - **Painting (D3).** Clicking an atom or one of its lobes cycles + → − → 0. The painted combination's energy, ledger, nodes and rule check follow. Its decomposition onto the set's levels (LGOs, or MOs for a whole-molecule set) shows "a true LGO/MO" when one level holds all the weight.
 - **Regression fixed.** Since the p functions on an atom were merged into one oriented lobe (design pass), a p lobe pointing at the viewer was always drawn red, because the merged size is positive and the sign is in the direction. So the allyl π orbitals lost their colours. The face-on lobe is now coloured by whether its positive end faces the viewer, and a browser check guards it.
 
+## Release 2, Milestone D: morph paths and Walsh plots, design choices (delegated, 2026-11-07)
+
+- **Paths built** (`engine/lgo_engine/morph.py`). Each passes through a worked case and reproduces it exactly there (tested to 1e−10 eV):
+  - water bending 90°–180°, for both presets;
+  - CH4 flattened from tetrahedral to square planar;
+  - the allyl chain closed into a ring;
+  - H2 + H → linear H3 → triangular H3+;
+  - the six-fluorine set → SF6, with the sulfur switched on;
+  - a central-orbital energy sweep, for the s or p orbital of H2O, CH4, BH3 and SF6.
+- **Not built yet.** BH3 → NH3 needs C3v group data and an NH3 fixture, so it waits for CONVENTIONS v1.5. The spec's literal "six H → SF6" would also change the ligand element (H s to F p); the six-fluorine → SF6 path keeps the ligands and switches on the central atom instead.
+- **Geometry paths and coupling paths.** Water and CH4 change geometry; the couplings follow from the same distance law. Allyl, H3 and SF6 switch contacts on, because in a tight-binding model bringing atoms into contact means switching their coupling on. Allyl and H3 use the full neighbour coupling at the end, so the ring and triangle endpoints are the textbook ε + 2t, ε − t, ε − t patterns.
+- **Labels along a path.** Each path is labelled in the symmetry it keeps throughout: water C2v, CH4 D2d, allyl C2v, SF6 Oh. The H3 assembly keeps none, so its frames are unlabelled (C1) except at the H3+ point.
+  - *Walsh plots:* the Hamiltonian is block-diagonalised by irrep, so different irreps may cross while the same irrep never does. Where there is no symmetry, levels are followed by overlap.
+  - *Exact degeneracies:* where a path produces one the group does not require (linear water's πu = a1 + b1 in C2v), the level is labelled "a1+b1" instead of being rejected.
+- **A morph frame is a finished diagram.** The construction slider and timeline are hidden during a morph. The Lecture/Model slider is hidden too, because the two cannot be combined.
+- **Model vs textbook: planar CH4.** In this model the occupied nonbonding orbital of planar CH4 is a hydrogen-only combination, at the H 1s energy, and C 2pz is the empty LUMO. Textbooks make C 2pz the occupied lone pair, because H–H repulsion (absent here, B5) raises the hydrogen combination. The path's note says so.
+
 ## B6. Sign-off (owner only)
 
 Not delegated. On 2026-11-06 the owner gave standing permission for Claude to apply the drafted changes. They are now in `CONVENTIONS.md` v1.3 and the spec, and the drafts in `drafts/` remain as the record. Applying them is not sign-off: v1.3 stays "not frozen" until the owner reviews it.

@@ -138,13 +138,22 @@ def approx_pair(params, name):
 
 
 def view(params, groups, name, s=1.0, level=None, conventions_sha256=None, extras=None, fragment=None,
-         electrons=None, approx=None, dial=0.0, lone_pair_angle=None, paint=None):
+         electrons=None, approx=None, dial=0.0, lone_pair_angle=None, paint=None, morph=None, morph_u=None):
     """Everything one screen needs: result, diagram, schedule, slider state and ledger.
 
     Release 2 dials: electrons (D6, electron stepper), approx (D2, 0 = lecture preset .. 1 = model
     preset, linear in the couplings that differ), dial (D4, rotation within a selected degenerate set)
     and lone_pair_angle (D5, water's nonbonding pair)."""
-    system = _system(params, name)
+    morph_info, Hmorph = None, None
+    if morph is not None:
+        # D1: a frame on a morph path. The path's builder gives the system and its Hamiltonian at morph_u.
+        from . import morph as morph_mod
+        Pm, system, Hmorph, mu = morph_mod.frame(params, morph, 0.0 if morph_u is None else morph_u)
+        name = Pm["case"]
+        morph_info = {"id": morph, "u": mu, "title": Pm["title"], "note": Pm["note"], "case_u": Pm["case_u"],
+                      "param": Pm["param"][0], "value": Pm["param"][1](mu), "at_case": abs(mu - Pm["case_u"]) < 1e-12}
+    else:
+        system = _system(params, name)
     default_electrons = system.electrons
     if electrons is not None:
         electrons = int(electrons)
@@ -159,9 +168,17 @@ def view(params, groups, name, s=1.0, level=None, conventions_sha256=None, extra
         approx = min(max(float(approx), 0.0), 1.0)
         Hl, Hm = (build_hamiltonian(_system(params, n), params) for n in pair)
         Happ = Hl + approx * (Hm - Hl)
+    if Hmorph is not None:
+        if approx is not None:
+            raise ValueError("approx and morph cannot be combined")
+        Happ = Hmorph
     result = run(system, params, groups, conventions_sha256, H=Happ)
     H = np.array(result["hamiltonian_eV"])
-    sched = build_schedule(system, Group(groups[system.group]) if system.group != "C1" else None, H)
+    if morph_info is not None:
+        s = 1.0   # a morph frame is a finished diagram at a point on the path, not a construction
+        sched = {"H0": H, "stages": [], "skipped": []}
+    else:
+        sched = build_schedule(system, Group(groups[system.group]) if system.group != "C1" else None, H)
     Hs = hamiltonian_at(sched, s)
     diagram = diagram_spec(system, H, result, groups, H_now=Hs, params=params)
     frag_vectors = diagram.pop("_fragment_vectors", {})
@@ -300,7 +317,7 @@ def view(params, groups, name, s=1.0, level=None, conventions_sha256=None, extra
                       "max": 2 * len(system.basis)},
         "approx": {"value": approx, "available": approx_pair(params, name) is not None},
         "dial": dial_info,
-        "nodes": nodes, "rule_check": rules, "paint": paint_out,
+        "nodes": nodes, "rule_check": rules, "paint": paint_out, "morph": morph_info,
         "paint_set": None if oset is None else {"atoms": oset["atoms"], "labels": [f"{system.atoms[i].element}{i + 1}" for i in oset["atoms"]],
                                                 "column": "molecular orbitals" if two_col else "ligand group orbitals"},
         "lone_pairs": views.lone_pairs(system, H, result, lone_pair_angle) if (lone_pair_angle is not None and name.startswith("H2O")) else None,
@@ -333,6 +350,16 @@ def exam_task(params, groups, name, kind="build"):
 def exam_check(params, groups, name, answers, kind="build"):
     exam, system, ctx, H, frags = _quiz_context(params, groups, name)
     return exam.check(system, params, ctx, H, frags, answers, kind)
+
+
+def morph_paths(params, case=None):
+    from . import morph as morph_mod
+    return morph_mod.path_list(params, case)
+
+
+def walsh(params, groups, path_id):
+    from . import morph as morph_mod
+    return morph_mod.walsh(params, groups, path_id)
 
 
 def export(params, groups, name, s=1.0, level=None, conventions_sha256=None):

@@ -449,6 +449,60 @@ class NodesRulesPainting(unittest.TestCase):
             api.view(P, G, "H3+", paint=[0, 0, 0])
 
 
+class MorphsAndWalsh(unittest.TestCase):
+    """Release 2, Milestone D: morph paths (D1) and correlation plots (F3.8)."""
+
+    def setUp(self):
+        from lgo_engine import app_api
+        self.api = app_api
+
+    def test_every_path_reproduces_its_case(self):
+        api = self.api
+        paths = api.morph_paths(P)
+        self.assertGreaterEqual(len(paths), 10)
+        for p in paths:
+            ref = [x["energy_eV"] for x in api.view(P, G, p["case"])["result"]["levels"]]
+            v = api.view(P, G, p["case"], morph=p["id"], morph_u=p["case_u"])
+            got = [x["energy_eV"] for x in v["result"]["levels"]]
+            np.testing.assert_allclose(got, ref, atol=1e-10, err_msg=p["id"])
+            self.assertTrue(v["morph"]["at_case"])
+            for u in np.linspace(0, 1, 6):
+                api.view(P, G, p["case"], morph=p["id"], morph_u=float(u))   # every frame runs
+
+    def test_walsh_tracking(self):
+        api = self.api
+        w = api.walsh(P, G, "H2O model: bend")
+        by = {}
+        for L in w["lines"]:
+            by.setdefault(L["irrep"], []).append(L)
+        for irrep, ls in by.items():   # the same irrep never crosses: rank order holds at every sample
+            ls.sort(key=lambda L: L["rank"])
+            for a, b in zip(ls, ls[1:]):
+                self.assertTrue(all(x <= y + 1e-12 for x, y in zip(a["energies"], b["energies"])), irrep)
+        ends = sorted((L["irrep"], L["energies"][-1]) for L in w["lines"])
+        b1 = [e for i, e in ends if i == "B1"][0]
+        self.assertTrue(any(i == "A1" and abs(e - b1) < 1e-9 for i, e in ends))   # 3a1 and 1b1 meet as the πu pair at 180°
+        e = np.array([L["energies"] for L in api.walsh(P, G, "H3+: assemble")["lines"]])
+        gaps = np.sort(e, axis=0)[2] - np.sort(e, axis=0)[1]
+        self.assertLess(gaps[-1], 1e-9); self.assertTrue(np.all(gaps[:-1] > 1e-6))   # e' degenerate only as a triangle
+
+    def test_path_endpoints(self):
+        api = self.api
+        t = api.run(api._system(P, "allyl cation pi"), P, G)["hamiltonian_eV"][0][1]
+        ec = P.onsite_energy("C", "p")
+        got = [x["energy_eV"] for x in api.view(P, G, "allyl cation pi", morph="allyl cation pi: close the ring", morph_u=1)["result"]["levels"]]
+        np.testing.assert_allclose(got, [ec + 2 * t, ec - t], atol=1e-10)
+        v = api.view(P, G, "CH4", morph="CH4: flatten", morph_u=1)
+        lv = v["result"]["levels"]
+        pz = [x for x in lv if abs(x["energy_eV"] - P.onsite_energy("C", "p")) < 1e-9]
+        hh = [x for x in lv if abs(x["energy_eV"] - P.onsite_energy("H", "s")) < 1e-9]
+        self.assertEqual(len(pz), 1); self.assertEqual(len(hh), 1)   # planar: nonbonding C 2pz and a nonbonding H combination
+        self.assertEqual(lv[v["result"]["frontier"]["HOMO"]]["energy_eV"], hh[0]["energy_eV"])   # model: H one occupied (no H–H coupling)
+        w = api.walsh(P, G, "SF6 model: insert sulfur")
+        eg = [L for L in w["lines"] if L["irrep"] == "Eg"][0]["energies"]
+        self.assertLess(max(eg) - min(eg), 1e-9)   # the eg LGOs have no sulfur partner and stay put
+
+
 class PracticeAndExam(unittest.TestCase):
     """Release 2, Milestone B: questions are generated and checked in the engine, against the Miessler levels (M8)."""
 

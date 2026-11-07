@@ -312,6 +312,34 @@ const check = (name, ok, detail = "") => { results.push({ name, ok, detail }); c
     const speed = await page.textContent("#speed-out");
     check("D10 speed test runs every case and reports the warm budget", /Warm full update/.test(speed) && /Budget/.test(speed), speed.split("\n")[5]);
 
+    // ---- Release 2, Milestone D: morph paths (D1) and the Walsh plot (F3.8). ----
+    await pick(page, "H2O model");
+    await page.waitForFunction(() => document.body.dataset.rendered === "H2O model|1|");
+    await page.waitForFunction(() => document.querySelectorAll("#morph-path option").length > 1);
+    await page.selectOption("#morph-path", "H2O model: bend");
+    await page.waitForFunction(() => JSON.parse(document.body.dataset.dials).morph !== null && document.querySelectorAll("#walsh .wl").length > 0);
+    const atCase = await page.$$eval("[data-mo]", (h) => h.map((x) => Number(x.dataset.energy)));
+    const caseErr = Math.max(...atCase.map((g, i) => Math.abs(g - REF["H2O model"][i].energy_eV)));
+    const approxHidden = await page.$eval("#approx-box", (b) => b.hidden);
+    await page.$eval("#morph-u", (x) => { x.value = 1000; x.dispatchEvent(new Event("input")); });
+    await page.waitForFunction(() => JSON.parse(document.body.dataset.dials).morph === 1);
+    const linear = await page.textContent("#morph-val");
+    const walshLabels = await page.$$eval("#walsh .wlabel", (t) => t.length);
+    check("D1/F3.8 water bend: opens at the H2O case point (equal to the fixture), slides to 180°, Walsh plot labelled by irrep",
+          caseErr < 1e-9 && linear.includes("180.0°") && walshLabels === 6 && approxHidden, `case error ${caseErr.toExponential(1)}; ${linear}`);
+    await pick(page, "H3+");
+    await page.waitForFunction(() => document.body.dataset.rendered === "H3+|1|" && document.querySelectorAll("#morph-path option").length > 1);
+    await page.selectOption("#morph-path", "H3+: assemble");
+    await page.waitForFunction(() => JSON.parse(document.body.dataset.dials).morph === 1);
+    const h3end = await page.$$eval("[data-mo]", (h) => h.map((x) => Number(x.dataset.energy)));
+    await page.$eval("#morph-u", (x) => { x.value = 500; x.dispatchEvent(new Event("input")); });
+    await page.waitForFunction(() => JSON.parse(document.body.dataset.dials).morph === 0.5);
+    const chain = await page.$$eval("[data-mo]", (h) => h.length);
+    check("D1 H2 + H → H3+: ends exactly at the H3+ case; at the midpoint (linear H3) the e′ pair is split",
+          Math.max(...h3end.map((g, i) => Math.abs(g - REF["H3+"][i].energy_eV))) < 1e-9 && chain === 3, `${chain} levels mid-path`);
+    await page.selectOption("#morph-path", "");
+    await page.waitForFunction(() => JSON.parse(document.body.dataset.dials).morph === null);
+
     // ---- Release 2, Milestone C: node markers (L5), rule check (L4), phase painting (D3). ----
     await pick(page, "allyl cation pi");
     await page.waitForFunction(() => document.body.dataset.rendered === "allyl cation pi|1|");

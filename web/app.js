@@ -18,7 +18,7 @@ const call = (cmd, args) => new Promise((resolve, reject) => {
 const $ = (id) => document.getElementById(id);
 const NS = "http://www.w3.org/2000/svg";
 const state = { case: null, s: 1, level: null, fragment: null, view: null, info: null, watching: false,
-  electrons: null, approx: null, dial: 0, lp: 0, paint: null };
+  electrons: null, approx: null, dial: 0, lp: 0, paint: null, morph: null };
 
 function el(tag, attrs = {}, text) {
   const e = document.createElementNS(NS, tag);
@@ -496,7 +496,7 @@ function dials(view) {
   const ap = $("approx");
   if (ap) {
     const c = caseInfo(view.case);
-    const show = view.approx.available;
+    const show = view.approx.available && !view.morph;
     $("approx-box").hidden = !show;
     if (show) ap.value = Math.round(100 * (view.approx.value ?? (c && c.variant === "lecture" ? 0 : 1)));
   }
@@ -809,6 +809,95 @@ function paintPanel(view) {
   box.dataset.pure = P.pure;
 }
 
+// ---- Milestone D: morph paths (D1) and the correlation (Walsh) plot (F3.8). ----
+const walshCache = {};
+async function morphMenu() {
+  const sel = $("morph-path"); if (!sel || !state.case) return;
+  const paths = await call("morph_paths", { case: state.case });
+  sel.replaceChildren(new Option("— none —", ""), ...paths.map((p) => new Option(p.title, p.id)));
+  sel.value = state.morph ? state.morph.id : "";
+  $("morphbar").hidden = paths.length === 0;
+  morphPaths = Object.fromEntries(paths.map((p) => [p.id, p]));
+}
+let morphPaths = {};
+function morphUpdate(view) {
+  const M = view.morph;
+  document.body.toggleAttribute("data-morph", !!M);
+  $("morph-ctl").hidden = !M;
+  $("walshbox").hidden = !M;
+  if (!M) return;
+  $("morph-u").value = Math.round(1000 * M.u);
+  $("morph-val").textContent = `${M.param}: ${M.value}${M.at_case ? ` (the ${view.case} case)` : ""}`;
+  $("morph-case").hidden = M.at_case;
+  $("walsh-note").textContent = M.note;
+  const W = walshCache[M.id];
+  if (W) drawWalsh(W, M.u, view);
+  else call("walsh", { path: M.id }).then((w) => { walshCache[M.id] = w; if (state.morph && state.morph.id === M.id) drawWalsh(w, state.morph.u, state.view); });
+}
+function drawWalsh(W, u, view) {
+  const svg = $("walsh"); svg.replaceChildren();
+  const Wd = 640, Ht = 320, L = 52, R = 70, T = 14, B = 40;
+  svg.setAttribute("viewBox", `0 0 ${Wd} ${Ht}`);
+  const all = W.lines.flatMap((l) => l.energies);
+  let lo = Math.min(...all), hi = Math.max(...all); const pad = (hi - lo) * 0.05 || 1; lo -= pad; hi += pad;
+  const X = (x) => L + x * (Wd - L - R), Y = (e) => T + (hi - e) / (hi - lo) * (Ht - T - B);
+  svg.append(el("line", { x1: L, x2: L, y1: T, y2: Ht - B, class: "axis-line" }));
+  svg.append(el("line", { x1: L, x2: Wd - R, y1: Ht - B, y2: Ht - B, class: "axis-line" }));
+  const step = hi - lo > 60 ? 10 : 5;
+  for (let e = Math.ceil(lo / step) * step; e <= hi; e += step) {
+    svg.append(el("line", { x1: L - 4, x2: L, y1: Y(e), y2: Y(e), class: "axis-line" }));
+    svg.append(el("text", { x: L - 7, y: Y(e) + 4, "text-anchor": "end", class: "axis-num" }, String(e).replace("-", "−")));
+  }
+  W.labels.forEach((t, i) => svg.append(el("text", { x: X(i / 2), y: Ht - B + 16, "text-anchor": i === 0 ? "start" : i === 2 ? "end" : "middle", class: "axis-num" }, t)));
+  svg.append(el("text", { x: (L + Wd - R) / 2, y: Ht - 6, "text-anchor": "middle", class: "axis-title" }, W.param));
+  // Occupation along the path: fill electrons into the levels in energy order at each sample.
+  const n = W.u.length, occ = W.lines.map(() => Array(n).fill(0));
+  for (let k = 0; k < n; k++) {
+    let left = (view && view.electrons ? view.electrons.count : W.electrons);
+    W.lines.map((l, i) => [l.energies[k], i]).sort((a, b) => a[0] - b[0]).forEach(([, i]) => {
+      const cap = 2 * W.lines[i].multiplicity, put = Math.min(cap, Math.max(left, 0)); occ[i][k] = put; left -= put;
+    });
+  }
+  W.lines.forEach((l, i) => {
+    for (let k = 0; k < n - 1; k++) {
+      svg.append(el("line", { x1: X(W.u[k]), y1: Y(l.energies[k]), x2: X(W.u[k + 1]), y2: Y(l.energies[k + 1]),
+                              class: occ[i][k] > 0 ? "wl occ" : "wl", "data-line": i }));
+    }
+  });
+  // End labels, spread apart where levels end together (e.g. 2a1 and 1b1 meeting as πu at 180°).
+  const ends = W.lines.map((l, i) => ({ i, y: Y(l.energies[n - 1]), l })).sort((a, b) => a.y - b.y);
+  for (let it = 0; it < 30; it++) {
+    let moved = false;
+    for (let k = 1; k < ends.length; k++) {
+      const need = 14 - (ends[k].ly ?? ends[k].y) + (ends[k - 1].ly ?? ends[k - 1].y);
+      if (need > 0) { ends[k - 1].ly = (ends[k - 1].ly ?? ends[k - 1].y) - need / 2; ends[k].ly = (ends[k].ly ?? ends[k].y) + need / 2; moved = true; }
+    }
+    if (!moved) break;
+  }
+  for (const e of ends) {
+    const ly = e.ly ?? e.y;
+    if (Math.abs(ly - e.y) > 1) svg.append(el("polyline", { points: `${Wd - R + 1},${e.y} ${Wd - R + 4},${ly}`, class: "leader" }));
+    const lab = e.l.irrep ? labelParts({ irrep: e.l.irrep }, { number: false }) : [[`ψ${e.i + 1}`, "base"]];
+    svg.append(richText(lab, { x: Wd - R + 6, y: ly + 4, class: "wlabel" }));
+  }
+  const cx = X(W.case_u);
+  svg.append(el("line", { x1: cx, x2: cx, y1: T, y2: Ht - B, class: "wcase" }));
+  svg.append(el("text", { x: cx + 3, y: T + 10, class: "wcase-t" }, "case"));
+  const ux = X(u);
+  svg.append(el("line", { x1: ux, x2: ux, y1: T, y2: Ht - B, class: "wnow" }));
+  const hit = el("rect", { x: L, y: T, width: Wd - L - R, height: Ht - T - B, fill: "transparent", class: "whit" });
+  hit.addEventListener("click", (e) => {
+    const r = svg.getBoundingClientRect(), xv = (e.clientX - r.left) / r.width * Wd;
+    setMorph(state.morph.id, Math.min(Math.max((xv - L) / (Wd - L - R), 0), 1));
+  });
+  svg.append(hit);
+}
+function setMorph(id, u) {
+  glideToken++;
+  state.morph = id ? { id, u } : null; state.level = null; state.fragment = null; state.paint = null; state.approx = null;
+  refresh();
+}
+
 function bonds(view) {
   const bo = view.result.bond_orders;
   const c = bo.counting, dm = bo.density_matrix;
@@ -860,15 +949,16 @@ let latest = 0;
 async function refresh() {
   const mine = ++latest;
   const view = await call("view", { case: state.case, s: state.s, level: state.level, fragment: state.fragment, electrons: state.electrons,
-    approx: state.approx, dial: state.dial, lone_pair_angle: state.case && state.case.startsWith("H2O") ? state.lp : null, paint: state.paint });
+    approx: state.approx, dial: state.dial, lone_pair_angle: state.case && state.case.startsWith("H2O") ? state.lp : null, paint: state.paint,
+    morph: state.morph ? state.morph.id : null, morph_u: state.morph ? state.morph.u : null });
   if (mine !== latest) return state.view;  // a newer request superseded this one
   state.view = view;
-  draw(view); levelTable(view); narrate(view); ledger(view); bonds(view); pes(view); dials(view); ruleCheck(view); paintPanel(view); banner(view); about(view);
+  draw(view); levelTable(view); narrate(view); ledger(view); bonds(view); pes(view); dials(view); ruleCheck(view); paintPanel(view); morphUpdate(view); banner(view); about(view);
   structure(view); matching(view); slotBadges(view);
   if (proposal) proposalUpdate(view);
   if ($("t-3d").checked) view3d.render(view);
   document.body.dataset.computeMs = view.compute_ms.toFixed(1);
-  document.body.dataset.dials = JSON.stringify({ electrons: view.electrons.count, approx: view.approx.value, dial: view.dial ? view.dial.angle_deg : null, lp: view.lone_pairs ? view.lone_pairs.angle_deg : null, paint: view.paint ? view.paint.signs : null });
+  document.body.dataset.dials = JSON.stringify({ electrons: view.electrons.count, approx: view.approx.value, dial: view.dial ? view.dial.angle_deg : null, lp: view.lone_pairs ? view.lone_pairs.angle_deg : null, paint: view.paint ? view.paint.signs : null, morph: view.morph ? view.morph.u : null });
   document.body.dataset.rendered = `${view.case}|${view.schedule.s}|${view.ledger ? (view.ledger.fragment ?? view.ledger.level) : ""}`;
   return view;
 }
@@ -1450,7 +1540,7 @@ function proposalUpdate(view) {
     state.case = cases.find((c) => c.name === "SF6 model").name;
     if (await fromLink()) $("s").value = state.s;
     sel.value = state.case;
-    sel.addEventListener("change", () => { if (quiz.mode !== "explore") { state.case = sel.value; state.level = null; state.fragment = null; state.electrons = null; state.approx = null; refresh(); newAttempt(); return; } glideToken++; state.case = sel.value; state.level = null; state.fragment = null; state.electrons = null; state.approx = null; state.dial = 0; state.lp = 0; state.paint = null; state.s = 1; $("s").value = 1; refresh(); });
+    sel.addEventListener("change", () => { if (quiz.mode !== "explore") { state.case = sel.value; state.level = null; state.fragment = null; state.electrons = null; state.approx = null; refresh(); newAttempt(); return; } glideToken++; state.case = sel.value; state.level = null; state.fragment = null; state.electrons = null; state.approx = null; state.dial = 0; state.lp = 0; state.paint = null; state.morph = null; morphMenu(); state.s = 1; $("s").value = 1; refresh(); });
     $("s").addEventListener("input", () => { glideToken++; state.s = Number($("s").value); state.level = null; state.fragment = null; refresh(); });
     $("whyjump").addEventListener("click", () => {
       const o = state.view.origins[state.level];
@@ -1477,6 +1567,11 @@ function proposalUpdate(view) {
     $("dial").addEventListener("input", (e) => { state.dial = Number(e.target.value); refresh(); });
     $("lpdial").addEventListener("input", (e) => { state.lp = Number(e.target.value); refresh(); });
     $("t-symonly").addEventListener("change", () => draw(state.view));
+    $("morph-path").addEventListener("change", (e) => {
+      const id = e.target.value; setMorph(id || null, id ? morphPaths[id].case_u : 0);
+    });
+    $("morph-u").addEventListener("input", (e) => setMorph(state.morph.id, Number(e.target.value) / 1000));
+    $("morph-case").addEventListener("click", () => setMorph(state.morph.id, morphPaths[state.morph.id].case_u));
     $("paint-toggle").addEventListener("click", () => {
       state.paint = state.paint ? null : state.view.paint_set.atoms.map(() => 1);
       state.level = null; state.fragment = null; refresh();
@@ -1492,6 +1587,7 @@ function proposalUpdate(view) {
     for (const id of ["t-mixing", "t-allowed", "t-irreps"]) $(id).addEventListener("change", () => draw(state.view));
     for (const id of ["case", "s", "watch"]) $(id).disabled = false;
     await refresh();
+    await morphMenu();
     document.body.dataset.ready = "1";
   } catch (e) {
     $("banner").textContent = `Engine failed to load: ${e.message}`;

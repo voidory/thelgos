@@ -205,3 +205,22 @@ body[data-mode="practice"] .timeline, body[data-mode="exam"] .timeline { display
 .decomp li { position: relative; padding: 2px 6px; margin: 2px 0; z-index: 0; }
 .decomp .bar { position: absolute; left: 0; top: 0; bottom: 0; background: var(--accent-soft); z-index: -1; border-radius: 4px; }
 #structure text { pointer-events: none; }
+
+/* Milestone D: morph bar and correlation plot. */
+.morphbar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 0 0 8px; font-size: 0.85rem; }
+.morphbar select { font: inherit; padding: 3px 6px; border: 1px solid var(--rule); border-radius: 6px; background: var(--panel); color: var(--fg); max-width: 100%; }
+.morphbar #morph-ctl { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.morphbar #morph-ctl[hidden] { display: none; }
+.morphbar input[type=range] { width: 220px; max-width: 60vw; }
+.walshbox { margin-top: 10px; }
+#walsh { width: 100%; height: auto; display: block; background: var(--panel); border: 1px solid var(--rule); border-radius: 10px; }
+#walsh .wl { stroke: var(--allowed); stroke-width: 1.5; }
+#walsh .wl.occ { stroke: var(--fg); stroke-width: 2.5; }
+#walsh .wlabel { font-family: "STIX Two Text", serif; font-size: 14px; fill: var(--fg); }
+#walsh .wcase { stroke: var(--accent); stroke-dasharray: 3 3; }
+#walsh .wcase-t { font-size: 10px; fill: var(--accent); }
+#walsh .wnow { stroke: var(--warn); stroke-width: 2; }
+#walsh .whit { cursor: crosshair; }
+#walsh .axis-num, #walsh .axis-title { font-size: 11px; fill: var(--muted); }
+body[data-morph] .timeline, body[data-morph] #narration, body[data-morph] #badges { display: none !important; }
+#walsh .leader { stroke: var(--muted); stroke-width: 0.7; fill: none; }

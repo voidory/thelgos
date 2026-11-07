@@ -60,8 +60,8 @@ def label_levels(system, group, H, c, levels):
         if n[best] / len(ix) > 0.999:
             labels.append(best)
             continue
-        if not system.linear:
-            raise AssertionError(f"{system.name}: level is not a clean irrep: {n}")
+        # A level spanning several irreps with integer counts is a degeneracy the group does not require
+        # (linear molecules in a finite subgroup, or a geometry on a morph path such as linear water).
         if any(abs(x - round(x)) > 1e-3 for x in n.values()) or abs(sum(n.values()) - len(ix)) > 1e-6:
             raise AssertionError(f"{system.name}: non-integer irrep decomposition {n}")
         labels.append("+".join(sorted(l for l, x in n.items() if x > 0.5)))

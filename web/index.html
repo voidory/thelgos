@@ -44,8 +44,21 @@
     </div>
   </section>
   <section class="diagram" aria-label="Molecular-orbital diagram">
+    <div id="morphbar" class="morphbar" hidden>
+      <label for="morph-path">Morph</label>
+      <select id="morph-path"><option value="">— none —</option></select>
+      <span id="morph-ctl" hidden>
+        <input type="range" id="morph-u" min="0" max="1000" step="1" aria-label="Position along the morph path">
+        <output id="morph-val"></output>
+        <button type="button" id="morph-case" class="linkish">back to the case</button>
+      </span>
+    </div>
     <svg id="diagram" role="group" aria-label="MO diagram: each molecular-orbital level is a button; the table after it lists every level"></svg>
     <div id="levels-sr" class="sr-only"></div>
+    <section id="walshbox" class="walshbox" hidden aria-label="Correlation plot">
+      <svg id="walsh" role="img" aria-label="Level energies along the morph path"></svg>
+      <p id="walsh-note" class="muted-text"></p>
+    </section>
     <section class="about" aria-label="About this diagram">
       <h2>About this diagram</h2>
       <p id="explanation" class="explanation"></p>
