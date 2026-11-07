@@ -176,6 +176,12 @@ Each entry in `levels` needs `irrep`, `energy`, `multiplicity`, `canonical_level
 - *Hashes.* `scripts/generate_groups.py` `f83619123284a30c859476ca949ac0d48f55c09f8d5e2699d77c310f0bf4b0cb` → `fdafd8eea4285f02d6b32061a68c2f23bd82442804c0ac2f55c81b6a2727a35c`. `scripts/check_release1.py` `a056eb0b7204892809a5b7477b07d0c14e309de8407e7c82115fe09cd82e0cf8` → `f289e20c4c7cca59064a8b92195c20b591f4a7a34ebff33f004b84e387ce1795`.
 - *Regenerated.* The new files are `groups/C3v.json` and `checks/bilbao_C3v.json`. In `checks/`, new fixtures are additions only, and `preset_schema_validation.json` has the new preset count; no existing value changed. `evidence/reference_spectra.json` gains the nine new fixtures; the 23 existing entries are kept as committed. They differ from a fresh run by at most 1.4e−14 eV, within the 1e−9 comparison, because they predate K20.
 
+**K22. CONVENTIONS v1.6: universal-law channel defaults** (2026-11-07, on the owner's acceptance of `drafts/CONVENTIONS-v1.6-draft.md`).
+- *Lookup.* In `scripts/parameters.py`, a default applies only to an element pair with no row at all in `pairs.csv`, and only when both elements have on-sites. The H default is used when the pair contains H. A pair with rows keeps the rule that a missing channel is an error, so K3's O–H pp_pi still raises.
+- *Tests.* K16's absent element moves from Ne, which v1.6 adds to the on-site table, to Kr, which is outside it. New assertions: C–Cl sp at 1.7854 Å equals 1.84·7.62/d², and Cl–H ss carries the 0.6 factor.
+- *Hashes.* `scripts/parameters.py` `06e81bc116861ca8f839ed69acf21454b26e55861e86ec658cb44f96abd65ab5` → `c75c66d99962f07c7fbfbce657143bf5dc4a403bee3570e856a352d02f5a4946`. `scripts/check_release1.py` `f289e20c4c7cca59064a8b92195c20b591f4a7a34ebff33f004b84e387ce1795` → `4a298d8d4d68a3e449d46b08d23970e0e36103315d7c6065f225c12b0202c671`.
+- *Regenerated.* `groups/` and `checks/` regenerate byte-identical: no fixture uses a default.
+
 ## Verification
 
 **Environment.** `requirements-checker.lock` was installed with `--require-hashes` into `.venv` (CPython 3.12.3), and `pip check` passed. This is not the README's 3.12.8 host and not the production 3.12.7.

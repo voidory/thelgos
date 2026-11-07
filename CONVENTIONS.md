@@ -1,6 +1,6 @@
 # CONVENTIONS.md — LGO Method Explorer
 
-**Version: 1.5 — FROZEN (owner sign-off B7, 2026-11-07)**  
+**Version: 1.6 — not frozen (applied 2026-11-07 on the owner's acceptance of `drafts/CONVENTIONS-v1.6-draft.md`; owner sign-off B8 of this text pending)**  
 **Owner / change authority: the project owner**  
 **Date: 2026-11-07, Singapore**  
 **Release 1 blockers: none. CrystOD comparison deferred until the programme is finished (B1). Diatomic fixtures (periods 2 and 3) and browser acceptance tests (C4) in place. v1.5 adds C3v, NH3, H2S, SiH4 and the hydrides NH, OH, HF.**
@@ -179,8 +179,17 @@ The contact ledger counts each unordered real-basis off-diagonal pair once with 
 | P (n=3) | −18.84 | −9.65 |
 | S (n=3) | −22.71 | −11.62 |
 | Cl (n=3) | −25.23 | −13.67 |
+| He (n=1) | −24.59 | absent |
+| Li (n=2) | −5.39 | not listed |
+| Be (n=2) | −9.32 | not listed |
+| Ne (n=2) | −48.47 | −21.59 |
+| Na (n=3) | −5.14 | not listed |
+| Mg (n=3) | −7.65 | not listed |
+| Ar (n=3) | −29.24 | −15.82 |
+| K (n=4) | −4.34 | not listed |
+| Ca (n=4) | −6.11 | not listed |
 
-All p directions share the p on-site. No main-group d parameters. Nitrogen was added by owner decision B4. *v1.5 erratum (V1):* the table signed in v1.4 still showed the earlier Harrison composite for B, C, N, O and S and omitted Al, Si, P and Cl; the values above are the ones in `params/onsite.csv`, which every result used. No computed value changed.
+All p directions share the p on-site. No main-group d parameters. Nitrogen was added by owner decision B4. *v1.5 erratum (V1):* the table signed in v1.4 still showed the earlier Harrison composite for B, C, N, O and S and omitted Al, Si, P and Cl; the values above are the ones in `params/onsite.csv`, which every result used. No computed value changed. *v1.6 (W1):* the rest of the same table (He to Ca) is added; the teaching table gives Li, Be, Na, Mg, K and Ca an s value only, so a molecule needing their p is "not built yet: element without parameters" (owner decision R3-1).
 
 ### 9.2 pairs.csv columns and lookup
 
@@ -198,7 +207,7 @@ All p directions share the p on-site. No main-group d parameters. Nitrogen was a
 - `source`: mandatory source URL or named decision provenance.
 - `override_reason`: mandatory for an override; H rows explicitly record extrapolation and pedagogical scaling.
 
-Precedence: **preset matrix-element override → element-pair/channel row → explicit channel default → error**. Defaults live in `params/channel_defaults.json`; the supplied default list is empty. A no-match lookup must raise an error, never silently return zero. Missing orbital channels are not requested; absence is not a fit to zero. Reverse-pair Hermiticity follows §1.
+Precedence: **preset matrix-element override → element-pair/channel row → explicit channel default → error**. Defaults live in `params/channel_defaults.json`. *v1.6 (W2, W3):* the defaults are Harrison's law for the four channels with the coefficients below, scale 0.6 when the pair contains H (s_carrier H) and 1 otherwise, the same rule as every H row. A default applies only to an element pair with no row at all in `pairs.csv`, and only when both elements have on-sites; a pair that has rows keeps the rule that a missing channel is an error (O–H has no pp_pi), and an element without on-sites still errors. Every pair that had a row keeps it, so no earlier value changes. A no-match lookup must raise an error, never silently return zero. Missing orbital channels are not requested; absence is not a fit to zero. Reverse-pair Hermiticity follows §1.
 
 For `harrison_inverse_square`, V=scale×eta×K/d². Coefficients remain ss=−1.40, sp=+1.84, pp sigma=+3.24, pp pi=−0.81: Harrison's 1980 book values as transcribed in `evidence/harrison.txt`. The same file lists a second set attributed to Shi & Papaconstantopoulos (2004), which is not used (DECISIONS.md M2). **All H-containing couplings extrapolate this scheme beyond the Harrison table's H coverage.** v1.5 adds Si–H ss and sp rows of the same form (V3). The 0.6 factor is a declared pedagogical correction, not a published coefficient or measured fit. The two strict ordering constraints are: BH3's empty pz (a2″) below the antibonding a1′ (lower bound); and in lecture water, the bonding 1b2 above the decoupled O 2s (upper bound). With the M7 on-sites they give 0.4234786093<sH<1.0312679542; with the earlier composite they gave 0.4914651002<sH<0.8938796155. Two further orderings hold at 0.6 and are kept on the owner's instruction to follow Miessler (DECISIONS.md B2): water's LUMO is 3a1*, below 2b2*, which holds for sH<0.666786; and CH4's LUMO is a1*, below t2*, which holds for sH<0.970429. Both are recorded as textbook orderings, from Miessler's figures as recalled, pending the owner's check against the book. They are not asserted by the checker. Together the four orderings allow 0.4235<sH<0.6668. B2 decided under delegation: 0.6 (DECISIONS.md). Because it was chosen to reproduce orderings, those orderings are not independent fidelity evidence. The audit reads the CSV rather than these prose numbers. The v1.5 molecules add no constraint: every ordering they show holds for any factor between 0.30 and 1.20, except NH3's two empty levels (a1* and e*), which swap near 0.80, outside the window.
 
@@ -267,6 +276,7 @@ Slides/aliases are nonblocking. Later d-channel parameters remain outside Releas
 | 1.4 | 2026-11-07 | Applied by Claude on the owner's decision M7: all on-sites from the Miessler teaching table (§9.1); couplings unchanged (Harrison η, H scale 0.6). Every fixture involving B, C, N, O, Si, P or S has new Appendix B values. Unchanged: the H-only sets, F2, Al2, Cl2. No qualitative result changed: orderings, spin agreements and counting bond orders are as before. H-scale window updated. Not frozen: owner sign-off B6 pending. |
 | 1.4 (frozen) | 2026-11-07 | Owner sign-off B6. Signed text: commit 81cf760, sha256 `ca861a1d6f47f5fe9962eb229a3fbdf4313c22ed2e83083dcfa8fdbe71b98d36`. No content change. |
 | 1.5 | 2026-11-07 | Applied on the owner's acceptance of `drafts/CONVENTIONS-v1.5-draft.md` ("accept v1.5 as recommended"; V5 as revised by the owner). V1 erratum (§9.1 table now the Miessler values in use); C3v (K21); NH3, H2S, SiH4, NH, OH, HF fixtures with CCCBDB geometries; Si–H rows; lecture presets for NH, OH, HF; A.3, A.5, A.6 and Appendix B rows. No earlier fixture's values changed. Not frozen: owner sign-off B7 pending. |
+| 1.6 | 2026-11-07 | Applied on the owner's acceptance of `drafts/CONVENTIONS-v1.6-draft.md` ("yes"). W1: on-site table completed from the same Miessler snapshot (He to Ca). W2/W3: universal-law channel defaults for element pairs with no row, both elements in the table (checker patch K22). No fixture value changes; `checks/` regenerate byte-identical. Not frozen: owner sign-off B8 pending. |
 | 1.5 (frozen) | 2026-11-07 | Owner sign-off B7. Signed text: commit 32d6376, sha256 `312ea75e7a92c46aadc24716ad4de8211b136223c15e1d402b42c4c3c2c7f62b`. No content change. |
 
 **A5 disposition:** the pairs.csv column specification is restored in §9.2. Exact legacy Appendix A.7 text was not present in the accessible attachments or earlier inline answer; it is not silently reconstructed as a quotation. The unknown legacy A.7 is **removed as an unrecoverable legacy section**, because its original content cannot be verified; it is replaced by the explicitly newly authored ledger/limit/invariance contract below. If the owner supplies the original, review whether it contains additional obligations before freezing. No claim that its exact old content has been recovered.

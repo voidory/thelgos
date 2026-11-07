@@ -1,6 +1,6 @@
 # CONVENTIONS v1.6 — draft for owner sign-off
 
-**Status: draft, not applied.** `CONVENTIONS.md` v1.5 stays frozen until the owner accepts this. Prepared 2026-11-07 by Claude during Release 3 Milestone A.
+**Status: accepted by the owner ("yes", 2026-11-07) and applied to `CONVENTIONS.md` v1.6.** This file is kept as the record of the proposal. Prepared 2026-11-07 by Claude during Release 3 Milestone A.
 
 ## One-page summary
 

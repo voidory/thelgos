@@ -704,6 +704,18 @@ class MoleculePacks(unittest.TestCase):
             app_api.view(P, G, pk["identity"]["name"])          # and the app view runs
             app_api.view(P, G, pk["identity"]["name"], s=0.5, level=0)
 
+    def test_v16_universal_defaults(self):
+        """CONVENTIONS v1.6 W2/W3: a pair with no row takes the universal law; rows and errors are unchanged."""
+        self.assertAlmostEqual(P.coupling("C", "Cl", "sp_sigma", 1.7854, "H2O_model"), 1.84 * 7.62 / 1.7854 ** 2, places=12)
+        self.assertAlmostEqual(P.coupling("Cl", "H", "ss_sigma", 1.0, "H2O_model"), -1.40 * 7.62 * 0.6, places=12)
+        with self.assertRaises(ValueError):
+            P.coupling("O", "H", "pp_pi", 1.0, "H2O_model")      # O-H has rows: a missing channel is still an error
+        with self.assertRaises(ValueError):
+            P.coupling("Kr", "Kr", "pp_pi", 1.0, "H2O_model")    # no on-site: still an error
+        self.assertEqual(P.onsite_energy("Ne", "p"), -21.59)
+        with self.assertRaises(ValueError):
+            P.onsite_energy("Mg", "p")                            # the table lists Mg 3s only
+
     def test_c1_fallback(self):
         v = app_api.view(P, G, "HOF", extras=__import__("load").load_extras())
         self.assertTrue(all(lv["irrep"] == "—" for lv in v["result"]["levels"]))
@@ -721,15 +733,17 @@ class MoleculePacks(unittest.TestCase):
         self.assertEqual(failed(wrong_group), ["geometry has the declared symmetry Td"])
         wrong_e = copy.deepcopy(bf3); wrong_e["id"] = "BF3e"; wrong_e["electrons"]["count"] = 8
         self.assertEqual(failed(wrong_e), ["electron count follows neutral-atom counting"])
-        ch3cl = {"schema_version": "1.0", "id": "CH3Cl", "identity": {"name": "CH3Cl test", "formula": "CH3Cl", "charge": 0},
-                 "template": "T3", "structure": {"shape": "AX3Y_C3v", "central": "C", "terminals": ["H", "H", "H", "Cl"],
-                 "bond_lengths_angstrom": [1.0900, 1.7854], "angle_degrees": 110.75, "source": "NIST CCCBDB, reference 1973Dun/McK"},
-                 "basis": {"central": "sp", "terminal": "sigma"}, "electrons": {"count": 8, "convention": "neutral_atom"},
-                 "group": {"declared": "C3v"}, "parameters": {"use": "scheme"}}
-        self.assertEqual(failed(ch3cl), ["parameters exist for every element, orbital and pair (R3-1)"])
-        reason = next(d for n, ok, d in packs.gate(P, G, ch3cl) if not ok)
-        self.assertIn("C-Cl", reason.replace("Cl-C", "C-Cl"))
-        P.presets.pop("pack:CH3Cl", None); P.presets.pop("pack:BF3x", None); P.presets.pop("pack:BF3e", None)
+        # R3-1: beryllium has an s on-site only, so a molecule needing Be 2p is refused, naming the missing parameter.
+        beh2 = {"schema_version": "1.0", "id": "BeH2", "identity": {"name": "BeH2 test", "formula": "BeH2", "charge": 0},
+                "template": "T1", "structure": {"shape": "AX2_bent", "central": "Be", "terminals": ["H", "H"],
+                "bond_lengths_angstrom": [1.33], "angle_degrees": 180, "source": "test input, not a sourced geometry"},
+                "basis": {"central": "sp", "terminal": "sigma"}, "electrons": {"count": 4, "convention": "neutral_atom"},
+                "group": {"declared": "D2h"}, "parameters": {"use": "scheme"}}
+        self.assertEqual(failed(beh2), ["parameters exist for every element, orbital and pair (R3-1)"])
+        reason = next(d for n, ok, d in packs.gate(P, G, beh2) if not ok)
+        self.assertIn("Be p", reason)
+        for k in ("pack:BeH2", "pack:BF3x", "pack:BF3e"):
+            P.presets.pop(k, None)
 
 
 class InspectorViews(unittest.TestCase):

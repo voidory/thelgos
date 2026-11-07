@@ -215,10 +215,14 @@ def run(data,out,groups,check_reference=True):
    rep['HOMO_carbon_weight']=wC
   diatomic_reports.append(rep)
  # Missing parameter lookups must error, not become zeros.
- # [K16] v1.2 used N-N as the absent element; N is now parameterised (decision B4), so neon stands in.
- try:P.get('Ne','Ne','pp_pi',1.,'H2_fixture')
+ # [K16] v1.2 used N-N as the absent element; N is now parameterised (decision B4), so neon stood in.
+ # [K22] v1.6 adds Ne to the on-site table, where the universal default applies, so krypton (outside the table) stands in.
+ try:P.get('Kr','Kr','pp_pi',1.,'H2_fixture')
  except ValueError:pass
  else:raise AssertionError('missing pair silently accepted')
+ # [K22] An element pair with no row and both elements in the table takes the universal law (C-Cl at 1.7854 A).
+ assert abs(P.get('C','Cl','sp_sigma',1.7854,'H2O_model')-1.84*7.62/1.7854**2)<1e-12
+ assert abs(P.get('Cl','H','ss_sigma',1.,'H2O_model')-(-1.4*7.62*0.6))<1e-12
  # [K3, revised in patch 3] An existing element pair with an absent channel: O-H has ss/sp rows but no pp_pi row.
  assert any(sorted([r['element_a'],r['element_b']])==['H','O'] for r in P.rows) and not any(sorted([r['element_a'],r['element_b']])==['H','O'] and r['channel']=='pp_pi' for r in P.rows),'K3 precondition: O-H rows exist without pp_pi'
  try:P.get('O','H','pp_pi',1.,'H2O_model')

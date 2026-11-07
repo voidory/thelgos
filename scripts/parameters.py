@@ -20,8 +20,10 @@ class Parameters:
    assert float(r['scale'])>0
  def onsite(self,e,o):return self.on[(e,o)]
  def get(self,a,b,ch,d,preset):
-  p=self.presets[preset];hits=[r for r in self.rows if sorted([r['element_a'],r['element_b']])==sorted([a,b]) and r['channel']==ch]
-  if not hits:hits=[r for r in self.defaults if r['channel']==ch]
+  p=self.presets[preset];rows=[r for r in self.rows if sorted([r['element_a'],r['element_b']])==sorted([a,b])];hits=[r for r in rows if r['channel']==ch]
+  # [K22] CONVENTIONS v1.6 W2/W3: universal-law default only for a pair with no row at all, both elements with on-sites;
+  # the H default when the pair contains H. A pair with rows keeps "missing channel is an error".
+  if not rows and a in {e for e,_ in self.on} and b in {e for e,_ in self.on}:hits=[r for r in self.defaults if r['channel']==ch and r['s_carrier']==('H' if 'H' in [a,b] else 'none')]
   if len(hits)!=1:raise ValueError(f'No unique pair/default row for {a}-{b} {ch}; absent is not zero')
   r=hits[0];law=r['distance_law'];scale=float(r['scale'])
   if r['s_carrier']=='H':

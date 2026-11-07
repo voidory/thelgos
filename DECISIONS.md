@@ -343,6 +343,13 @@ Built on top, the Release 2 items that waited for v1.5:
 
 `drafts/CONVENTIONS-v1.5-draft.md` proposes NH3, H2S and SiH4 (needed for the BH3 → NH3 morph and the H2O/H2S and CH4/SiH4 comparisons), the C3v group, Si–H rows, optional diatomic hydrides NH, OH and HF, and lecture presets that switch the central s–H coupling off (V5). It also records an erratum in signed v1.4. The frozen §9.1 table still shows the earlier Harrison composite values, although the text, `params/onsite.csv` and every result use Miessler; no computed number is affected. Nothing is applied until the owner signs off. The C3v group data and the new geometries come from fresh Bilbao and CCCBDB snapshots in `evidence/` (the Bilbao host was added to a new personal environment for this repository, with the owner's approval). The draft's numbers come from a scratch prototype with the unchanged engine.
 
+## CONVENTIONS v1.6 applied (2026-11-07); sign-off B8 of the applied text pending
+
+The owner accepted the v1.6 draft ("yes"). Applied:
+- W1: the Miessler on-site table completed from the same snapshot, He to Ca. Li, Be, Na, Mg, K and Ca have s only.
+- W2/W3: Harrison universal-law channel defaults for element pairs with no row, both elements in the table (checker patch K22).
+No fixture value changed; `checks/` and `groups/` regenerate byte-identical. The packs CH3Cl (C3v, inequivalent ligands) and HOCl (Cs, C1 fallback) now pass the gate and are in the app. The gate's negative test for R3-1 is now BeH2, because the table gives Be no 2p.
+
 ## Release 3, Milestone A: molecule packs, C1 fallback, consistency test (2026-11-07)
 
 - **Packs** (`packs/<id>.json`, schema `packs/pack.schema.json`, listed in `packs/index.json`). A pack gives:

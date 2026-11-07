@@ -28,8 +28,17 @@ class ParameterSet:
     def coupling(self, a, b, channel, d, preset):
         """Slater-Koster parameter V for an element pair and channel at distance d (Angstrom)."""
         p = self.presets[preset]
-        hits = [r for r in self.rows if sorted((r["element_a"], r["element_b"])) == sorted((a, b))
-                and r["channel"] == channel] or [r for r in self.defaults if r["channel"] == channel]
+        pair = sorted((a, b))
+        rows = [r for r in self.rows if sorted((r["element_a"], r["element_b"])) == pair]
+        hits = [r for r in rows if r["channel"] == channel]
+        if not rows:
+            # CONVENTIONS v1.6 section 9.2 (W2, W3): the universal-law default applies only to a pair with no row at
+            # all, both of whose elements have on-sites; the H default when the pair contains H. A pair with rows keeps
+            # the rule that a missing channel is an error (O-H has no pp_pi).
+            known = {e for e, _ in self.onsite}
+            if a in known and b in known:
+                carrier = "H" if "H" in (a, b) else "none"
+                hits = [r for r in self.defaults if r["channel"] == channel and r["s_carrier"] == carrier]
         if len(hits) != 1:
             raise ValueError(f"no unique pair/default row for {a}-{b} {channel}; absent is not zero")
         r = hits[0]

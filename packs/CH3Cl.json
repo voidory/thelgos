@@ -1,0 +1,60 @@
+{
+  "schema_version": "1.0",
+  "id": "CH3Cl",
+  "identity": {
+    "name": "CH3Cl",
+    "formula": "CH3Cl",
+    "charge": 0,
+    "smiles": "CCl",
+    "aliases": [
+      "chloromethane",
+      "methyl chloride"
+    ]
+  },
+  "template": "T3",
+  "structure": {
+    "shape": "AX3Y_C3v",
+    "central": "C",
+    "terminals": [
+      "H",
+      "H",
+      "H",
+      "Cl"
+    ],
+    "bond_lengths_angstrom": [
+      1.09,
+      1.7854
+    ],
+    "angle_degrees": 110.75,
+    "source": "NIST CCCBDB experimental geometry, reference 1973Dun/McK (r C–H 1.090 Å, r C–Cl 1.785 Å, Cartesian 1.7854 Å; angle H–C–H 110.75°)",
+    "evidence": "evidence/cccbdb_CH3Cl.html"
+  },
+  "basis": {
+    "central": "sp",
+    "terminal": "sigma"
+  },
+  "edges": {
+    "ligand_ligand": false
+  },
+  "electrons": {
+    "count": 8,
+    "convention": "neutral_atom"
+  },
+  "group": {
+    "declared": "C3v",
+    "source": "NIST CCCBDB (evidence/cccbdb_CH3Cl.html)"
+  },
+  "parameters": {
+    "use": "scheme"
+  },
+  "notes": [
+    {
+      "title": "Inequivalent ligands",
+      "text": "Three hydrogens and one chlorine: fix-and-flip pairing applies only within the set of three hydrogens, and the counting bond order assumes equivalent bonds, which these are not. The density-matrix bond orders, shown per bond, are the better guide here (spec section 3, flagged but drawn)."
+    },
+    {
+      "title": "σ only for chlorine",
+      "text": "Chlorine contributes one inward-pointing 3p σ orbital; its other 3p orbitals (lone pairs) are left out. The C–Cl coupling comes from the universal Harrison law (CONVENTIONS v1.6), as every coupling does."
+    }
+  ]
+}
