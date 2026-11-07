@@ -47,10 +47,12 @@ The approved layout (case rail, construction timeline, tabbed inspector) is the 
 - Watch mode plays through; step jumps glide, and with reduced motion they do not;
 - the selected level's sketch card sits clear of bars and labels;
 - accessibility: every level is a named button and is listed in the screen-reader table; the inspector tabs answer to the arrow keys; Enter selects a focused level and keeps focus on it;
+- the banner shows the CONVENTIONS version read from the file;
+- layout: the full diagram from 1024 px up, the phone geometry at 360 px, and nothing clipped or scrolling sideways;
 - there is no horizontal scroll at 360 px, and no page errors.
 
 `make check` does not run these, because they need the network.
 
 ## Not built yet
 
-The Release 2+ features (L4–L5, P4–P5, Practice and Exam modes, D1–D10), and from the design pass: highlighting ledger contacts in the 3D view, and pinning the timeline on phones.
+The Release 2+ features (L4–L5, P4–P5, Practice and Exam modes, D1–D10), from Release 1: the CH4 photoelectron-spectrum view and selecting ligand group orbitals or ledger contacts in the 3D view.

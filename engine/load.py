@@ -1,6 +1,7 @@
 """File loading for the engine (the only I/O layer). Reads params/ and groups/ from a bundle root."""
 import csv
 import hashlib
+import re
 import json
 from pathlib import Path
 
@@ -27,6 +28,16 @@ def load_groups(root=ROOT):
 
 def conventions_sha256(root=ROOT):
     return hashlib.sha256(Path(root, "CONVENTIONS.md").read_bytes()).hexdigest()
+
+
+def conventions_version(root=ROOT):
+    """The version and status line from CONVENTIONS.md's header, e.g. ("1.4", "not frozen")."""
+    head = Path(root, "CONVENTIONS.md").read_text().split("\n", 5)
+    for line in head:
+        m = re.match(r"\*\*Version: ([0-9.]+)\s*[—-]\s*(.*?)\*\*", line)
+        if m:
+            return m.group(1), ("frozen" if "NOT FROZEN" not in m.group(2).upper() else "not frozen")
+    return None, None
 
 
 def load_extras(root=ROOT):

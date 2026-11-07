@@ -4,8 +4,8 @@ The engine takes parameters and point-group tables as plain data and returns a
 JSON-serialisable Result. File loading lives outside the package (engine/load.py),
 so the same code runs under CPython and Pyodide.
 
-Status: provisional, built against CONVENTIONS v1.2 review candidate, which the owner
-has not yet signed off.
+Status: provisional. Built against CONVENTIONS.md as it stands (its header gives the version);
+the owner has not yet signed it off (B6).
 """
 from .model import Atom, BasisFunction, System
 from .params import ParameterSet

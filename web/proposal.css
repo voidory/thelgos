@@ -44,6 +44,15 @@ body.proposal .inspector h2 { font-size: 0.9rem; }
 body.proposal .about { background: var(--panel); border: 1px solid var(--rule); border-radius: 10px; padding: 4px 16px 10px; }
 body.proposal .badge { border-color: var(--accent); color: var(--accent); background: var(--accent-soft); }
 body.proposal .badge .kind { color: inherit; opacity: 0.8; }
+/* Mid-size screens: keep the diagram at least ~600 px wide so it uses the full layout, not the phone one.
+   1180-1279 px: narrower rail and inspector. 901-1179 px: inspector moves below the diagram. */
+@media (max-width: 1279px) and (min-width: 1180px) {
+  body.proposal main { grid-template-columns: 180px minmax(0, 1fr) 320px; gap: 14px; padding: 14px 16px; }
+}
+@media (max-width: 1179px) and (min-width: 901px) {
+  body.proposal main { grid-template-columns: 180px minmax(0, 1fr); grid-template-areas: "rail stage" "rail inspector"; padding: 14px 16px; }
+  body.proposal .inspector { position: static; }
+}
 @media (max-width: 900px) {
   body.proposal main { grid-template-columns: minmax(0, 1fr); grid-template-areas: "rail" "stage" "inspector"; padding: 10px 12px; }
   body.proposal .inspector { position: static; }
@@ -51,6 +60,11 @@ body.proposal .badge .kind { color: inherit; opacity: 0.8; }
   body.proposal .rail h2 { display: none; }
   body.proposal .rail button.case { white-space: nowrap; width: auto; border: 1px solid var(--rule); }
   body.proposal header { flex-direction: column; gap: 2px; }
+  /* Phones: the construction timeline stays on screen while the diagram scrolls under it. */
+  body.proposal .timeline { position: sticky; top: 0; z-index: 5; box-shadow: 0 2px 6px rgba(0,0,0,0.08); }
+  body.proposal .timeline > div { min-width: 0; }
+  body.proposal .timeline .steps { flex-wrap: nowrap; overflow-x: auto; }
+  body.proposal .timeline .step { white-space: nowrap; }
 }
 
 /* ---- MO diagram typography and marks (design pass) ---- */

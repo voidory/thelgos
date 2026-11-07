@@ -248,6 +248,20 @@ const check = (name, ok, detail = "") => { results.push({ name, ok, detail }); c
     const after = await page.$eval("#s", (s) => Number(s.value));
     check("Watch mode plays to the finished diagram", after === 1);
 
+    // Banner shows the CONVENTIONS version read from the file, not a hard-coded one.
+    const convVer = fs.readFileSync(path.join(ROOT, "CONVENTIONS.md"), "utf8").match(/\*\*Version: ([0-9.]+)/)[1];
+    const banner = await page.textContent("#banner");
+    check("banner shows the current CONVENTIONS version", banner.includes(`CONVENTIONS v${convVer},`), banner.split("·").slice(-1)[0].trim());
+    // Layout: the full diagram (not the phone geometry) from 900 px up, and nothing clipped at any width.
+    const layout = [];
+    for (const w of [360, 1024, 1200, 1440]) {
+      await page.setViewportSize({ width: w, height: 900 });
+      await page.waitForTimeout(350);
+      layout.push(await page.evaluate((w) => { const s = document.querySelector("#diagram"); const vb = s.viewBox.baseVal; const bb = s.getBBox();
+        return { w, compact: s.classList.contains("compact"), clipped: bb.x < vb.x - 0.5 || bb.x + bb.width > vb.x + vb.width + 0.5, scroll: document.scrollingElement.scrollWidth > w }; }, w));
+    }
+    check("layout: full diagram from 1024 px up, phone geometry at 360 px, nothing clipped or scrolling sideways",
+          layout.every((l) => l.compact === (l.w < 900) && !l.clipped && !l.scroll), JSON.stringify(layout.filter((l) => l.compact !== (l.w < 900) || l.clipped || l.scroll)));
     await page.setViewportSize({ width: 360, height: 800 });
     await page.waitForTimeout(300);
     const sw = await page.evaluate(() => document.scrollingElement.scrollWidth);

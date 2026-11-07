@@ -28,12 +28,12 @@ const ready = (async () => {
   py.runPython(`
 import sys, json
 sys.path[:0] = ["/bundle/engine"]
-from load import load_params, load_groups, conventions_sha256, load_extras
+from load import load_params, load_groups, conventions_sha256, conventions_version, load_extras
 from lgo_engine import app_api, __version__
 P = load_params("/bundle"); G = load_groups("/bundle"); CSHA = conventions_sha256("/bundle"); X = load_extras("/bundle")
 `);
   return { load_ms: performance.now() - t0, version: py.runPython("__version__"),
-           python: py.runPython("sys.version.split()[0]"), numpy: py.runPython("import numpy; numpy.__version__") };
+           python: py.runPython("sys.version.split()[0]"), conventions: JSON.parse(py.runPython("json.dumps(conventions_version('/bundle'))")), numpy: py.runPython("import numpy; numpy.__version__") };
 })();
 
 self.onmessage = async (ev) => {

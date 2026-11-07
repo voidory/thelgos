@@ -30,7 +30,7 @@
 
 1. **Label placement:** done (pixel-proximity rows and gutter collision avoidance).
 2. **Orbital sketch:** done, as a single card for the *selected* level rather than a thumbnail on every MO. Thumbnails on all levels crowd the diagram (SF6 has 10 levels; the cards would overlap the correlation lines). The card goes in the emptiest free spot near its level and is left out when none exists.
-3. **Phone diagram:** done (compact geometry). The timeline is not pinned while scrolling.
+3. **Phone diagram:** done (compact geometry; the timeline stays pinned while the diagram scrolls; the canvas widens instead of clipping long labels). Mid-size screens (900–1279 px) use a narrower rail and inspector, or put the inspector below the diagram, so they get the full diagram rather than the phone one.
 4. **Glide:** done for step jumps and "why does it jump". Every frame is a real engine evaluation of H(s), not a screen interpolation, so the motion is the model's. Reduced-motion users get the jump.
 5. **3D view:** ellipsoids now follow any direction. The 3D view opens in the same orientation as the 2D sketch. *Not done:* highlighting ledger contacts in 3D (the 2D sketch does this).
 6. **Accessibility:** done.

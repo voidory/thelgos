@@ -275,6 +275,12 @@ function draw(view) {
   // Smaller in the compact geometry; left out when no spot is free of bars and labels.
   const pk = atEnd ? `M${state.level}` : `S${state.level}`;
   if (view.structure && state.level !== null && pos[pk]) sketchCard(svg, view.structure, pos[pk], { W, H, top, bottom, AX, size: compact ? 84 : 108 });
+  // Never clip: if labels reach past the canvas (long labels in the compact geometry), widen the viewBox to fit.
+  const bb = svg.getBBox();
+  if (bb.width > 0) {
+    const x0 = bb.x < 0 ? bb.x - 4 : 0, x1 = bb.x + bb.width > W ? bb.x + bb.width + 4 : W;
+    if (x0 < 0 || x1 > W) svg.setAttribute("viewBox", `${x0} 0 ${x1 - x0} ${H}`);
+  }
   if (refocus != null) { const h = svg.querySelector(`[data-mo="${refocus}"], [data-slider-level="${refocus}"]`); if (h) h.focus({ preventScroll: true }); }
 }
 
@@ -436,7 +442,7 @@ function about(view) {
 function banner(view) {
   const tag = view.preset.provenance_tag;
   $("banner").textContent = `Model units (eV scale) · preset: ${tag} (${view.preset.id}) · not a spectral prediction · ` +
-    `engine ${view.result.version} · CONVENTIONS v1.3, not frozen` + (view.result.warnings.length ? ` · warnings: ${view.result.warnings.join(", ")}` : "");
+    `engine ${view.result.version} · CONVENTIONS v${(state.info && state.info.conventions && state.info.conventions[0]) || "?"}, ${(state.info && state.info.conventions && state.info.conventions[1]) || "status unknown"}` + (view.result.warnings.length ? ` · warnings: ${view.result.warnings.join(", ")}` : "");
 }
 
 let latest = 0;
