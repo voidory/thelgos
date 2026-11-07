@@ -24,7 +24,7 @@ body.proposal .rail button.case:hover { background: var(--accent-soft); }
 body.proposal .rail button.case[aria-current="true"] { background: var(--accent); color: var(--on-accent); }
 body.proposal .rail button.case small { color: inherit; opacity: 0.7; margin-left: 4px; }
 body.proposal label:has(#case) { display: none; }
-body.proposal svg#diagram { border-radius: 10px; }
+body.proposal :is(svg#diagram, svg#diagram2) { border-radius: 10px; }
 body.proposal svg .level { stroke-width: 3; stroke-linecap: round; }
 body.proposal svg .level.frag { stroke: var(--muted); }
 body.proposal svg .level.selected { stroke: var(--accent); stroke-width: 5; }
@@ -68,36 +68,36 @@ body.proposal .badge .kind { color: inherit; opacity: 0.8; }
 }
 
 /* ---- MO diagram typography and marks (design pass) ---- */
-#diagram { --serif: "STIX Two Text", "STIX Two Math", "Cambria Math", "Times New Roman", serif; }
-#diagram .orb-label { font-family: var(--serif); font-size: 17px; fill: var(--fg); paint-order: stroke; stroke: var(--panel); stroke-width: 5px; stroke-linejoin: round; }
-#diagram .col-title { font-size: 11px; letter-spacing: 0.08em; fill: var(--muted); font-weight: 600; }
-#diagram .axis-line { stroke: var(--muted); stroke-width: 1; }
-#diagram .axis-num { font-size: 11px; fill: var(--muted); font-feature-settings: "tnum" 1; }
-#diagram .axis-title { font-family: var(--serif); font-style: italic; font-size: 13px; fill: var(--muted); }
-#diagram .level { stroke: var(--fg); stroke-width: 3; stroke-linecap: butt; }
-#diagram .level.frag { stroke: var(--fg); opacity: 0.75; }
-#diagram .level.moving { stroke: var(--muted); }
-#diagram .level.selected { stroke: var(--accent); stroke-width: 5; }
-#diagram .electron { stroke: var(--fg); stroke-width: 1.4; fill: none; stroke-linecap: round; stroke-linejoin: round; }
-#diagram .mix { stroke: var(--mix); stroke-opacity: 0.45; }
-#diagram .allowed { stroke: var(--allowed); stroke-dasharray: 4 4; }
-#diagram .leader { stroke: var(--muted); stroke-width: 0.7; fill: none; }
-#diagram .frontier { font-family: system-ui, sans-serif; font-size: 10px; letter-spacing: 0.06em; fill: var(--accent); font-weight: 600; }
-#diagram .warn-mark { fill: var(--warn); font-size: 10px; }
-#diagram .warn-dot { fill: var(--warn); }
-#diagram.compact .orb-label { font-size: 17px; stroke-width: 4px; }
-#diagram.compact .axis-num { font-size: 12px; }
-#diagram.compact .col-title { font-size: 12px; letter-spacing: 0.04em; }
-#diagram.compact .axis-title { font-size: 12px; }
-#diagram.compact .frontier { font-size: 10px; }
-#diagram .sketch-card { fill: var(--panel); stroke: var(--rule); stroke-width: 1; filter: drop-shadow(0 1px 2px rgba(0,0,0,0.08)); }
-#diagram .sketch-leader { stroke: var(--accent); stroke-width: 1; stroke-dasharray: 2 2; }
-#diagram .sketch .atom { fill: var(--panel); stroke: var(--muted); stroke-width: 0.8; }
+:is(#diagram, #diagram2) { --serif: "STIX Two Text", "STIX Two Math", "Cambria Math", "Times New Roman", serif; }
+:is(#diagram, #diagram2) .orb-label { font-family: var(--serif); font-size: 17px; fill: var(--fg); paint-order: stroke; stroke: var(--panel); stroke-width: 5px; stroke-linejoin: round; }
+:is(#diagram, #diagram2) .col-title { font-size: 11px; letter-spacing: 0.08em; fill: var(--muted); font-weight: 600; }
+:is(#diagram, #diagram2) .axis-line { stroke: var(--muted); stroke-width: 1; }
+:is(#diagram, #diagram2) .axis-num { font-size: 11px; fill: var(--muted); font-feature-settings: "tnum" 1; }
+:is(#diagram, #diagram2) .axis-title { font-family: var(--serif); font-style: italic; font-size: 13px; fill: var(--muted); }
+:is(#diagram, #diagram2) .level { stroke: var(--fg); stroke-width: 3; stroke-linecap: butt; }
+:is(#diagram, #diagram2) .level.frag { stroke: var(--fg); opacity: 0.75; }
+:is(#diagram, #diagram2) .level.moving { stroke: var(--muted); }
+:is(#diagram, #diagram2) .level.selected { stroke: var(--accent); stroke-width: 5; }
+:is(#diagram, #diagram2) .electron { stroke: var(--fg); stroke-width: 1.4; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+:is(#diagram, #diagram2) .mix { stroke: var(--mix); stroke-opacity: 0.45; }
+:is(#diagram, #diagram2) .allowed { stroke: var(--allowed); stroke-dasharray: 4 4; }
+:is(#diagram, #diagram2) .leader { stroke: var(--muted); stroke-width: 0.7; fill: none; }
+:is(#diagram, #diagram2) .frontier { font-family: system-ui, sans-serif; font-size: 10px; letter-spacing: 0.06em; fill: var(--accent); font-weight: 600; }
+:is(#diagram, #diagram2) .warn-mark { fill: var(--warn); font-size: 10px; }
+:is(#diagram, #diagram2) .warn-dot { fill: var(--warn); }
+:is(#diagram, #diagram2).compact .orb-label { font-size: 17px; stroke-width: 4px; }
+:is(#diagram, #diagram2).compact .axis-num { font-size: 12px; }
+:is(#diagram, #diagram2).compact .col-title { font-size: 12px; letter-spacing: 0.04em; }
+:is(#diagram, #diagram2).compact .axis-title { font-size: 12px; }
+:is(#diagram, #diagram2).compact .frontier { font-size: 10px; }
+:is(#diagram, #diagram2) .sketch-card { fill: var(--panel); stroke: var(--rule); stroke-width: 1; filter: drop-shadow(0 1px 2px rgba(0,0,0,0.08)); }
+:is(#diagram, #diagram2) .sketch-leader { stroke: var(--accent); stroke-width: 1; stroke-dasharray: 2 2; }
+:is(#diagram, #diagram2) .sketch .atom { fill: var(--panel); stroke: var(--muted); stroke-width: 0.8; }
 
 /* Accessibility: visible keyboard focus everywhere; screen-reader-only text. */
 :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-#diagram .mo-hit:focus { outline: none; }
-#diagram .mo-hit:focus-visible { fill: var(--accent-soft); fill-opacity: 0.6; stroke: var(--accent); stroke-width: 1.5; }
+:is(#diagram, #diagram2) .mo-hit:focus { outline: none; }
+:is(#diagram, #diagram2) .mo-hit:focus-visible { fill: var(--accent-soft); fill-opacity: 0.6; stroke: var(--accent); stroke-width: 1.5; }
 .tabpanel:focus-visible { outline-offset: -2px; }
 .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
 @media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; transition: none !important; animation: none !important; } }
@@ -138,7 +138,7 @@ input[type=range], input[type=checkbox] { accent-color: var(--accent); }
 .lp-pair .atom { fill: var(--panel); stroke: var(--muted); stroke-width: 0.8; }
 .approx-box { display: inline-flex; align-items: center; gap: 6px; font-size: 0.8rem; color: var(--muted); }
 .approx-box input { width: 140px; }
-#diagram.symonly .level { stroke-dasharray: none; }
+:is(#diagram, #diagram2).symonly .level { stroke-dasharray: none; }
 .speed { margin-top: 6px; }
 .speed button { font: inherit; font-size: 0.8rem; padding: 3px 10px; border-radius: 999px; border: 1px solid var(--rule); background: var(--panel); color: var(--fg); cursor: pointer; }
 .speed-out { white-space: pre-wrap; overflow-wrap: anywhere; font-size: 0.75rem; background: var(--panel); border: 1px solid var(--rule); border-radius: 6px; padding: 8px; color: var(--fg); }
@@ -188,7 +188,7 @@ body[data-mode="practice"] .timeline, body[data-mode="exam"] .timeline { display
 .quiz .chip[aria-pressed="true"] .sym { color: inherit; opacity: 0.85; }
 
 /* Milestone C: node markers, rule check, phase painting. */
-#diagram .nodes-tag { font-family: system-ui, sans-serif; font-size: 10px; fill: var(--muted); }
+:is(#diagram, #diagram2) .nodes-tag { font-family: system-ui, sans-serif; font-size: 10px; fill: var(--muted); }
 #structure .node-mark { stroke: var(--accent); fill: none; stroke-width: 2.5; stroke-dasharray: 5 3; }
 #structure .node-through { stroke-dasharray: 2 3; }
 #structure .node-mark.hot { stroke: var(--warn); stroke-width: 4; }
@@ -244,3 +244,23 @@ body.proposal .timeline .step.doubt-step[aria-current="true"] { background: var(
 .doubtbox .doubt-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
 .doubtbox .doubt-actions .chipbtn { margin-left: 0; }
 .doubtbox .doubt-actions .alt { border-color: var(--accent); color: var(--accent); }
+
+/* ---- Release 2, Milestone E: compare (D9). ---- */
+.compare-wrap { display: flex; gap: 10px; align-items: flex-start; min-width: 0; }
+.compare-wrap > figure { margin: 0; flex: 1 1 0; min-width: 0; }
+.compare-wrap svg { width: 100%; height: auto; display: block; }
+.cmp-cap { font-size: 0.85rem; font-weight: 600; margin: 0 0 4px 8px; }
+body:not(.comparing) .cmp-cap { display: none; }
+.comparebar { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; margin: 6px 0; font-size: 0.9rem; }
+.comparebar select { font: inherit; max-width: 100%; min-width: 0; }
+:is(#diagram, #diagram2) g.peer-hot .level { stroke: var(--warn); stroke-width: 5; }
+@media (max-width: 700px) { .compare-wrap { flex-direction: column; } }
+
+/* ---- D7 linked highlighting. ---- */
+:is(#diagram) g.linked .level { stroke: var(--warn); stroke-width: 5; }
+:is(#diagram) line.mix.linked, :is(#diagram) line.allowed.linked { stroke: var(--warn); opacity: 1; }
+#structure .linked:is(circle, ellipse, path) { stroke: var(--warn); stroke-width: 3; }
+#structure line.linked { stroke: var(--warn); stroke-width: 4; }
+#ledger tr.linked td, #matching .linked { background: var(--accent-soft); }
+#pes .pes-band.linked rect, #pes .pes-band.linked path, #pes .pes-band.linked line { stroke: var(--warn); stroke-width: 3; }
+#walsh .wl.linked { stroke: var(--warn); stroke-width: 3.5; opacity: 1; }

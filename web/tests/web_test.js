@@ -374,6 +374,35 @@ const check = (name, ok, detail = "") => { results.push({ name, ok, detail }); c
     await page.selectOption("#sched", "lecture");
     await page.waitForFunction(() => JSON.parse(document.body.dataset.dials).schedule === "lecture");
 
+    // ---- Release 2, Milestone E: compare (D9) and linked highlighting (D7). ----
+    await pick(page, "allyl cation pi");
+    await page.waitForFunction(() => document.body.dataset.rendered === "allyl cation pi|1|");
+    await page.selectOption("#compare", JSON.stringify(["allyl cation pi", 4]));
+    await page.waitForFunction(() => document.body.dataset.compare === "allyl cation pi|4" && document.querySelectorAll("#diagram2 [data-peer-mo]").length === 3);
+    const axes = await page.evaluate(() => ["#diagram", "#diagram2"].map((id) => [...document.querySelectorAll(`${id} .axis-num`)].map((t) => `${t.textContent}@${Math.round(+t.getAttribute("y"))}`).join(",")));
+    const cap = await page.textContent("#cap-peer");
+    await page.mouse.move(0, 0);
+    await page.focus('#diagram [data-key="1A2"]');
+    const peerHotN = await page.$$eval("#diagram2 g.peer-hot", (g) => g.length);
+    check("D9 compare: allyl cation beside the anion on one energy axis; the same level highlights in both",
+          axes[0] === axes[1] && axes[0].length > 0 && /anion/.test(cap) && peerHotN === 1, `${cap} · axis ${axes[0] === axes[1] ? "shared" : "differs"}`);
+    await page.selectOption("#compare", "");
+    await page.waitForFunction(() => document.body.dataset.compare === "");
+    await pick(page, "H2O model");
+    await page.waitForFunction(() => document.body.dataset.rendered === "H2O model|1|");
+    await page.mouse.move(0, 0);
+    await page.focus('#diagram [data-mo="1"]');
+    const lk = await page.evaluate(() => ({ frags: document.querySelectorAll("#diagram g.linked [data-frag]").length,
+      lines: document.querySelectorAll("#diagram line.mix.linked").length, pes: document.querySelectorAll("#pes .pes-band.linked").length,
+      match: document.querySelectorAll("#matching .linked").length }));
+    await page.$eval('[data-mo="1"]', (h) => h.dispatchEvent(new Event("click")));
+    await page.waitForFunction(() => document.body.dataset.rendered === "H2O model|1|1");
+    await page.$eval('#structure circle.atom[data-atom="1"]', (a) => a.dispatchEvent(new MouseEvent("mouseover", { bubbles: true })));
+    const rowsLit = await page.$$eval("#ledger tr.linked", (r) => r.length);
+    check("D7 linked highlighting: a level lights its fragment orbitals, mixing lines, spectrum band and matching cells; an atom lights its ledger rows",
+          lk.frags === 2 && lk.lines === 2 && lk.pes === 1 && lk.match > 0 && rowsLit > 0, JSON.stringify({ ...lk, rowsLit }));
+    await page.mouse.move(0, 0);
+
     // ---- Release 2, Milestone C: node markers (L5), rule check (L4), phase painting (D3). ----
     await pick(page, "allyl cation pi");
     await page.waitForFunction(() => document.body.dataset.rendered === "allyl cation pi|1|");
@@ -414,7 +443,7 @@ const check = (name, ok, detail = "") => { results.push({ name, ok, detail }); c
     await page.click('.modeswitch [data-mode="practice"]');
     await page.waitForSelector("#quiz .qstep h3");
     const qSteps = await page.$$eval("#quiz .qstep h3", (h) => h.length);
-    const diagramHidden = await page.$eval("#diagram", (d) => getComputedStyle(d).display === "none");
+    const diagramHidden = await page.$eval("#diagram", (d) => d.getClientRects().length === 0);
     await page.$$eval("#quiz .qcheck", (b) => b[0].click());
     await page.waitForSelector('#quiz .qres[data-step="Order the atomic orbitals"]');
     const qfb = await page.textContent('#quiz .qres[data-step="Order the atomic orbitals"]');

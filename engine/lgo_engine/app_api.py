@@ -288,6 +288,8 @@ def view(params, groups, name, s=1.0, level=None, conventions_sha256=None, extra
                               "through_rows": [i for i, r in enumerate(ledger["rows"]) if r.get("node") == "through"]}
         if paint_out is not None:
             paint_out["nodes"] = nodes["count"]
+    if ledger is not None:
+        ledger["basis_atoms"] = [f.atom for f in system.basis]   # D7: rows link to the atoms they join
     origin = views.origins(sched, result["levels"])
     for st in sched["stages"]:
         st["rules"] = views.STAGE_RULES.get(st["kind"], [])

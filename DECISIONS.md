@@ -270,7 +270,7 @@ The owner approved these defaults: the current molecules only; two question type
 - **A morph frame is a finished diagram.** The construction slider and timeline are hidden during a morph. The Lecture/Model slider is hidden too, because the two cannot be combined.
 - **Model vs textbook: planar CH4.** In this model the occupied nonbonding orbital of planar CH4 is a hydrogen-only combination, at the H 1s energy, and C 2pz is the empty LUMO. Textbooks make C 2pz the occupied lone pair, because H–H repulsion (absent here, B5) raises the hydrogen combination. The path's note says so.
 
-## Release 2, Milestone E: doubt toggles and alternative schedules, design choices (delegated, 2026-11-07)
+## Release 2, Milestone E: doubt toggles, alternative schedules, compare and linked highlighting, design choices (delegated, 2026-11-07)
 
 - **Alternative schedules (P5)** (`engine/lgo_engine/schedule.py`). Besides the lecture order, a case may offer:
   - *a different pairing:* another symmetry operation that pairs as many atoms. Pairings related by a symmetry operation give the same plateaus, so only one per class is kept. SF6 gets the cis pairing (2-6, 3-7, 4-5) beside the lecture's trans pairs; H3+'s three choices are all equivalent, so it gets none;
@@ -293,7 +293,26 @@ The owner approved these defaults: the current molecules only; two question type
     - R9: node counts against the exact order.
   - *Alternatives:* paint phases, another schedule, the lecture/model slider, a morph (central sweep; closing the allyl ring), the symmetry-allowed lines, or the electron stepper, whichever exists for the case.
 - **Speed (D10).** The schedule options depend only on geometry, symmetry, edges and which couplings are non-zero, so they are cached on those, and the pairing search keeps only the best involutions per set. A cold first view of SF6 costs about 30 ms in CPython, and the browser's worst warm recompute stayed at 47 ms.
-- **Fixed along the way:** mid-construction MO rows with several levels drew stray commas between empty labels.
+- **Compare (D9).** A *Compare with* menu under the morph bar. It lists suggested partners first, then any case:
+  - the allyl cation against the radical and the anion (the same diagram with 3 or 4 π electrons);
+  - each period-2 diatomic against its period-3 partner (N2/P2, O2/S2, F2/Cl2, C2/Si2, B2/Al2), and CO against N2 (isoelectronic);
+  - H2O model against lecture, H3+ against neutral H3, CH4 against its four hydrogens alone.
+  The comparison is a second, finished diagram beside the first, on the same energy range. Levels with the same symmetry label (number and irrep, e.g. 1πu) highlight together in both, and a selected level's namesake stays highlighted. The spec's H2O vs H2S and CH4 vs SiH4 need H2S and SiH4, which wait for CONVENTIONS v1.5.
+- **Linked highlighting (D7).** One mechanism for every pane. Each item carries identity tokens, plus tokens for its counterparts, and hovering or focusing an item lights everything that shares one. A line (a correlation line, a structure contact) lights only when one of its own endpoints is the item. The links:
+  - an MO level ↔ the fragment orbitals it is built from and the mixing lines joining them, its photoelectron band, its Walsh line during a morph, and the matching-table rows and columns of its fragments;
+  - a fragment orbital ↔ its MOs and its matching-table row or column;
+  - a matching-table cell ↔ both its fragment orbitals;
+  - an atom or lobe in the structure ↔ the ledger rows it takes part in;
+  - a ledger row ↔ its contact line, its atoms, and the 3D view (as before).
+  Electrons sit on their level and link with it. The lighting is re-applied after every redraw, so it survives a recompute under the pointer.
+- **Engine output added for D7 and display:**
+  - matching-table rows and columns name their fragment orbital (`frag`);
+  - the ledger gives each basis function's atom (`basis_atoms`);
+  - an atomic column whose group is one orbital on several atoms gets a display name ("C 2p" rather than "C1px/C2px/C3px"); the label is unchanged.
+  No energy, label or check changes.
+- **Fixed along the way:**
+  - mid-construction MO rows with several levels drew stray commas between empty labels;
+  - in the two-column layout the atomic column's labels sat in the gutter where the correlation lines leave the bars; they now go in the outer gutter.
 
 ## B6. Sign-off (owner only)
 

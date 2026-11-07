@@ -59,7 +59,17 @@
         <button type="button" id="morph-case" class="linkish">back to the case</button>
       </span>
     </div>
-    <svg id="diagram" role="group" aria-label="MO diagram: each molecular-orbital level is a button; the table after it lists every level"></svg>
+    <div id="comparebar" class="comparebar">
+      <label for="compare">Compare with</label>
+      <select id="compare"><option value="">— nothing —</option></select>
+      <span id="compare-note" class="muted-text"></span>
+    </div>
+    <div class="compare-wrap">
+      <figure class="cmp-main"><figcaption id="cap-main" class="cmp-cap"></figcaption>
+        <svg id="diagram" role="group" aria-label="MO diagram: each molecular-orbital level is a button; the table after it lists every level"></svg></figure>
+      <figure id="compare-pane" class="cmp-peer" hidden><figcaption id="cap-peer" class="cmp-cap"></figcaption>
+        <svg id="diagram2" role="group" aria-label="Comparison diagram on the same energy axis"></svg></figure>
+    </div>
     <div id="levels-sr" class="sr-only"></div>
     <section id="walshbox" class="walshbox" hidden aria-label="Correlation plot">
       <svg id="walsh" role="img" aria-label="Level energies along the morph path"></svg>

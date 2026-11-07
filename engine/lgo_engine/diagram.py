@@ -101,6 +101,18 @@ def diagram_spec(system, H, result, groups, H_now=None, params=None):
         cols["right"] = [{"id": f"R{k}", "energy_eV": float(e[ix[0]]), "multiplicity": len(ix), "irrep": "—",
                           "label": "/".join(sorted({system.basis[int(np.argmax(abs(c[:, i])))].label.rstrip("0123456789") for i in ix})),
                           "_v": c[:, ix]} for k, ix in enumerate(cluster_levels(e, Hd))]
+        if params is not None:
+            # Display name when every function in a group is the same orbital on different atoms
+            # ("C1px/C2px/C3px" -> "C 2px"); the label itself is unchanged.
+            for f in cols["right"]:
+                names = set()
+                for i in range(f["_v"].shape[1]):
+                    b = system.basis[int(np.argmax(abs(f["_v"][:, i])))]
+                    el = system.atoms[b.atom].element
+                    tail = b.label[len(el):].lstrip("0123456789")[len(b.kind):]
+                    names.add(f"{el} {params.orbital_name.get((el, b.kind), b.kind)}{tail}")
+                if len(names) == 1:
+                    f["display"] = names.pop()
     mos = []
     count = {}  # valence-only numbering within each symmetry, ascending energy (CONVENTIONS §6)
     for k, lv_ in enumerate(result["levels"]):

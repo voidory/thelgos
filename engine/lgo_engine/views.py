@@ -141,7 +141,7 @@ def matching_spec(system, H, frag_left, frag_right, P):
             V = V @ _align(A @ H @ V)
         suffix = "xyz" if (lv["irrep"] == "—" and lv["multiplicity"] == 3) else "abc"
         for k in range(lv["multiplicity"]):
-            cols.append({"label": lv["label"] + ("" if lv["multiplicity"] == 1 else suffix[k]), "irrep": lv["irrep"], "v": V[:, k]})
+            cols.append({"label": lv["label"] + ("" if lv["multiplicity"] == 1 else suffix[k]), "irrep": lv["irrep"], "v": V[:, k], "frag": lv.get("id")})
     for l, k in left:
         parts = l["label"].split("/")
         if "components" in l:
@@ -152,14 +152,14 @@ def matching_spec(system, H, frag_left, frag_right, P):
             name = f"{l['label']}{'xyz'[k]}"
         else:
             name = l["label"]
-        rows.append({"label": name, "irrep": l["irrep"], "v": l["_v_full"][:, k]})
+        rows.append({"label": name, "irrep": l["irrep"], "v": l["_v_full"][:, k], "frag": l.get("id")})
     table = [[float(r["v"] @ H @ c["v"]) for c in cols] for r in rows]
     for i, r in enumerate(rows):
         for j, c in enumerate(cols):
             if abs(table[i][j]) < 1e-9:
                 table[i][j] = 0.0
-    return {"rows": [{"label": r["label"], "irrep": r["irrep"]} for r in rows],
-            "cols": [{"label": c["label"], "irrep": c["irrep"]} for c in cols],
+    return {"rows": [{"label": r["label"], "irrep": r["irrep"], "frag": r["frag"]} for r in rows],
+            "cols": [{"label": c["label"], "irrep": c["irrep"], "frag": c["frag"]} for c in cols],
             "tally_eV": table,
             "rule": "Each entry is ⟨central orbital|H|LGO⟩, the signed sum of its per-lobe contacts; 0 means no interaction (P6)."}
 

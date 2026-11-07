@@ -18,7 +18,7 @@ const call = (cmd, args) => new Promise((resolve, reject) => {
 const $ = (id) => document.getElementById(id);
 const NS = "http://www.w3.org/2000/svg";
 const state = { case: null, s: 1, level: null, fragment: null, view: null, info: null, watching: false,
-  electrons: null, approx: null, dial: 0, lp: 0, paint: null, morph: null, schedule: null, doubt: [], doubtOpen: null };
+  electrons: null, approx: null, dial: 0, lp: 0, paint: null, morph: null, schedule: null, doubt: [], doubtOpen: null, compare: null, compareView: null };
 
 function el(tag, attrs = {}, text) {
   const e = document.createElementNS(NS, tag);
@@ -124,10 +124,72 @@ function capsTitle(t) {
   return m ? m[1] + m[2].toUpperCase() : t.toUpperCase();
 }
 
+// D9 compare: the main diagram and the comparison share one energy range, and levels with the same symmetry
+// label (number and irrep) highlight together in both.
 function draw(view) {
-  const svg = $("diagram");
+  const cmp = state.compare && state.compareView && !view.morph ? state.compareView : null;
+  let range = null;
+  if (cmp) {
+    const es = [view, cmp].flatMap((v) => [...v.diagram.left, ...v.diagram.right, ...v.diagram.centre, ...v.diagram.slider_levels].map((x) => x.energy_eV));
+    range = [Math.min(...es), Math.max(...es)];
+  }
+  $("compare-pane").hidden = !cmp;
+  document.body.classList.toggle("comparing", !!cmp);
+  drawOne(view, { range });
+  if (cmp) {
+    drawOne(cmp, { svg: $("diagram2"), range, peer: true });
+    const selLv = state.level !== null && view.schedule.s >= 1 ? view.diagram.centre[state.level] : null;
+    const k = selLv && levelKey(selLv);
+    if (k) for (const h of $("diagram2").querySelectorAll(`.mo-hit[data-key="${CSS.escape(k)}"]`)) h.parentNode.classList.add("peer-hot");
+    $("cap-main").textContent = captionFor(view);
+    $("cap-peer").textContent = captionFor(cmp);
+  }
+}
+function captionFor(v) {
+  const E = v.electrons;
+  if (v === state.compareView && state.compare && state.compare.label) return state.compare.label;
+  return `${v.case}${E.count !== E.default ? ` with ${E.count} electrons${E.charge_label ? ` (${E.charge_label})` : ""}` : ""}`;
+}
+function levelKey(lv) {
+  const sym = lv.linear_label || lv.irrep;
+  return sym && sym !== "—" ? `${lv.number}${sym}` : null;
+}
+function peerHot(key, on) {
+  for (const h of document.querySelectorAll(`#diagram .mo-hit[data-key="${CSS.escape(key)}"], #diagram2 .mo-hit[data-key="${CSS.escape(key)}"]`)) h.parentNode.classList.toggle("peer-hot", on);
+}
+// Suggested comparisons for each case (D9). The spec's H2O vs H2S and CH4 vs SiH4 need CONVENTIONS v1.5.
+const COMPARE_SUGGEST = {
+  "allyl cation pi": [["allyl cation pi", 4, "allyl anion (4 π electrons)"], ["allyl cation pi", 3, "allyl radical (3 π electrons)"]],
+  "H3+": [["neutral H3", null, "neutral H3 (one more electron)"]], "neutral H3": [["H3+", null, "H3+"]],
+  "H2O model": [["H2O lecture", null, "H2O lecture (the lecture's simplification)"]], "H2O lecture": [["H2O model", null, "H2O model"]],
+  CH4: [["four H Td", null, "its four hydrogens alone"]], "SF6 model": [["SF6 lecture", null, "SF6 lecture"]],
+  N2: [["P2", null, "P2 (period 3)"], ["CO", null, "CO (isoelectronic)"]], CO: [["N2", null, "N2 (isoelectronic)"]],
+  B2: [["Al2", null, "Al2 (period 3)"]], C2: [["Si2", null, "Si2 (period 3)"]], O2: [["S2", null, "S2 (period 3)"]], F2: [["Cl2", null, "Cl2 (period 3)"]],
+  Al2: [["B2", null, "B2 (period 2)"]], Si2: [["C2", null, "C2 (period 2)"]], P2: [["N2", null, "N2 (period 2)"]], S2: [["O2", null, "O2 (period 2)"]], Cl2: [["F2", null, "F2 (period 2)"]],
+};
+function compareMenu() {
+  const sel = $("compare"); sel.replaceChildren(new Option("— nothing —", ""));
+  const sug = COMPARE_SUGGEST[state.case] || [];
+  const enc = (c, e) => JSON.stringify([c, e]);
+  if (sug.length) { const g = document.createElement("optgroup"); g.label = "Suggested"; for (const [c, e, t] of sug) { const o = new Option(t, enc(c, e)); o.dataset.label = t; g.append(o); } sel.append(g); }
+  const g = document.createElement("optgroup"); g.label = "Any case";
+  for (const c of state.cases) if (c.name !== state.case) g.append(new Option(c.name, enc(c.name, null)));
+  sel.append(g);
+  sel.value = state.compare ? enc(state.compare.case, state.compare.electrons) : "";
+  if (sel.value === "" && state.compare) { sel.value = ""; state.compare = null; state.compareView = null; }
+}
+async function setCompare(v) {
+  state.compare = v; state.compareView = null;
+  if (v) state.compareView = await call("view", { case: v.case, electrons: v.electrons, s: 1 });
+  $("compare-note").textContent = v ? "Same energy axis; hover a level to find its namesake in the other diagram." : "";
+  draw(state.view);
+  document.body.dataset.compare = v ? `${v.case}|${v.electrons ?? ""}` : "";
+}
+function drawOne(view, opts = {}) {
+  const svg = opts.svg || $("diagram");
+  const peer = !!opts.peer;
   // Keep keyboard focus on the same level across redraws (selecting a level redraws the diagram).
-  const fe = document.activeElement, refocus = fe && svg.contains(fe) && fe.classList.contains("mo-hit") ? fe.dataset.mo ?? fe.dataset.sliderLevel ?? fe.dataset.frag : null;
+  const fe = document.activeElement, refocus = !peer && fe && svg.contains(fe) && fe.classList.contains("mo-hit") ? fe.dataset.mo ?? fe.dataset.sliderLevel ?? fe.dataset.frag : null;
   svg.replaceChildren();
   const d = view.diagram;
   const atEnd = view.schedule.s >= 1;
@@ -139,7 +201,7 @@ function draw(view) {
   const W = compact ? 420 : 640, H = compact ? 520 : 600, top = compact ? 44 : 52, bottom = compact ? 28 : 34;
   svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
   const all = [...d.left, ...d.right, ...d.centre, ...d.slider_levels].map((x) => x.energy_eV);
-  let lo = Math.min(...all), hi = Math.max(...all);
+  let [lo, hi] = opts.range || [Math.min(...all), Math.max(...all)];
   const pad = (hi - lo) * 0.05 || 1;
   lo -= pad; hi += pad;
   // F3.6 symmetry-only view: heights show order only (energies collapsed to evenly spaced ranks), since
@@ -193,7 +255,7 @@ function draw(view) {
         const x0 = x;
         for (let i = 0; i < lv.multiplicity; i++) {
           const a = x + i * (BAR + GAP);
-          const cls = isMO ? (state.level === k ? "level selected" : atEnd ? "level" : "level moving") : (state.fragment === lv.id ? "level frag selected" : "level frag");
+          const cls = isMO ? (!peer && state.level === k ? "level selected" : atEnd ? "level" : "level moving") : (!peer && state.fragment === lv.id ? "level frag selected" : "level frag");
           g.append(el("line", { x1: a, x2: a + BAR, y1: yy, y2: yy, class: cls }));
           if (isMO && atEnd && lv.electrons !== undefined) {
             const n = (i < lv.electrons ? 1 : 0) + (i < lv.electrons - lv.multiplicity ? 1 : 0);
@@ -205,23 +267,47 @@ function draw(view) {
         const x1 = x - GROUP;
         const key = isMO ? (atEnd ? `M${k}` : `S${k}`) : lv.id;
         pos[key] = { x0, x1, y: yy };
+        // D7 linked highlighting: a level shares tokens with its photoelectron band and Walsh line; a level and a
+        // fragment orbital point at each other through the mixing lines that join them.
+        if (!peer && atEnd) {
+          const mix = d.lines.filter((ln) => ln.layer === "mixing");
+          if (isMO) {
+            const ids = [`mo:${k}`, `pes:${k}`];
+            if (view.morph && lv.irrep && lv.irrep !== "—" && !lv.irrep.includes("+")) ids.push(`w:${lv.irrep}:${lv.number - 1}`);
+            g.dataset.link = ids.join(" ");
+            g.dataset.linkTo = mix.filter((ln) => ln.to === `M${k}`).map((ln) => `frag:${ln.from}`).join(" ");
+          } else {
+            g.dataset.link = `frag:${lv.id}`;
+            g.dataset.linkTo = mix.filter((ln) => ln.from === lv.id).map((ln) => `mo:${ln.to.slice(1)}`).join(" ");
+          }
+        }
         if (isMO) {
           g.append(el("title", {}, `${view.provenance.level_energy} ${atEnd ? view.provenance.level_label : ""} E = ${fmt(lv.energy_eV, 3)} eV`.trim()));
+          const key = atEnd ? levelKey(lv) : null;
           const hit = el("rect", { x: x0 - 4, y: yy - 9, width: x1 - x0 + 8, height: 18, class: "mo-hit", tabindex: 0,
-                                   role: "button", "aria-pressed": state.level === k, "aria-label": levelName(lv, k, atEnd, view),
-                                   [atEnd ? "data-mo" : "data-slider-level"]: k, "data-energy": lv.energy_eV, "data-multiplicity": lv.multiplicity });
-          hit.addEventListener("click", () => select(k));
-          hit.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") select(k); });
+                                   role: peer ? "img" : "button", "aria-label": levelName(lv, k, atEnd, view),
+                                   [peer ? "data-peer-mo" : atEnd ? "data-mo" : "data-slider-level"]: k, "data-energy": lv.energy_eV, "data-multiplicity": lv.multiplicity });
+          if (!peer) {
+            hit.setAttribute("aria-pressed", state.level === k);
+            hit.addEventListener("click", () => select(k));
+            hit.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") select(k); });
+          }
+          if (key) {
+            hit.dataset.key = key;
+            for (const [ev, on] of [["mouseenter", true], ["mouseleave", false], ["focus", true], ["blur", false]]) hit.addEventListener(ev, () => peerHot(key, on));
+          }
           g.append(hit);
         } else {
           g.append(el("title", {}, view.provenance.fragment));
           // Fragment orbitals (LGOs, central-atom or atom orbitals) are selectable too: ledger, structure and 3D follow.
           const fname = `${lv.label}${lv.irrep && lv.irrep !== "—" ? ` (${lv.irrep})` : ""}, ${fmt(lv.energy_eV, 2)} eV${lv.multiplicity > 1 ? `, ${lv.multiplicity}-fold degenerate` : ""}`;
-          const fh = el("rect", { x: x0 - 4, y: yy - 9, width: x1 - x0 + 8, height: 18, class: "mo-hit frag-hit", tabindex: 0, role: "button",
-                                  "aria-pressed": state.fragment === lv.id, "aria-label": fname, "data-frag": lv.id });
-          fh.addEventListener("click", () => selectFragment(lv.id));
-          fh.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") selectFragment(lv.id); });
-          g.append(fh);
+          if (!peer) {
+            const fh = el("rect", { x: x0 - 4, y: yy - 9, width: x1 - x0 + 8, height: 18, class: "mo-hit frag-hit", tabindex: 0, role: "button",
+                                    "aria-pressed": state.fragment === lv.id, "aria-label": fname, "data-frag": lv.id });
+            fh.addEventListener("click", () => selectFragment(lv.id));
+            fh.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") selectFragment(lv.id); });
+            g.append(fh);
+          }
         }
         svg.append(g);
       }
@@ -229,14 +315,14 @@ function draw(view) {
       const rightmost = cx[col] + width / 2, leftmost = cx[col] - width / 2;
       const yy = y(r.e);
       const parts = [];
-      const bases = r.items.map(([lv]) => (lv.label || "").replace(/[xyz]$/, ""));
+      const bases = r.items.map(([lv]) => (lv.display || lv.label || "").replace(/[xyz]$/, ""));
       const oneBase = !isMO && !(col === "right" && d.column_titles.right === "Ligand group orbitals") && bases.every((b) => b === bases[0]) && bases[0];
       if (oneBase) parts.push(...orbitalNameParts(bases[0]));
       else r.items.forEach(([lv], i) => {
         if (i && !(isMO && !(atEnd && $("t-irreps").checked))) parts.push([", ", "base"]);  // no separator between empty labels
         if (isMO) { if (atEnd && $("t-irreps").checked) parts.push(...labelParts(lv)); }
         else if (col === "right" && d.column_titles.right === "Ligand group orbitals") parts.push(...labelParts(lv, { number: false }));
-        else parts.push(...orbitalNameParts(lv.label));
+        else parts.push(...orbitalNameParts(lv.display || lv.label));
       });
       const homo = isMO && atEnd && r.items.some(([, k]) => k === view.result.frontier.HOMO);
       const lumo = isMO && atEnd && r.items.some(([, k]) => k === view.result.frontier.LUMO);
@@ -245,7 +331,10 @@ function draw(view) {
       if (isMO && atEnd && r.items.length === 1 && r.items[0][0].nodes !== undefined) parts.push([`${r.items[0][0].nodes} node${r.items[0][0].nodes === 1 ? "" : "s"}`, "nodes"]);
       if (homo || lumo) parts.push([homo && lumo ? "HOMO = LUMO" : homo ? "HOMO" : "LUMO", "tag"]);
       if (warn) parts.push(["◆", "warn"]);
-      if (parts.length) labels[col].push({ y: yy, x: col === "left" ? leftmost - 10 : rightmost + 10, anchor: col === "left" ? "end" : "start", parts, ox: col === "left" ? leftmost : rightmost });
+      // Labels go in the outer gutter: left of a column drawn left of the MOs (including the two-column layout's
+      // atomic column), right otherwise, so they never sit where the correlation lines leave the bars.
+      const onLeft = !isMO && cx[col] < cx.centre;
+      if (parts.length) labels[col].push({ y: yy, x: onLeft ? leftmost - 10 : rightmost + 10, anchor: onLeft ? "end" : "start", parts, ox: onLeft ? leftmost : rightmost });
     }
   }
   layout("left", d.left, false);
@@ -263,6 +352,7 @@ function draw(view) {
       const line = el("line", { x1: fromRight ? f.x0 : f.x1, y1: f.y, x2: fromRight ? t.x1 : t.x0, y2: t.y,
                                 class: ln.layer === "mixing" ? "mix" : "allowed",
                                 "stroke-width": ln.layer === "mixing" ? (0.5 + 2.2 * ln.weight).toFixed(2) : 0.9 });
+      if (!peer) { line.dataset.link = `frag:${ln.from} mo:${ln.to.slice(1)}`; line.dataset.linkKind = "edge"; }
       line.append(el("title", {}, ln.layer === "mixing" ? `${view.provenance.mixing_line} Weight ${(100 * ln.weight).toFixed(0)} %.` : view.provenance.allowed_line));
       g.append(line);
     }
@@ -294,7 +384,7 @@ function draw(view) {
   // spot near its level (fewest crossed correlation lines, no overlap with bars or labels).
   // Smaller in the compact geometry; left out when no spot is free of bars and labels.
   const pk = state.fragment ?? (atEnd ? `M${state.level}` : `S${state.level}`);
-  if (view.structure && (state.level !== null || state.fragment) && pos[pk]) sketchCard(svg, view.structure, pos[pk], { W, H, top, bottom, AX, size: compact ? 84 : 108 });
+  if (!peer && view.structure && (state.level !== null || state.fragment) && pos[pk]) sketchCard(svg, view.structure, pos[pk], { W, H, top, bottom, AX, size: compact ? 84 : 108 });
   // Never clip: if labels reach past the canvas (long labels in the compact geometry), widen the viewBox to fit.
   const bb = svg.getBBox();
   if (bb.width > 0) {
@@ -456,7 +546,7 @@ function pes(view) {
     : "Black bars: model bands. No measured spectrum is curated for this case yet.";
   for (const b of P.bands) {
     const lv = view.diagram.centre[b.level];
-    const g = el("g", { class: "pes-band", "data-ie": b.ie_eV, "data-electrons": b.electrons });
+    const g = el("g", { class: "pes-band", "data-ie": b.ie_eV, "data-electrons": b.electrons, "data-link": `pes:${b.level}` });
     g.append(el("rect", { x: x(b.ie_eV) - 4, y: y(b.electrons), width: 8, height: H - B - y(b.electrons), rx: 2 }));
     g.append(richText(labelParts(lv), { x: x(b.ie_eV), y: y(b.electrons) - 5, "text-anchor": "middle", class: "pes-label" }));
     g.append(el("title", {}, `${fmt(-b.ie_eV, 2)} eV level, ${b.electrons} electrons`));
@@ -861,7 +951,7 @@ function drawWalsh(W, u, view) {
   W.lines.forEach((l, i) => {
     for (let k = 0; k < n - 1; k++) {
       svg.append(el("line", { x1: X(W.u[k]), y1: Y(l.energies[k]), x2: X(W.u[k + 1]), y2: Y(l.energies[k + 1]),
-                              class: occ[i][k] > 0 ? "wl occ" : "wl", "data-line": i }));
+                              class: occ[i][k] > 0 ? "wl occ" : "wl", "data-line": i, ...(l.irrep ? { "data-link": `w:${l.irrep}:${l.rank}` } : {}) }));
     }
   });
   // End labels, spread apart where levels end together (e.g. 2a1 and 1b1 meeting as πu at 180°).
@@ -954,7 +1044,12 @@ async function refresh() {
   if (mine !== latest) return state.view;  // a newer request superseded this one
   state.view = view;
   draw(view); levelTable(view); narrate(view); ledger(view); bonds(view); pes(view); dials(view); ruleCheck(view); paintPanel(view); morphUpdate(view); banner(view); about(view);
-  structure(view); matching(view); slotBadges(view); doubtUpdate(view);
+  structure(view); matching(view); slotBadges(view); doubtUpdate(view); linkify(view);
+  // Re-light after every redraw, from the focused or hovered item, now that every pane holds its new elements.
+  linkedFrom = null;
+  const keep = (document.activeElement && document.activeElement.closest && document.activeElement.closest("[data-link]")) ||
+    [...document.querySelectorAll(":hover")].reverse().find((e) => e.dataset && e.dataset.link) || null;
+  lightLinks(keep);
   if (proposal) proposalUpdate(view);
   if ($("t-3d").checked) view3d.render(view);
   document.body.dataset.computeMs = view.compute_ms.toFixed(1);
@@ -1032,6 +1127,38 @@ async function watch() {
   document.body.dataset.watchDone = "1";
 }
 
+
+// ---- D7 linked highlighting. ----
+// Every highlightable item carries identity tokens (data-link) and, optionally, tokens of its counterparts
+// (data-link-to). Hovering or focusing an item lights every item sharing a token with it; an "edge" (a line
+// joining two things) lights only when one of its own endpoints is the hovered item.
+function linkify(view) {
+  const L = view.ledger;
+  for (const n of document.querySelectorAll("#structure [data-atom]")) n.dataset.link = `atom:${n.dataset.atom}`;
+  for (const n of document.querySelectorAll("#structure [data-row]")) { n.dataset.link = `row:${n.dataset.row}`; n.dataset.linkKind = "edge"; }
+  if (L && L.basis_atoms) for (const tr of document.querySelectorAll("#ledger tr[data-row]")) {
+    const r = L.rows[Number(tr.dataset.row)];
+    tr.dataset.link = [`row:${tr.dataset.row}`, `atom:${L.basis_atoms[r.mu]}`, ...(r.kind === "contact" ? [`atom:${L.basis_atoms[r.nu]}`] : [])].join(" ");
+  }
+}
+let linkedFrom = null;
+function lightLinks(node) {
+  if (node === linkedFrom) return;
+  for (const e of document.querySelectorAll(".linked")) e.classList.remove("linked");
+  linkedFrom = node;
+  if (!node) { document.body.dataset.linked = ""; return; }
+  const own = new Set(node.dataset.link.split(" ").filter(Boolean));
+  const all = new Set([...own, ...(node.dataset.linkTo || "").split(" ").filter(Boolean)]);
+  let n = 0;
+  for (const e of document.querySelectorAll("[data-link]")) {
+    const toks = e.dataset.link.split(" ");
+    const hit = e.dataset.linkKind === "edge" ? toks.some((t) => own.has(t)) || (e === node) : toks.some((t) => all.has(t));
+    if (hit) { e.classList.add("linked"); n++; }
+  }
+  document.body.dataset.linked = `${node.dataset.link}|${n}`;
+}
+for (const ev of ["mouseover", "focusin"]) document.addEventListener(ev, (e) => lightLinks(e.target.closest && e.target.closest("[data-link]")));
+document.addEventListener("mouseleave", () => lightLinks(null));
 
 // ---- Doubt toggles (P4) and alternative schedules (P5). ----
 // Each rule the case uses can be marked "not convinced". Its moment on the construction then becomes a
@@ -1267,12 +1394,12 @@ function matching(view) {
   const m = view.diagram.matching;
   if (!m) { box.textContent = "No central atom: nothing to match."; return; }
   const t = document.createElement("table");
-  t.innerHTML = `<thead><tr><th></th>${m.cols.map((c) => `<th title="${c.irrep}">${c.label}${c.irrep !== "—" ? `<br><small>${c.irrep}</small>` : ""}</th>`).join("")}</tr></thead>`;
+  t.innerHTML = `<thead><tr><th></th>${m.cols.map((c) => `<th title="${c.irrep}" data-link="frag:${c.frag}">${c.label}${c.irrep !== "—" ? `<br><small>${c.irrep}</small>` : ""}</th>`).join("")}</tr></thead>`;
   const tb = document.createElement("tbody");
   m.rows.forEach((r, i) => {
     const tr = document.createElement("tr");
-    tr.innerHTML = `<td>${r.label}${r.irrep !== "—" ? ` <small>${r.irrep}</small>` : ""}</td>` +
-      m.tally_eV[i].map((v) => (v === 0 ? `<td class="zero">0</td>` : `<td>${fmt(v, 2)}</td>`)).join("");
+    tr.innerHTML = `<td data-link="frag:${r.frag}">${r.label}${r.irrep !== "—" ? ` <small>${r.irrep}</small>` : ""}</td>` +
+      m.tally_eV[i].map((v, j) => `<td${v === 0 ? ' class="zero"' : ""} data-link="frag:${r.frag} frag:${m.cols[j].frag}">${v === 0 ? "0" : fmt(v, 2)}</td>`).join("");
     tb.append(tr);
   });
   t.append(tb);
@@ -1636,8 +1763,12 @@ function proposalUpdate(view) {
     state.case = cases.find((c) => c.name === "SF6 model").name;
     if (await fromLink()) $("s").value = state.s;
     sel.value = state.case;
-    sel.addEventListener("change", () => { if (quiz.mode !== "explore") { state.case = sel.value; state.level = null; state.fragment = null; state.electrons = null; state.approx = null; refresh(); newAttempt(); return; } glideToken++; state.case = sel.value; state.level = null; state.fragment = null; state.electrons = null; state.approx = null; state.dial = 0; state.lp = 0; state.paint = null; state.morph = null; state.schedule = null; state.doubtOpen = null; morphMenu(); state.s = 1; $("s").value = 1; refresh(); });
+    sel.addEventListener("change", () => { if (quiz.mode !== "explore") { state.case = sel.value; state.level = null; state.fragment = null; state.electrons = null; state.approx = null; refresh(); newAttempt(); return; } glideToken++; state.case = sel.value; state.level = null; state.fragment = null; state.electrons = null; state.approx = null; state.dial = 0; state.lp = 0; state.paint = null; state.morph = null; state.schedule = null; state.doubtOpen = null; morphMenu(); if (state.compare && state.compare.case === sel.value && state.compare.electrons === null) { state.compare = null; state.compareView = null; } compareMenu(); state.s = 1; $("s").value = 1; refresh(); });
     $("s").addEventListener("input", () => { glideToken++; state.s = Number($("s").value); state.level = null; state.fragment = null; state.doubtOpen = null; refresh(); });
+    $("compare").addEventListener("change", (e) => {
+      const v = e.target.value ? JSON.parse(e.target.value) : null, o = e.target.selectedOptions[0];
+      setCompare(v ? { case: v[0], electrons: v[1], label: o && o.dataset.label ? o.dataset.label : null } : null);
+    });
     $("sched").addEventListener("change", (e) => { glideToken++; state.schedule = e.target.value === "lecture" ? null : e.target.value; state.level = null; state.fragment = null; state.doubtOpen = null; refresh(); });
     $("whyjump").addEventListener("click", () => {
       const o = state.view.origins[state.level];
@@ -1685,6 +1816,7 @@ function proposalUpdate(view) {
     for (const id of ["case", "s", "watch"]) $(id).disabled = false;
     await refresh();
     await morphMenu();
+    compareMenu();
     document.body.dataset.ready = "1";
   } catch (e) {
     $("banner").textContent = `Engine failed to load: ${e.message}`;
