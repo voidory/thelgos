@@ -186,6 +186,13 @@ Skipping with a note says exactly what the model assumes.
 - The engine and app code needed no changes: on-sites are data.
 - The SF6 levels shift (S is deeper, so a1g goes from −11.79 to −13.12 and t1u* from +1.43 to +0.64), but its ordering, labels and construction stages are unchanged. The eg level is F-only and does not move.
 
+**Flip audit (owner request, 2026-11-07).** `engine/tools/compare_params.py` compared every case under the two tables (old params from commit 64a2202). It checks level order, electrons, HOMO/LUMO, warnings, the bonding/antibonding star, comparisons with experiment, bond orders, construction stages, the order at every construction checkpoint, and which fragment orbital dominates each MO. 5 changes across 23 cases, none in a finished diagram's level order:
+- *BH3.* B 2s moves from 1.07 eV above the H 1s set to 0.44 eV below it. So at the separate-atoms step the order is B 2s < H set, and the lowest a1′ is now mostly B 2s (51 %, was 47 %); a1′* swaps the other way.
+- *SF6, model and lecture.* At construction step 1, S 3s (−22.71) drops below the lower three fluorine pair combinations (−21.18). Before, S 3s sat above them at −20.80. Only that intermediate step changes.
+- *N2.* 1σg and 2σg are near-even 2s/2p mixes, and their majority character tips across 50 %: 1σg goes from 50 % 2p to 52 % 2s, 2σg the reverse. The cause is Miessler's wider 2s–2p gap (12.38 against 11.57 eV), which means slightly less s–p mixing.
+
+Each of these has a "Miessler vs Harrison energies" reading note in the app (`params/case_notes.json`).
+
 **Couplings are unchanged** (Harrison η, M2). The model now pairs measured-ionisation on-sites with Harrison's couplings. It was already a pedagogical mix; this makes it no less one.
 
 **Hydrogen scale.** The window widened to 0.4235–1.0313, which now includes 1.0. Keeping 0.6 leaves every H-containing result as it would be under the decision already approved (B2), and changes one thing at a time. Whether to drop the scale altogether is a separate owner question.

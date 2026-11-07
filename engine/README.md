@@ -42,3 +42,7 @@ Run `make test-engine`, which `make check` also runs. The suite covers:
 - Practice and Exam modes, node markers and the rule badges (Release 2 and later).
 
 The browser front end is in `web/` (see `web/README.md`).
+
+## Comparing parameter sets
+
+`python engine/tools/compare_params.py OLD_ROOT [NEW_ROOT]` lists every qualitative change between two `params/` sets: level order, frontier orbitals, warnings, bonding character, comparisons with experiment, construction-step order and dominant fragment per MO. Use it before any parameter or model change. For the M7 on-site switch it found 5 changes, documented in DECISIONS.md M7.
