@@ -4,7 +4,7 @@ An interactive explorer for ligand-group-orbital (LGO) molecular-orbital diagram
 
 ## Live app
 
-**https://voidory.github.io/thelgos/** is Release 1 (engine 1.0.0, CONVENTIONS v1.4 frozen). Each push to the default branch runs `make check` and, only if it passes, redeploys through `.github/workflows/pages.yml`. `web/build_site.sh` assembles the site: the app, engine sources, `params/`, `groups/` and `CONVENTIONS.md`.
+**https://voidory.github.io/thelgos/** is Release 1 (engine 1.0.0, CONVENTIONS v1.4 frozen). Each push to the default branch runs `make check` and, only if it passes, redeploys through `.github/workflows/pages.yml`. `web/build_site.sh` assembles the site: the app, engine sources, `params/`, `groups/` and `CONVENTIONS.md`. If Pages is instead set to deploy from the branch, the root `index.html` redirects to the app and `.nojekyll` stops Jekyll from dropping the engine's `__init__.py`. In that mode the whole repository is served and no checks run first, so "GitHub Actions" is the recommended source.
 
 ## History: the v1.2 audit package
 
