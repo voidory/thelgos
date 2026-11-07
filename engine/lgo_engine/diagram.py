@@ -119,9 +119,11 @@ def diagram_spec(system, H, result, groups, H_now=None, params=None):
             frag["_v_full"] = full
     from .views import matching_spec
     matching = matching_spec(system, H, cols.get("left", []), cols.get("right", []), P) if (centre is not None or diatomic) else None
+    vectors = {}
     for side in cols:
         for frag in cols[side]:
-            frag.pop("_v"), frag.pop("_v_full")
+            frag.pop("_v")
+            vectors[frag["id"]] = frag.pop("_v_full")
     if diatomic:
         titles = {"left": f"{system.atoms[0].element} (atom 1)", "centre": "Molecular orbitals", "right": f"{system.atoms[1].element} (atom 2)"}
     elif centre is not None:
@@ -132,6 +134,7 @@ def diagram_spec(system, H, result, groups, H_now=None, params=None):
             "column_titles": titles,
             "left": cols.get("left", []), "right": cols["right"], "centre": mos, "lines": lines,
             "axis_label": AXIS_LABEL, "electrons": system.electrons, "matching": matching}
+    spec["_fragment_vectors"] = vectors  # internal: app_api uses it for a selected fragment orbital, then drops it
     if H_now is not None:
         e = np.linalg.eigvalsh(H_now)
         spec["slider_levels"] = [{"energy_eV": float(e[ix[0]]), "multiplicity": len(ix)} for ix in cluster_levels(e, H_now)]

@@ -154,11 +154,25 @@ const check = (name, ok, detail = "") => { results.push({ name, ok, detail }); c
     const r2 = await p2.evaluate(() => document.body.dataset.rendered);
     check("F5.6: share link reproduces the view in a new page", r2.startsWith("SF6 model|0.75|"), r2);
     await p2.close();
+    // F3.7: a ligand group orbital is selectable; ledger, structure and 3D follow; hovering a ledger row highlights its 3D rod.
+    await page.$eval('[data-frag="R2"]', (h) => h.dispatchEvent(new Event("click")));
+    await page.waitForFunction(() => document.body.dataset.rendered === "SF6 model|0.75|R2" || document.body.dataset.rendered.endsWith("|R2"));
+    const fragLedger = await page.$eval("#ledger table", (t) => Math.abs(Number(t.dataset.total) - Number(t.dataset.eigen)));
+    const fragSel = await page.$eval('[data-frag="R2"]', (h) => h.getAttribute("aria-pressed"));
+    check("F3.7: a ligand group orbital is selectable, with its own ledger", fragLedger < 1e-10 && fragSel === "true", `ledger error ${fragLedger.toExponential(1)}`);
     await page.check("#t-3d");
     await page.waitForTimeout(300);
     const painted = await page.$eval("#view3d", (c) => { const g = c.getContext("webgl2"); const px = new Uint8Array(4 * 50 * 50);
       g.readPixels(c.width / 2 - 25, c.height / 2 - 25, 50, 50, g.RGBA, g.UNSIGNED_BYTE, px); return new Set(Array.from(px)).size; });
     check("F3.7: 3D view renders the selected orbital", painted > 4, `${painted} distinct byte values`);
+    const snap = () => page.$eval("#view3d", (c) => { const g = c.getContext("webgl2"); const px = new Uint8Array(4 * c.width * c.height);
+      g.readPixels(0, 0, c.width, c.height, g.RGBA, g.UNSIGNED_BYTE, px); let h = 0; for (let i = 0; i < px.length; i += 97) h = (h * 31 + px[i]) >>> 0; return h; });
+    const before3d = await snap();
+    await page.evaluate(() => { const tr = [...document.querySelectorAll("#ledger tr[data-row]")].find((t) => !t.textContent.includes("on-site")); tr.dispatchEvent(new Event("mouseenter")); });
+    await page.waitForTimeout(200);
+    const after3d = await snap();
+    await page.evaluate(() => { const tr = [...document.querySelectorAll("#ledger tr[data-row]")].find((t) => !t.textContent.includes("on-site")); tr.dispatchEvent(new Event("mouseleave")); });
+    check("F3.7: hovering a ledger contact highlights it in the 3D view", before3d !== after3d);
     const both = await page.evaluate(() => [getComputedStyle(document.querySelector("#structure")).display, getComputedStyle(document.querySelector("#view3d")).display]);
     check("3D view replaces the 2D sketch while on", both[0] === "none" && both[1] !== "none", both.join(" / "));
     if (shots) await page.screenshot({ path: path.join(shots, "inspector-3d.png"), fullPage: true });

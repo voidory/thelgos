@@ -17,7 +17,7 @@ const call = (cmd, args) => new Promise((resolve, reject) => {
 
 const $ = (id) => document.getElementById(id);
 const NS = "http://www.w3.org/2000/svg";
-const state = { case: null, s: 1, level: null, view: null, info: null, watching: false };
+const state = { case: null, s: 1, level: null, fragment: null, view: null, info: null, watching: false };
 
 function el(tag, attrs = {}, text) {
   const e = document.createElementNS(NS, tag);
@@ -125,7 +125,7 @@ function capsTitle(t) {
 function draw(view) {
   const svg = $("diagram");
   // Keep keyboard focus on the same level across redraws (selecting a level redraws the diagram).
-  const fe = document.activeElement, refocus = fe && svg.contains(fe) && fe.classList.contains("mo-hit") ? fe.dataset.mo ?? fe.dataset.sliderLevel : null;
+  const fe = document.activeElement, refocus = fe && svg.contains(fe) && fe.classList.contains("mo-hit") ? fe.dataset.mo ?? fe.dataset.sliderLevel ?? fe.dataset.frag : null;
   svg.replaceChildren();
   const d = view.diagram;
   const atEnd = view.schedule.s >= 1;
@@ -182,7 +182,7 @@ function draw(view) {
         const x0 = x;
         for (let i = 0; i < lv.multiplicity; i++) {
           const a = x + i * (BAR + GAP);
-          const cls = isMO ? (state.level === k ? "level selected" : atEnd ? "level" : "level moving") : "level frag";
+          const cls = isMO ? (state.level === k ? "level selected" : atEnd ? "level" : "level moving") : (state.fragment === lv.id ? "level frag selected" : "level frag");
           g.append(el("line", { x1: a, x2: a + BAR, y1: yy, y2: yy, class: cls }));
           if (isMO && atEnd && lv.electrons !== undefined) {
             const n = (i < lv.electrons ? 1 : 0) + (i < lv.electrons - lv.multiplicity ? 1 : 0);
@@ -204,6 +204,13 @@ function draw(view) {
           g.append(hit);
         } else {
           g.append(el("title", {}, view.provenance.fragment));
+          // Fragment orbitals (LGOs, central-atom or atom orbitals) are selectable too: ledger, structure and 3D follow.
+          const fname = `${lv.label}${lv.irrep && lv.irrep !== "—" ? ` (${lv.irrep})` : ""}, ${fmt(lv.energy_eV, 2)} eV${lv.multiplicity > 1 ? `, ${lv.multiplicity}-fold degenerate` : ""}`;
+          const fh = el("rect", { x: x0 - 4, y: yy - 9, width: x1 - x0 + 8, height: 18, class: "mo-hit frag-hit", tabindex: 0, role: "button",
+                                  "aria-pressed": state.fragment === lv.id, "aria-label": fname, "data-frag": lv.id });
+          fh.addEventListener("click", () => selectFragment(lv.id));
+          fh.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") selectFragment(lv.id); });
+          g.append(fh);
         }
         svg.append(g);
       }
@@ -273,15 +280,15 @@ function draw(view) {
   // Sketch card for the selected level: the orbital drawn as in the lecture, placed in the emptiest
   // spot near its level (fewest crossed correlation lines, no overlap with bars or labels).
   // Smaller in the compact geometry; left out when no spot is free of bars and labels.
-  const pk = atEnd ? `M${state.level}` : `S${state.level}`;
-  if (view.structure && state.level !== null && pos[pk]) sketchCard(svg, view.structure, pos[pk], { W, H, top, bottom, AX, size: compact ? 84 : 108 });
+  const pk = state.fragment ?? (atEnd ? `M${state.level}` : `S${state.level}`);
+  if (view.structure && (state.level !== null || state.fragment) && pos[pk]) sketchCard(svg, view.structure, pos[pk], { W, H, top, bottom, AX, size: compact ? 84 : 108 });
   // Never clip: if labels reach past the canvas (long labels in the compact geometry), widen the viewBox to fit.
   const bb = svg.getBBox();
   if (bb.width > 0) {
     const x0 = bb.x < 0 ? bb.x - 4 : 0, x1 = bb.x + bb.width > W ? bb.x + bb.width + 4 : W;
     if (x0 < 0 || x1 > W) svg.setAttribute("viewBox", `${x0} 0 ${x1 - x0} ${H}`);
   }
-  if (refocus != null) { const h = svg.querySelector(`[data-mo="${refocus}"], [data-slider-level="${refocus}"]`); if (h) h.focus({ preventScroll: true }); }
+  if (refocus != null) { const h = svg.querySelector(`[data-mo="${refocus}"], [data-slider-level="${refocus}"], [data-frag="${refocus}"]`); if (h) h.focus({ preventScroll: true }); }
 }
 
 function sketchCard(svg, S, p, { W, H, top, bottom, AX, size }) {
@@ -373,10 +380,12 @@ function ledger(view) {
   box.replaceChildren();
   const L = view.ledger;
   const wj = $("whyjump");
-  wj.hidden = !(L && view.schedule.s >= 1);
+  wj.hidden = !(L && L.level !== null && view.schedule.s >= 1);
   if (!L) { $("ledger-hint").textContent = "Tap a molecular orbital (at any point of the construction) to see every contact that sets its energy."; return; }
   const when = view.schedule.s >= 1 ? "" : ` at this point of the construction (s = ${view.schedule.s.toFixed(2)})`;
-  $("ledger-hint").textContent = `Level ${L.level + 1}${when}: ledger total ${fmt(L.total_eV, 6)} eV; eigenvalue ${fmt(L.eigenvalue_eV, 6)} eV.`;
+  $("ledger-hint").textContent = L.fragment
+    ? `${L.fragment_label}${L.multiplicity > 1 ? ` (one of ${L.multiplicity} degenerate components)` : ""}: ledger total ${fmt(L.total_eV, 6)} eV; orbital energy ${fmt(L.eigenvalue_eV, 6)} eV. Only contacts within its own set appear: it has not met the other side yet.`
+    : `Level ${L.level + 1}${when}: ledger total ${fmt(L.total_eV, 6)} eV; eigenvalue ${fmt(L.eigenvalue_eV, 6)} eV.`;
   const t = document.createElement("table");
   t.dataset.total = L.total_eV;
   t.dataset.eigen = L.eigenvalue_eV;
@@ -490,7 +499,7 @@ function banner(view) {
 let latest = 0;
 async function refresh() {
   const mine = ++latest;
-  const view = await call("view", { case: state.case, s: state.s, level: state.level });
+  const view = await call("view", { case: state.case, s: state.s, level: state.level, fragment: state.fragment });
   if (mine !== latest) return state.view;  // a newer request superseded this one
   state.view = view;
   draw(view); levelTable(view); narrate(view); ledger(view); bonds(view); pes(view); banner(view); about(view);
@@ -498,11 +507,12 @@ async function refresh() {
   if (proposal) proposalUpdate(view);
   if ($("t-3d").checked) view3d.render(view);
   document.body.dataset.computeMs = view.compute_ms.toFixed(1);
-  document.body.dataset.rendered = `${view.case}|${view.schedule.s}|${view.ledger ? view.ledger.level : ""}`;
+  document.body.dataset.rendered = `${view.case}|${view.schedule.s}|${view.ledger ? (view.ledger.fragment ?? view.ledger.level) : ""}`;
   return view;
 }
 
-function select(k) { glideToken++; state.level = k; refresh(); }
+function select(k) { glideToken++; state.level = k; state.fragment = null; refresh(); }
+function selectFragment(id) { glideToken++; state.fragment = id; state.level = null; refresh(); }
 
 // Glide: when jumping between construction steps (step buttons, "why does it jump"), the levels slide
 // to their new energies through intermediate s values instead of snapping, so the eye can follow each
@@ -514,7 +524,7 @@ async function glide(target, level = null, ms = 420) {
   const from = state.s;
   const reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   if (!reduce && Math.abs(target - from) > 1e-9) {
-    state.level = null;
+    state.level = null; state.fragment = null;
     const t0 = performance.now();
     for (;;) {
       const u = Math.min(1, (performance.now() - t0) / ms);
@@ -584,6 +594,7 @@ function slotBadges(view) {
 // ---- Linked contacts: a ledger row and its structure line highlight together (L2). ----
 function hot(row, on) {
   for (const e of document.querySelectorAll(`[data-row="${row}"]`)) e.classList.toggle("hot", on);
+  view3d.hot(on ? Number(row) : null);
 }
 
 // ---- Structure view (L2): atoms, orbital lobes coloured by phase, contact lines. ----
@@ -788,7 +799,7 @@ const status = (t) => { $("export-status").textContent = t; };
 
 // ---- 3D viewer (F3.7): WebGL2, atoms and the selected orbital's lobes; drag to rotate. ----
 const view3d = (() => {
-  let gl, prog, sphere, rot = [0, 0], lastView = null, lastCase = null, buf = {};
+  let gl, prog, sphere, rot = [0, 0], lastView = null, lastCase = null, buf = {}, hotRow = null;
   const VS = `#version 300 es
   in vec3 p; uniform mat4 M; uniform mat4 P; uniform vec3 c; uniform vec3 s; uniform mat3 R; out vec3 n; out vec3 col;
   // R orients the ellipsoid: its first column is the lobe's long axis, in engine coordinates.
@@ -876,6 +887,16 @@ const view3d = (() => {
     const lobes = displayLobes(S);
     const maxc = Math.max(...lobes.map((l) => Math.abs(l.coefficient)), 1e-9);
     for (const at of S.atoms) draw(at.xyz, [0.18, 0.18, 0.18], [...atom, 1]);
+    // Ledger contacts as thin rods between atoms: dark = stabilising, light = destabilising; the hovered ledger row in the warn colour.
+    const maxE = Math.max(...S.contacts.map((k) => Math.abs(k.energy_eV)), 1e-9);
+    const fgc = rgb(css("--fg")), lite = rgb(css("--allowed")), warn = rgb(css("--warn"));
+    for (const k of S.contacts) {
+      const A = S.atoms[k.atoms[0]].xyz, B = S.atoms[k.atoms[1]].xyz;
+      const d = B.map((v, i) => v - A[i]), len = Math.hypot(...d);
+      if (len < 1e-6) continue;
+      const isHot = hotRow === k.ledger_row, w = (0.025 + 0.05 * Math.abs(k.energy_eV) / maxE) * (isHot ? 1.8 : 1);
+      draw(A.map((v, i) => v + d[i] / 2), [len / 2, w, w], [...(isHot ? warn : k.style === "solid" ? fgc : lite), 1], frame(d));
+    }
     for (const l of lobes) {
       const at = S.atoms[l.atom].xyz, r = 0.12 + 0.42 * Math.abs(l.coefficient) / maxc;
       if (l.kind === "s") { draw(at, [r, r, r], [...(l.coefficient > 0 ? pos : neg), 1]); continue; }
@@ -889,7 +910,9 @@ const view3d = (() => {
       }
     }
   }
-  return { render };
+  // Ledger hover: highlight that contact's rod (only when the 3D view is showing).
+  function hot(row) { hotRow = row; if (lastView && !$("view3d").hidden) render(lastView); }
+  return { render, hot };
 })();
 
 
@@ -1026,8 +1049,8 @@ function proposalUpdate(view) {
     state.case = cases.find((c) => c.name === "SF6 model").name;
     if (await fromLink()) $("s").value = state.s;
     sel.value = state.case;
-    sel.addEventListener("change", () => { glideToken++; state.case = sel.value; state.level = null; state.s = 1; $("s").value = 1; refresh(); });
-    $("s").addEventListener("input", () => { glideToken++; state.s = Number($("s").value); state.level = null; refresh(); });
+    sel.addEventListener("change", () => { glideToken++; state.case = sel.value; state.level = null; state.fragment = null; state.s = 1; $("s").value = 1; refresh(); });
+    $("s").addEventListener("input", () => { glideToken++; state.s = Number($("s").value); state.level = null; state.fragment = null; refresh(); });
     $("whyjump").addEventListener("click", () => {
       const o = state.view.origins[state.level];
       glide(o.s, o.level_index_there).then((v) => v && status(`Jumped to where this level appeared: ${o.label}`));

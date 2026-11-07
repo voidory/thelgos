@@ -282,6 +282,19 @@ class ReadingPanel(unittest.TestCase):
             if "orbital_ordering" in r:
                 self.assertEqual(got["Orbital ordering"], r["orbital_ordering"]["agrees"], r["case"])
 
+    def test_fragment_orbital_selection(self):
+        """F3.7: every fragment orbital (LGO or central/atom orbital) is selectable; its ledger sums to its energy."""
+        from lgo_engine import app_api
+        n = 0
+        for s in cases.release1(P):
+            d = app_api.view(P, G, s.name)["diagram"]
+            for f in d.get("left", []) + d["right"]:
+                v = app_api.view(P, G, s.name, fragment=f["id"])
+                self.assertAlmostEqual(v["ledger"]["total_eV"], f["energy_eV"], delta=1e-10, msg=(s.name, f["id"]))
+                self.assertEqual(len(v["structure"]["contacts"]), sum(1 for r in v["ledger"]["rows"] if r["kind"] == "contact" and abs(r["energy_eV"]) >= 1e-9))
+                n += 1
+        self.assertGreater(n, 50)
+
     def test_photoelectron_spectrum(self):
         """Spec Release 1, CH4: two bands with degeneracies 3:1, badged approximate; measured values cited."""
         from load import load_extras

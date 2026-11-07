@@ -74,7 +74,7 @@ def _system(params, name):
     raise ValueError(f"unknown case {name!r}")
 
 
-def view(params, groups, name, s=1.0, level=None, conventions_sha256=None, extras=None):
+def view(params, groups, name, s=1.0, level=None, conventions_sha256=None, extras=None, fragment=None):
     """Everything one screen needs: result, diagram, schedule, slider state and ledger."""
     system = _system(params, name)
     result = run(system, params, groups, conventions_sha256)
@@ -82,6 +82,7 @@ def view(params, groups, name, s=1.0, level=None, conventions_sha256=None, extra
     sched = build_schedule(system, Group(groups[system.group]) if system.group != "C1" else None, H)
     Hs = hamiltonian_at(sched, s)
     diagram = diagram_spec(system, H, result, groups, H_now=Hs, params=params)
+    frag_vectors = diagram.pop("_fragment_vectors", {})
     K = len(sched["stages"])
     lam = lambdas(s, K)
     active = next((k for k, x in enumerate(lam) if 0 < x < 1), None)
@@ -101,6 +102,20 @@ def view(params, groups, name, s=1.0, level=None, conventions_sha256=None, extra
         ledger["multiplicity"] = len(ix)
         ledger["basis_labels"] = [f.label for f in system.basis]
         structure = views.structure_spec(system, Huse, c, ledger)
+    elif fragment is not None:
+        # A selected fragment orbital (an LGO, or a symmetry-adapted central-atom/atom orbital): its ledger and
+        # structure, from the full Hamiltonian. Only one component of a degenerate set is shown.
+        if fragment not in frag_vectors:
+            raise ValueError(f"unknown fragment orbital {fragment!r}")
+        c = np.array(frag_vectors[fragment])[:, 0]
+        c = c / np.linalg.norm(c)
+        k = int(np.flatnonzero(abs(c) > 1e-8)[0])
+        c = c if c[k] >= 0 else -c
+        info = next(x for side in ("left", "right") for x in diagram.get(side, []) if x["id"] == fragment)
+        ledger = contact_ledger(H, c)
+        ledger.update({"level": None, "fragment": fragment, "fragment_label": info["label"], "eigenvalue_eV": info["energy_eV"],
+                       "multiplicity": info["multiplicity"], "basis_labels": [f.label for f in system.basis]})
+        structure = views.structure_spec(system, H, c, ledger)
     origin = views.origins(sched, result["levels"])
     for st in sched["stages"]:
         st["rules"] = views.STAGE_RULES.get(st["kind"], [])

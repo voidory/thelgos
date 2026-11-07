@@ -20,7 +20,7 @@ The approved layout (case rail, construction timeline, tabbed inspector) is the 
 | L3 | Rule badges (R1–R10) on each construction stage, the ledger, matching and bond order; tapping one shows the rule, its meaning in the model and its badge |
 | P3 | Why-jump: "Show where this level appeared" moves the slider to the checkpoint at which the selected level first reached its final energy, with that moment's ledger and structure |
 | P6 | Matching table: ⟨central orbital\|H\|LGO⟩ tallies; zero means no interaction, and the zero pattern follows the irreps |
-| F3.7 | 3D view (WebGL2): atoms and the selected orbital's lobes (p functions on an atom merged into one oriented lobe); opens in the 2D sketch's orientation; drag to rotate |
+| F3.7 | 3D view (WebGL2): atoms, ledger contacts as rods, and the selected orbital's lobes (p functions on an atom merged into one oriented lobe); opens in the 2D sketch's orientation; drag to rotate. Any MO or fragment orbital (LGO, central-atom or atom orbital) can be selected in the diagram; the ledger, 2D structure, sketch card and 3D view follow it; hovering a ledger row highlights that contact in 2D and 3D |
 | F5.1–F5.6 | Provenance tooltips; generated explanation; SVG, PNG and JSON export; JSON import with validation; share links (compressed config in the URL fragment, nothing stored on a server) |
 | L1 | Contact ledger for the selected level: every on-site and contact row, phase, contact weight, energy contribution, running total. The total equals the eigenvalue |
 | P1–P2 | Construction slider over H(s), with stage ticks and narration, and B5 notes for skipped stages |
@@ -47,6 +47,7 @@ The approved layout (case rail, construction timeline, tabbed inspector) is the 
 - Watch mode plays through; step jumps glide, and with reduced motion they do not;
 - the selected level's sketch card sits clear of bars and labels;
 - accessibility: every level is a named button and is listed in the screen-reader table; the inspector tabs answer to the arrow keys; Enter selects a focused level and keeps focus on it;
+- F3.7: a ligand group orbital is selectable with its own ledger; hovering a ledger contact changes the 3D view;
 - the CH4 photoelectron spectrum: two bands 3:1, badged approximate, measured positions cited;
 - the banner shows the CONVENTIONS version read from the file;
 - layout: the full diagram from 1024 px up, the phone geometry at 360 px, and nothing clipped or scrolling sideways;
@@ -56,4 +57,4 @@ The approved layout (case rail, construction timeline, tabbed inspector) is the 
 
 ## Not built yet
 
-The Release 2+ features (L4–L5, P4–P5, Practice and Exam modes, D1–D10), from Release 1: selecting ligand group orbitals or ledger contacts in the 3D view.
+The Release 2+ features (L4–L5, P4–P5, Practice and Exam modes, D1–D10), from Release 1: nothing. Share links and exports carry a selected MO but not a selected fragment orbital.
