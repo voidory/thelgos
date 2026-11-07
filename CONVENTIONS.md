@@ -1,6 +1,6 @@
 # CONVENTIONS.md — LGO Method Explorer
 
-**Version: 1.5 — not frozen (applied 2026-11-07 on the owner's acceptance of `drafts/CONVENTIONS-v1.5-draft.md`; owner sign-off B7 of this text pending)**  
+**Version: 1.5 — FROZEN (owner sign-off B7, 2026-11-07)**  
 **Owner / change authority: the project owner**  
 **Date: 2026-11-07, Singapore**  
 **Release 1 blockers: none. CrystOD comparison deferred until the programme is finished (B1). Diatomic fixtures (periods 2 and 3) and browser acceptance tests (C4) in place. v1.5 adds C3v, NH3, H2S, SiH4 and the hydrides NH, OH, HF.**
@@ -248,6 +248,7 @@ Release 1 gates (all closed except C1, which owner decision B1 defers):
 - C1 (deferred by B1): original archive identity, tested real default-EHT adapter and executed qualitative comparisons.
 - C2: closed. Source-backed B2, C2, N2, O2, F2, CO, Al2, Si2, P2, S2 and Cl2 geometries, explicit blocks (A.6) and regression rows (Appendix B) are in place.
 - C4: closed 2026-11-07. `web/tests/web_test.js` runs in Pyodide 0.27.7 in Chromium and checks every case: both slider end points (s = 1 against `evidence/reference_spectra.json` to 1e−9 eV; s = 0 against the on-site table to 1e−12 eV, with multiplicities); the ledger identity at s = 1 and s = 0.5 (1e−10 eV); counting bond orders against A.5; and Watch mode playing to the finished diagram. It is not part of `make check`, because it needs the network.
+- B7: closed 2026-11-07. The owner signed off v1.5 ("ok i sign off v1.5") after accepting `drafts/CONVENTIONS-v1.5-draft.md` and reviewing the applied text. The signed text is this file at commit 32d6376, sha256 `312ea75e7a92c46aadc24716ad4de8211b136223c15e1d402b42c4c3c2c7f62b`. The only edits made afterwards are this status record, the header and the changelog row.
 - B6: closed 2026-11-07. The owner signed off v1.4 ("I sign off v1.4") after reading `drafts/signoff-summary-v1.4.md`, which lists the delegated decisions (B2, B3 in-plane axis, B5, M1–M4) and the points resting on weaker sources. The signed text is this file at commit 81cf760, sha256 `ca861a1d6f47f5fe9962eb229a3fbdf4313c22ed2e83083dcfa8fdbe71b98d36`. The only edits made afterwards are this status record, the header and the changelog row.
 
 Slides/aliases are nonblocking. Later d-channel parameters remain outside Release 1. Spec-document edits in tier D are reserved for the reviewer after approval, not silently applied here.
@@ -266,6 +267,7 @@ Slides/aliases are nonblocking. Later d-channel parameters remain outside Releas
 | 1.4 | 2026-11-07 | Applied by Claude on the owner's decision M7: all on-sites from the Miessler teaching table (§9.1); couplings unchanged (Harrison η, H scale 0.6). Every fixture involving B, C, N, O, Si, P or S has new Appendix B values. Unchanged: the H-only sets, F2, Al2, Cl2. No qualitative result changed: orderings, spin agreements and counting bond orders are as before. H-scale window updated. Not frozen: owner sign-off B6 pending. |
 | 1.4 (frozen) | 2026-11-07 | Owner sign-off B6. Signed text: commit 81cf760, sha256 `ca861a1d6f47f5fe9962eb229a3fbdf4313c22ed2e83083dcfa8fdbe71b98d36`. No content change. |
 | 1.5 | 2026-11-07 | Applied on the owner's acceptance of `drafts/CONVENTIONS-v1.5-draft.md` ("accept v1.5 as recommended"; V5 as revised by the owner). V1 erratum (§9.1 table now the Miessler values in use); C3v (K21); NH3, H2S, SiH4, NH, OH, HF fixtures with CCCBDB geometries; Si–H rows; lecture presets for NH, OH, HF; A.3, A.5, A.6 and Appendix B rows. No earlier fixture's values changed. Not frozen: owner sign-off B7 pending. |
+| 1.5 (frozen) | 2026-11-07 | Owner sign-off B7. Signed text: commit 32d6376, sha256 `312ea75e7a92c46aadc24716ad4de8211b136223c15e1d402b42c4c3c2c7f62b`. No content change. |
 
 **A5 disposition:** the pairs.csv column specification is restored in §9.2. Exact legacy Appendix A.7 text was not present in the accessible attachments or earlier inline answer; it is not silently reconstructed as a quotation. The unknown legacy A.7 is **removed as an unrecoverable legacy section**, because its original content cannot be verified; it is replaced by the explicitly newly authored ledger/limit/invariance contract below. If the owner supplies the original, review whether it contains additional obligations before freezing. No claim that its exact old content has been recovered.
 

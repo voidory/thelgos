@@ -4,11 +4,11 @@ An interactive explorer for ligand-group-orbital (LGO) molecular-orbital diagram
 
 ## Live app
 
-**https://voidory.github.io/thelgos/** carries Release 1 and the Release 2 features (engine 1.0.0, CONVENTIONS v1.5, applied and awaiting sign-off; v1.4 was the last frozen version). Each push to the default branch runs `make check` and, only if it passes, redeploys through `.github/workflows/pages.yml`. `web/build_site.sh` assembles the site: the app, engine sources, `params/`, `groups/` and `CONVENTIONS.md`. If Pages is instead set to deploy from the branch, the root `index.html` redirects to the app and `.nojekyll` stops Jekyll from dropping the engine's `__init__.py`. In that mode the whole repository is served and no checks run first, so "GitHub Actions" is the recommended source.
+**https://voidory.github.io/thelgos/** carries Release 1 and the Release 2 features (engine 1.0.0, CONVENTIONS v1.5 frozen). Each push to the default branch runs `make check` and, only if it passes, redeploys through `.github/workflows/pages.yml`. `web/build_site.sh` assembles the site: the app, engine sources, `params/`, `groups/` and `CONVENTIONS.md`. If Pages is instead set to deploy from the branch, the root `index.html` redirects to the app and `.nojekyll` stops Jekyll from dropping the engine's `__init__.py`. In that mode the whole repository is served and no checks run first, so "GitHub Actions" is the recommended source.
 
 ## History: the v1.2 audit package
 
-The rest of this file is the README of the v1.2 package as it was supplied, kept unchanged as history. Current status: `CONVENTIONS.md` v1.5 is applied and awaits the owner's sign-off (B7); v1.4 was frozen by sign-off B6. Decisions are in `DECISIONS.md`.
+The rest of this file is the README of the v1.2 package as it was supplied, kept unchanged as history. Current status: `CONVENTIONS.md` v1.5 is frozen (owner sign-off B7); v1.4 was frozen by B6. Decisions are in `DECISIONS.md`.
 
 This is an actual generated audit package, not a claim that a file has been produced elsewhere. `CONVENTIONS.md` is the primary candidate. **Not frozen. The owner has not approved v1.2.** The input TODO is preserved in `evidence/CONVENTIONS-v1.2-TODO.md`.
 
@@ -75,7 +75,7 @@ The baseline uses the packaged freshly retrieved snapshots to avoid website avai
 
 ## Owner decisions and later gates
 
-**Current status (2026-11-07):** CONVENTIONS v1.4 was signed off and frozen (B6); v1.5 (C3v, NH3, H2S, SiH4, NH, OH, HF and a v1.4 erratum) is applied and awaits sign-off (B7). All owner and delegated decisions are in `DECISIONS.md`, and Release 1's only open gate is the deferred CrystOD comparison (B1). The paragraph below is the original v1.2 package note, kept as history.
+**Current status (2026-11-07):** CONVENTIONS v1.4 was signed off and frozen (B6); v1.5 (C3v, NH3, H2S, SiH4, NH, OH, HF and a v1.4 erratum) is signed off and frozen (B7). All owner and delegated decisions are in `DECISIONS.md`, and Release 1's only open gate is the deferred CrystOD comparison (B1). The paragraph below is the original v1.2 package note, kept as history.
 
 B2=0.6, B3=benzene atoms on ±x, B5=skip zero-coupling stages are **defaults pending approval**. B1 still needs the original zip. B4 is unresolved: N2 stays excluded; N parameter values are not added. B6 sign-off has not happened. C2 diatomic source geometries/explicit blocks/regressions, C1 real checker and C4 browser tests are still open. Tier-D spec edits were not applied.
 

@@ -314,7 +314,11 @@ The owner approved these defaults: the current molecules only; two question type
   - mid-construction MO rows with several levels drew stray commas between empty labels;
   - in the two-column layout the atomic column's labels sat in the gutter where the correlation lines leave the bars; they now go in the outer gutter.
 
-## CONVENTIONS v1.5 applied (2026-11-07); sign-off B7 of the applied text pending
+## CONVENTIONS v1.5 applied and signed off (B7, 2026-11-07)
+
+**Signed off.** The owner wrote "ok i sign off v1.5". `CONVENTIONS.md` v1.5 is frozen. The signed text is commit 32d6376, sha256 `312ea75e7a92c46aadc24716ad4de8211b136223c15e1d402b42c4c3c2c7f62b`. Any later change needs a new version and the owner's approval.
+
+### How it was applied
 
 The owner read the draft and decided V5 (bond orders for the hydrides). They asked which picture fits the module's definition, (bonding − antibonding)/2. The answer:
 - For NH, OH and HF, Miessler's picture has the central s nonbonding, which the lecture preset reproduces.
