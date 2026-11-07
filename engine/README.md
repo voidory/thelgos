@@ -20,6 +20,7 @@ The engine the app runs on (spec sections 8 and 9). It is pure NumPy, with no fi
 | `views.py` | L2–L5, P3, P6, F5.1, F5.2 | Structure, matching tallies, origins, rule badges, node counts, rule checks, explanation and provenance |
 | `exam.py` | Practice, Exam | Practice and Exam tasks and their checking |
 | `packs.py` | F2.14, F2.15, section 14 | Molecule packs: build a System from a pack's template shape and sourced geometry, the C1 fallback, and the `make add-molecule` gate checks |
+| `matcher.py` | M1–M5 | The case matcher: reads a name, formula or SMILES; library, isomers and VSEPR evidence; three-way verdict with reason codes; nearest drawn case |
 | `morph.py` | D1, F3.8 | Morph paths through the worked cases and Walsh correlation plots |
 | `app_api.py` | — | The entry points the browser worker calls: `case_list`, `view` and the Release 2 commands (quiz, exam, morph, Walsh) |
 | `cases.py` | F1.1 | Release 1 geometries from CONVENTIONS §2, with lengths and angles taken from `params/presets.json` |

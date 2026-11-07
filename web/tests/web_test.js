@@ -432,6 +432,21 @@ const check = (name, ok, detail = "") => { results.push({ name, ok, detail }); c
     check("Release 3 packs: HOF (Cs, not in the library) draws with the C1 fallback; packs are marked in the rail",
           hof.labels === 6 && /C1 fallback/.test(hof.notes) && hof.rail >= 3, JSON.stringify({ ...hof, notes: hof.notes.length }));
 
+    // ---- Release 3, Milestone B: the case matcher. ----
+    const findIt = async (t) => { await page.fill("#finder-input", t); await page.press("#finder-input", "Enter");
+      await page.waitForFunction((t) => document.body.dataset.match && JSON.parse(document.body.dataset.match).input === t, t); return JSON.parse(await page.evaluate(() => document.body.dataset.match)); };
+    const m1 = await findIt("C3H5+"), m2 = await findIt("H2Se");
+    const nearTxt = await page.textContent("#finder-card .nearest");
+    await page.click("#finder-card .actions .primary");
+    await page.waitForFunction(() => document.body.dataset.rendered === "H2O model|1|");
+    const m3 = await findIt("allyl anion");
+    await page.click("#finder-card .actions .primary");
+    await page.waitForFunction(() => document.body.dataset.rendered.startsWith("allyl cation pi|") && JSON.parse(document.body.dataset.dials).electrons === 4);
+    check("Release 3 matcher: C3H5+ asks for a structure; H2Se is not built (Se) and opens its nearest case; the allyl anion opens with 4 electrons",
+          m1.verdict === "choose" && m2.verdict === "not_built" && m2.code === "element_parameters" && /H2O model/.test(nearTxt) && m3.verdict === "drawn",
+          `${m1.verdict} · ${m2.code} · ${nearTxt}`);
+    await page.click("#finder-card .close");
+
     // ---- Release 2, Milestone C: node markers (L5), rule check (L4), phase painting (D3). ----
     await pick(page, "allyl cation pi");
     await page.waitForFunction(() => document.body.dataset.rendered === "allyl cation pi|1|");

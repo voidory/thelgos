@@ -286,3 +286,26 @@ body:not(.comparing) .cmp-cap { display: none; }
 .loading.failed .msg { color: var(--warn); }
 @keyframes lgo-spin { to { transform: rotate(360deg); } }
 @media (prefers-reduced-motion: reduce) { .loading-card li.active::before { animation: none; border-top-color: var(--accent); } .loading, .loading-card .bar span { transition: none; } }
+
+/* ---- Release 3, Milestone B: the case matcher. ---- */
+.finder { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; margin: 6px 0 0; max-width: 640px; }
+.finder input { flex: 1 1 220px; min-width: 0; font: inherit; padding: 6px 10px; border: 1px solid var(--rule); border-radius: 999px; background: var(--panel); color: var(--fg); }
+.finder select, .finder button { font: inherit; }
+.finder button { border: 0; border-radius: 999px; padding: 6px 14px; background: var(--accent); color: var(--on-accent); cursor: pointer; }
+.finder-card { margin: 8px 16px 0; padding: 12px 14px; border: 1px solid var(--rule); border-left-width: 4px; border-radius: 10px; background: var(--panel); font-size: 0.9rem; max-width: 900px; }
+.finder-card[data-verdict="drawn"] { border-left-color: var(--accent); }
+.finder-card[data-verdict="not_built"], .finder-card[data-verdict="choose"] { border-left-color: var(--warn); }
+.finder-card h2 { margin: 0 0 6px; font-size: 1.05rem; display: flex; flex-wrap: wrap; gap: 8px; align-items: baseline; }
+.finder-card .close { margin-left: auto; border: 0; background: none; color: var(--accent); text-decoration: underline; font: inherit; font-size: 0.85rem; cursor: pointer; padding: 0; }
+.finder-card .pill { font-size: 0.75rem; border-radius: 999px; padding: 1px 8px; border: 1px solid var(--rule); }
+.finder-card .pill.drawn { background: var(--accent); color: var(--on-accent); border-color: var(--accent); }
+.finder-card .pill.not_built, .finder-card .pill.choose { border-color: var(--warn); color: var(--warn); }
+.finder-card p { margin: 4px 0; }
+.finder-card .also { margin: 2px 0 6px; padding-left: 18px; color: var(--muted, #6b6a64); font-size: 0.85rem; }
+.finder-card .evidence { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 2px 12px; margin: 8px 0; font-size: 0.85rem; }
+.finder-card .evidence dt { color: var(--muted, #6b6a64); }
+.finder-card .evidence dd { margin: 0; }
+.finder-card .actions { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.finder-card .actions .chipbtn { margin-left: 0; }
+.finder-card .actions .primary { border-color: var(--accent); color: var(--accent); }
+@media (max-width: 700px) { .finder-card { margin: 8px 10px 0; } }

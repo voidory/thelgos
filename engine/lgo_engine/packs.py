@@ -168,4 +168,12 @@ def gate(params, groups, pack):
     except AssertionError as e:
         check("pairing schedule (F2.13) partitions the couplings and ends at H", False, str(e))
     check("morph invariants", True, "no morph paths declared")
+    # Matcher fixture (F2.15): the pack's formula and name must find the pack itself.
+    from .app_api import match
+    for text in (pack["identity"]["formula"], pack["identity"]["name"]):
+        r = match(params, groups, text)
+        if not (r["verdict"] == "drawn" and r.get("case") == pack["identity"]["name"]):
+            check(f"matcher finds the pack from {text!r}", False, f"{r['verdict']}: {r.get('case') or r.get('reason')}")
+            return out
+    check("matcher finds the pack from its formula and name", True)
     return out

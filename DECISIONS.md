@@ -343,6 +343,45 @@ Built on top, the Release 2 items that waited for v1.5:
 
 `drafts/CONVENTIONS-v1.5-draft.md` proposes NH3, H2S and SiH4 (needed for the BH3 → NH3 morph and the H2O/H2S and CH4/SiH4 comparisons), the C3v group, Si–H rows, optional diatomic hydrides NH, OH and HF, and lecture presets that switch the central s–H coupling off (V5). It also records an erratum in signed v1.4. The frozen §9.1 table still shows the earlier Harrison composite values, although the text, `params/onsite.csv` and every result use Miessler; no computed number is affected. Nothing is applied until the owner signs off. The C3v group data and the new geometries come from fresh Bilbao and CCCBDB snapshots in `evidence/` (the Bilbao host was added to a new personal environment for this repository, with the owner's approval). The draft's numbers come from a scratch prototype with the unchanged engine.
 
+## Release 3, Milestone B: the case matcher, design choices (delegated, 2026-11-07)
+
+`engine/lgo_engine/matcher.py` is rule-based and deterministic, and calls no language model. The library is `matcher/library.json` (fixture identities, electron-count variants and isomer lists) plus the packs. The tests are `matcher/fixtures.json`: 54 inputs with expected verdicts, written by Claude for the owner to check.
+
+- **Reading the input (M1).** Auto mode tries a name, then a formula, then SMILES. Other readings are offered as buttons: "CO" is carbon monoxide, and as SMILES it is methanol. A formula that repeats an element symbol ("OO", "CCO") is read as SMILES first.
+  - *Charges* need an explicit size: "SiF6 2-", "SO4^2-", "SO4(2-)" or "SO4-2". "NH4+" is NH4 with +1, not NH with +4.
+  - *SMILES (R3-2)* covers the organic subset, aromatic lowercase, bracket atoms with H count and charge, bonds, branches and ring closures; implicit hydrogens use the lowest standard valence.
+- **Structure (M2).** The library comes first. A formula with several known structures asks for a choice (C3H5+: allyl or cyclopropyl cation; H3+: triangle or linear). For everything else, VSEPR from the formula gives the shape, point group and template, as evidence only: nothing is drawn without a sourced geometry (R3-3).
+  - *Central atom:* the element appearing once that is not H; non-halogens are preferred, then non-oxygen.
+  - *Bonds:* single bonds to H and halogens. A terminal O, S, N or C would need multiple bonds, which is the "π from terminal atoms" case.
+- **Verdict (M3, M4).** The "outside the method" checks come first:
+  - a single atom or ion;
+  - a metal element;
+  - a binary salt of a group 1 or 2 metal with a halogen, chalcogen or N. Gas-phase alkaline-earth dihalides such as BaF2 are kept as molecules.
+  - a network solid (SiO2, BN, SiC, C).
+
+  Otherwise the reasons for "not built yet" are listed in priority order, the first being the verdict and the rest shown as "also":
+  1. d-block element;
+  2. element without parameters (outside the table, or no p where one is needed; H and He use s only);
+  3. π from terminal atoms;
+  4. multicentre bonding (B2 or Al2 with six bridging or terminal atoms);
+  5. no structure from the formula ("give SMILES");
+  6. isomer-dependent group;
+  7. point group not in library;
+  8. no template for the shape (seesaw, T-shaped, square planar, trigonal bipyramidal, square pyramidal);
+  9. too large (more than 20 basis functions);
+  10. no sourced geometry, always last.
+- **Nearest case (M5).** The score rewards, in this order:
+  - the same template (another π template scores less);
+  - the same number of terminal atoms;
+  - a central atom in the same group, or the same element;
+  - the same terminal elements, and each shared element;
+  - for diatomics, matching s-only atoms;
+  - then the closest valence-electron count.
+
+  The card names what differs ("O → Se", "charge 0 → +1"). A morph is offered only where a path joins the two cases (BH3 ↔ NH3, H2 → H3+). A drawn case lists the morphs from it and to it: NH3 shows the BH3 pyramidalisation, which is the spec's M5 example, now that NH3 is drawn.
+- **App.** A "Find a molecule" box in the header, with a mode menu (auto, name, formula, SMILES). The verdict card shows the reasons, the evidence and buttons: open the case (with the electron count for variants such as the allyl anion), open the nearest case, the morphs, the isomer choices and the other readings.
+- **Consistency (F2.15).** The engine tests run every fixture, open every "drawn" verdict in the app view, and the pack gate checks that each pack's formula and name find the pack.
+
 ## CONVENTIONS v1.6 applied (2026-11-07); sign-off B8 of the applied text pending
 
 The owner accepted the v1.6 draft ("yes"). Applied:

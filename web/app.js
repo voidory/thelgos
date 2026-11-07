@@ -1180,6 +1180,68 @@ async function watch() {
 }
 
 
+// ---- Release 3, Milestone B: the case matcher (M1-M5). The engine decides; this only shows the verdict. ----
+const VERDICT = { drawn: "Drawn", not_built: "Not built yet", outside: "Outside the method", choose: "Pick a structure", unread: "Not recognised", empty: "" };
+const EVIDENCE = { formula: "Formula", template: "Template", shape: "Shape", vsepr: "VSEPR", group: "Point group", central: "Central atom",
+  terminals: "Terminal atoms", equivalent_terminals: "Equivalent terminals", basis_functions: "Basis functions", source: "Source", electrons: "Electrons" };
+async function find(text, mode = "auto") {
+  $("finder-input").value = text; $("finder-mode").value = mode;
+  const r = await call("match", { text, mode });
+  renderFinder(r);
+  document.body.dataset.match = JSON.stringify({ input: r.input, verdict: r.verdict, code: r.code || null, case: r.case || null });
+  return r;
+}
+async function openCase(name, electrons = null, morphId = null) {
+  if (quiz.mode !== "explore") setMode("explore");
+  $("case").value = name; $("case").dispatchEvent(new Event("change"));
+  await new Promise((res) => { const t = setInterval(() => { if (state.view && state.view.case === name) { clearInterval(t); res(); } }, 30); });
+  if (electrons != null) { state.electrons = electrons; await refresh(); }
+  if (morphId) { await morphMenu(); $("morph-path").value = morphId; $("morph-path").dispatchEvent(new Event("change")); }
+}
+function renderFinder(r) {
+  const box = $("finder-card"); box.replaceChildren(); box.hidden = r.verdict === "empty"; if (box.hidden) return;
+  box.dataset.verdict = r.verdict;
+  const h = document.createElement("h2");
+  h.innerHTML = `<span class="pill ${r.verdict}">${VERDICT[r.verdict] || r.verdict}</span> ${esc(r.input)}` +
+    (r.read_as ? ` <small class="muted-text">read as ${r.read_as === "smiles" ? "SMILES" : r.read_as}</small>` : "");
+  const close = document.createElement("button"); close.type = "button"; close.className = "linkish close"; close.textContent = "close";
+  close.addEventListener("click", () => { box.hidden = true; });
+  h.append(close); box.append(h);
+  const p = document.createElement("p"); p.textContent = r.reason; box.append(p);
+  if (r.also && r.also.length) {
+    const ul = document.createElement("ul"); ul.className = "also";
+    for (const a of r.also) { const li = document.createElement("li"); li.textContent = `Also: ${a.reason}`; ul.append(li); }
+    box.append(ul);
+  }
+  const ev = Object.entries(r.evidence || {}).filter(([k, v]) => v !== null && v !== undefined && k in EVIDENCE);
+  if (ev.length) {
+    const dl = document.createElement("dl"); dl.className = "evidence";
+    for (const [k, v] of ev) { dl.insertAdjacentHTML("beforeend", `<dt>${EVIDENCE[k]}</dt><dd>${esc(typeof v === "boolean" ? (v ? "yes" : "no") : v)}</dd>`); }
+    box.append(dl);
+  }
+  const acts = document.createElement("div"); acts.className = "actions";
+  const btn = (label, fn, cls = "") => { const b = document.createElement("button"); b.type = "button"; b.className = `chipbtn ${cls}`; b.textContent = label; b.addEventListener("click", fn); acts.append(b); return b; };
+  if (r.verdict === "drawn") {
+    btn(`Open ${r.case}${r.electrons != null ? ` with ${r.electrons} electrons` : ""}`, () => openCase(r.case, r.electrons), "primary");
+    for (const m of r.related || []) btn(`Morph: ${m.title}`, () => openCase(m.from, null, m.morph));
+  }
+  if (r.verdict === "choose") for (const c of r.choices) {
+    if (c.case) btn(`${c.name}: open`, () => openCase(c.case), "primary");
+    else if (c.morph) btn(`${c.name}: see it on the morph`, () => openCase(r.choices.find((x) => x.case).case, null, c.morph));
+    else { const b = btn(`${c.name}: why not`, () => { p.textContent = `${c.name}: not built yet, ${c.why_not_built}.`; }); b.title = c.why_not_built || ""; }
+  }
+  if (r.nearest) {
+    const n = r.nearest;
+    const d = document.createElement("p"); d.className = "nearest";
+    d.textContent = `Nearest drawn case: ${n.case}` + (n.differs.length ? ` (differs: ${n.differs.join(", ")})` : "") + ".";
+    box.append(d);
+    btn(`Open ${n.case}`, () => openCase(n.case), "primary");
+    if (n.morph) btn(`Morph: ${n.morph.title}`, () => openCase(n.case, null, n.morph.id));
+  }
+  for (const a of r.alternatives || []) btn(`Read as ${a.read_as === "smiles" ? "SMILES" : a.read_as} instead (${a.formula})`, () => find(r.input, a.mode));
+  if (acts.children.length) box.append(acts);
+}
+
 // ---- D7 linked highlighting. ----
 // Every highlightable item carries identity tokens (data-link) and, optionally, tokens of its counterparts
 // (data-link-to). Hovering or focusing an item lights every item sharing a token with it; an "edge" (a line
@@ -1818,6 +1880,7 @@ function proposalUpdate(view) {
     sel.value = state.case;
     sel.addEventListener("change", () => { if (quiz.mode !== "explore") { state.case = sel.value; state.level = null; state.fragment = null; state.electrons = null; state.approx = null; refresh(); newAttempt(); return; } glideToken++; state.case = sel.value; state.level = null; state.fragment = null; state.electrons = null; state.approx = null; state.dial = 0; state.lp = 0; state.paint = null; state.morph = null; state.schedule = null; state.doubtOpen = null; morphMenu(); if (state.compare && state.compare.case === sel.value && state.compare.electrons === null) { state.compare = null; state.compareView = null; } compareMenu(); state.s = 1; $("s").value = 1; refresh(); });
     $("s").addEventListener("input", () => { glideToken++; state.s = Number($("s").value); state.level = null; state.fragment = null; state.doubtOpen = null; refresh(); });
+    $("finder").addEventListener("submit", (e) => { e.preventDefault(); find($("finder-input").value, $("finder-mode").value); });
     $("compare").addEventListener("change", (e) => {
       const v = e.target.value ? JSON.parse(e.target.value) : null, o = e.target.selectedOptions[0];
       setCompare(v ? { case: v[0], electrons: v[1], label: o && o.dataset.label ? o.dataset.label : null } : null);

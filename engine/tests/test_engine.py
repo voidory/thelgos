@@ -746,6 +746,48 @@ class MoleculePacks(unittest.TestCase):
             P.presets.pop(k, None)
 
 
+class Matcher(unittest.TestCase):
+    """Release 3 Milestone B: every matcher fixture gets its expected verdict (M3/M4), with evidence (M4), the nearest
+    case (M5) and isomer prompts (M2); the reader handles charges and SMILES (M1)."""
+
+    def test_fixture_verdicts(self):
+        fixtures = json.loads((ROOT / "matcher/fixtures.json").read_text())["fixtures"]
+        self.assertGreaterEqual(len(fixtures), 40)
+        for fx in fixtures:
+            r = app_api.match(P, G, fx["input"])
+            self.assertEqual(r["verdict"], fx["verdict"], fx["input"])
+            for k in ("case", "code", "electrons"):
+                if k in fx:
+                    self.assertEqual(r.get(k), fx[k], (fx["input"], k))
+            if "nearest" in fx:
+                self.assertIn((r.get("nearest") or {}).get("case"), fx["nearest"], fx["input"])
+            if "alternative" in fx:
+                self.assertIn(fx["alternative"], [a["formula"] for a in r["alternatives"]], fx["input"])
+            if "related_morph" in fx:
+                self.assertIn(fx["related_morph"], [x["morph"] for x in r.get("related", [])], fx["input"])
+            if r["verdict"] in ("not_built", "outside"):
+                self.assertTrue(r["reason"] and r["evidence"].get("formula"), fx["input"])
+            if r["verdict"] == "drawn":           # every drawn verdict opens a real case (F2.15)
+                app_api.view(P, G, r["case"], electrons=r.get("electrons"))
+
+    def test_charges_and_smiles(self):
+        from lgo_engine import matcher
+        self.assertEqual(matcher.parse_formula("NH4+"), ({"N": 1, "H": 4}, 1))
+        self.assertEqual(matcher.parse_formula("SiF6 2-"), ({"Si": 1, "F": 6}, -2))
+        self.assertEqual(matcher.parse_formula("SO4^2-")[1], -2)
+        self.assertEqual(matcher.smiles_formula(matcher.parse_smiles("c1ccccc1")), ({"C": 6, "H": 6}, 0))
+        self.assertEqual(matcher.smiles_formula(matcher.parse_smiles("[NH4+]")), ({"N": 1, "H": 4}, 1))
+        self.assertEqual(matcher.smiles_formula(matcher.parse_smiles("CC(=O)O")), ({"C": 2, "H": 4, "O": 2}, 0))
+        self.assertIsNone(matcher.parse_smiles("C1CC"))       # unclosed ring
+
+    def test_isomer_prompt_and_smiles_choice(self):
+        r = app_api.match(P, G, "C3H5+")
+        self.assertEqual(r["verdict"], "choose")
+        self.assertEqual({c["name"] for c in r["choices"]}, {"allyl cation", "cyclopropyl cation"})
+        self.assertEqual(app_api.match(P, G, "C=C[CH2+]")["case"], "allyl cation pi")
+        self.assertNotEqual(app_api.match(P, G, "C1C[CH+]1")["verdict"], "drawn")
+
+
 class InspectorViews(unittest.TestCase):
     """L2, L3, P3, P6, F5.1, F5.2, F5.4-F5.5 on the engine side."""
 

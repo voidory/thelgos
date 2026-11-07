@@ -23,7 +23,14 @@
 <header>
   <h1>LGO Method Explorer</h1>
   <p id="banner" class="banner" role="note">Loading the engine…</p>
+  <form id="finder" class="finder" role="search" autocomplete="off">
+    <label for="finder-input" class="sr-only">Find a molecule</label>
+    <input id="finder-input" type="text" placeholder="Find a molecule: name, formula (NH4+) or SMILES" spellcheck="false">
+    <select id="finder-mode" aria-label="Read the input as"><option value="auto">auto</option><option value="name">name</option><option value="formula">formula</option><option value="smiles">SMILES</option></select>
+    <button type="submit">Find</button>
+  </form>
 </header>
+<section id="finder-card" class="finder-card" hidden aria-live="polite" aria-label="Matcher verdict"></section>
 <main>
   <section class="controls" aria-label="Case and construction">
     <label>Case <select id="case" disabled></select></label>

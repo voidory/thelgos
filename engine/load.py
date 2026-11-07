@@ -24,6 +24,8 @@ def load_params(root=ROOT):
     # is missing can fall back to C1 (F2.14). Packs are data beside the CONVENTIONS fixtures.
     P.packs = load_packs(root)
     P.group_names = {p.stem for p in Path(root, "groups").glob("*.json")}
+    lib = Path(root, "matcher/library.json")
+    P.matcher_library = json.loads(lib.read_text()) if lib.exists() else {"entries": [], "isomers": {}}
     return P
 
 

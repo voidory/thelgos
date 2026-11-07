@@ -2,7 +2,7 @@
 
 Schema check, then the engine-side checks in lgo_engine.packs.gate: formula, parameters (owner decision
 R3-1), electron count, declared symmetry or C1 fallback, R4 count, ledger totals, the pairing schedule and
-morph invariants. The matcher fixture check arrives with the matcher (Milestone B). Exits non-zero, naming
+morph invariants and the matcher fixture (the pack's formula and name find it). Exits non-zero, naming
 the failing check, if any fails. Nothing is written."""
 import argparse
 import json
@@ -30,7 +30,6 @@ def main(argv=None):
         print(f"FAIL schema: {e.message} at {'/'.join(map(str, e.absolute_path))}")
         return 1
     results += packs.gate(load_params(ROOT), load_groups(ROOT), pack)
-    results.append(("matcher fixture", True, "not yet available: the matcher arrives in Release 3 Milestone B"))
     listed = pack["id"] in json.loads((ROOT / "packs/index.json").read_text())["packs"]
     for name, ok, detail in results:
         print(f"{'PASS' if ok else 'FAIL'} {name}{': ' + detail if detail else ''}")

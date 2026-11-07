@@ -4,11 +4,11 @@
 importScripts("https://cdn.jsdelivr.net/pyodide/v0.27.7/full/pyodide.js");
 
 const ENGINE = ["__init__.py", "model.py", "params.py", "hamiltonian.py", "solve.py", "symmetry.py",
-  "analysis.py", "ledger.py", "result.py", "schedule.py", "cases.py", "diagram.py", "fidelity.py", "views.py", "exam.py", "morph.py", "doubt.py", "packs.py", "app_api.py"];
+  "analysis.py", "ledger.py", "result.py", "schedule.py", "cases.py", "diagram.py", "fidelity.py", "views.py", "exam.py", "morph.py", "doubt.py", "packs.py", "matcher.py", "app_api.py"];
 const GROUPS = ["C2h", "C2v", "C3v", "D2d", "D2h", "D3h", "D4h", "D6h", "D8h", "Oh", "Td"];
 const DATA = ["params/onsite.csv", "params/pairs.csv", "params/presets.json", "params/channel_defaults.json",
   "params/case_notes.json", "params/curated_checks.json",
-  "CONVENTIONS.md", "engine/load.py", ...GROUPS.map(g => `groups/${g}.json`),
+  "CONVENTIONS.md", "engine/load.py", "matcher/library.json", ...GROUPS.map(g => `groups/${g}.json`),
   ...ENGINE.map(f => `engine/lgo_engine/${f}`)];
 
 let py = null;
@@ -75,6 +75,9 @@ json.dumps(app_api.export(P, G, a["case"], s=a.get("s", 1.0), level=a.get("level
     } else if (cmd === "import") {
       py.globals.set("ARGS", JSON.stringify(args));
       out = JSON.parse(py.runPython(`json.dumps(app_api.validate_import(P, json.loads(ARGS), conventions_sha256=CSHA))`));
+    } else if (cmd === "match") {
+      py.globals.set("ARGS", JSON.stringify(args));
+      out = JSON.parse(py.runPython(`a = json.loads(ARGS)\njson.dumps(app_api.match(P, G, a["text"], a.get("mode", "auto")), allow_nan=False)`));
     } else if (cmd === "morph_paths") {
       py.globals.set("ARGS", JSON.stringify(args));
       out = JSON.parse(py.runPython(`a = json.loads(ARGS)\njson.dumps(app_api.morph_paths(P, a.get("case")))`));

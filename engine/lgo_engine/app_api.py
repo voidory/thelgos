@@ -414,6 +414,13 @@ def exam_check(params, groups, name, answers, kind="build"):
     return exam.check(system, params, ctx, H, frags, answers, kind)
 
 
+def match(params, groups, text, mode="auto"):
+    """Release 3 Milestone B: the case matcher (M1-M5) on a typed name, formula or SMILES string."""
+    from . import matcher
+    from . import morph as morph_mod
+    return matcher.match(params, groups, text, mode, lib=getattr(params, "matcher_library", None), morphs=morph_mod.path_list(params))
+
+
 def morph_paths(params, case=None):
     from . import morph as morph_mod
     return morph_mod.path_list(params, case)

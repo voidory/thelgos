@@ -1,0 +1,46 @@
+{
+  "schema_version": "1.0",
+  "note": "Identities of the CONVENTIONS fixtures for the matcher (Release 3 Milestone B). Molecule packs carry their own identity. 'case' is the app case to open; 'electrons' (optional) opens it with that electron count (the electron stepper, D6). Templates follow spec section 3.",
+  "entries": [
+    {"case": "H2O model", "formula": "H2O", "charge": 0, "names": ["water"], "smiles": "O", "template": "T1", "shape": "AX2E2 bent"},
+    {"case": "CH4", "formula": "CH4", "charge": 0, "names": ["methane"], "smiles": "C", "template": "T3", "shape": "AX4 tetrahedral"},
+    {"case": "BH3", "formula": "BH3", "charge": 0, "names": ["borane"], "smiles": "B", "template": "T2", "shape": "AX3 trigonal planar"},
+    {"case": "NH3", "formula": "H3N", "charge": 0, "names": ["ammonia"], "smiles": "N", "template": "AX3E", "shape": "AX3E1 pyramidal"},
+    {"case": "H2S", "formula": "H2S", "charge": 0, "names": ["hydrogen sulfide", "hydrogen sulphide"], "smiles": "S", "template": "T1", "shape": "AX2E2 bent"},
+    {"case": "SiH4", "formula": "H4Si", "charge": 0, "names": ["silane"], "smiles": "[SiH4]", "template": "T3", "shape": "AX4 tetrahedral"},
+    {"case": "NH model", "formula": "HN", "charge": 0, "names": ["imidogen", "nitrene NH"], "smiles": "[NH]", "template": "T0", "shape": "diatomic"},
+    {"case": "OH model", "formula": "HO", "charge": 0, "names": ["hydroxyl", "hydroxyl radical"], "smiles": "[OH]", "template": "T0", "shape": "diatomic"},
+    {"case": "HF model", "formula": "FH", "charge": 0, "names": ["hydrogen fluoride"], "smiles": "F", "template": "T0", "shape": "diatomic"},
+    {"case": "SF6 model", "formula": "F6S", "charge": 0, "names": ["sulfur hexafluoride", "sulphur hexafluoride"], "smiles": "FS(F)(F)(F)(F)F", "template": "T4", "shape": "AX6 octahedral"},
+    {"case": "H2", "formula": "H2", "charge": 0, "names": ["hydrogen", "dihydrogen"], "smiles": "[H][H]", "template": "T0", "shape": "diatomic"},
+    {"case": "H3+", "formula": "H3", "charge": 1, "names": ["trihydrogen cation", "triatomic hydrogen cation"], "template": "T5", "shape": "ring of 3 s orbitals"},
+    {"case": "neutral H3", "formula": "H3", "charge": 0, "names": ["triatomic hydrogen", "cyclic H3"], "template": "T5", "shape": "ring of 3 s orbitals"},
+    {"case": "H3+", "electrons": 4, "formula": "H3", "charge": -1, "names": ["trihydrogen anion"], "template": "T5", "shape": "ring of 3 s orbitals"},
+    {"case": "allyl cation pi", "formula": "C3H5", "charge": 1, "names": ["allyl cation"], "smiles": "C=C[CH2+]", "template": "T6", "shape": "open chain of 3 pπ"},
+    {"case": "allyl cation pi", "electrons": 3, "formula": "C3H5", "charge": 0, "names": ["allyl radical", "allyl"], "smiles": "C=C[CH2]", "template": "T6", "shape": "open chain of 3 pπ"},
+    {"case": "allyl cation pi", "electrons": 4, "formula": "C3H5", "charge": -1, "names": ["allyl anion"], "smiles": "C=C[CH2-]", "template": "T6", "shape": "open chain of 3 pπ"},
+    {"case": "six H Oh", "formula": null, "charge": 0, "names": ["six H Oh", "octahedral H6", "six hydrogens in Oh"], "template": "T8", "shape": "ligand set, no central atom"},
+    {"case": "four H Td", "formula": null, "charge": 0, "names": ["four H Td", "tetrahedral H4", "four hydrogens in Td"], "template": "T8", "shape": "ligand set, no central atom"},
+    {"case": "B2", "formula": "B2", "charge": 0, "names": ["diboron"], "template": "T0", "shape": "diatomic"},
+    {"case": "C2", "formula": "C2", "charge": 0, "names": ["dicarbon"], "template": "T0", "shape": "diatomic"},
+    {"case": "N2", "formula": "N2", "charge": 0, "names": ["nitrogen", "dinitrogen"], "smiles": "N#N", "template": "T0", "shape": "diatomic"},
+    {"case": "O2", "formula": "O2", "charge": 0, "names": ["oxygen", "dioxygen"], "smiles": "O=O", "template": "T0", "shape": "diatomic"},
+    {"case": "F2", "formula": "F2", "charge": 0, "names": ["fluorine", "difluorine"], "smiles": "FF", "template": "T0", "shape": "diatomic"},
+    {"case": "CO", "formula": "CO", "charge": 0, "names": ["carbon monoxide"], "smiles": "[C-]#[O+]", "template": "T0", "shape": "diatomic"},
+    {"case": "Al2", "formula": "Al2", "charge": 0, "names": ["dialuminium", "dialuminum"], "template": "T0", "shape": "diatomic"},
+    {"case": "Si2", "formula": "Si2", "charge": 0, "names": ["disilicon"], "template": "T0", "shape": "diatomic"},
+    {"case": "P2", "formula": "P2", "charge": 0, "names": ["diphosphorus"], "smiles": "P#P", "template": "T0", "shape": "diatomic"},
+    {"case": "S2", "formula": "S2", "charge": 0, "names": ["disulfur", "disulphur"], "smiles": "S=S", "template": "T0", "shape": "diatomic"},
+    {"case": "Cl2", "formula": "Cl2", "charge": 0, "names": ["chlorine", "dichlorine"], "smiles": "ClCl", "template": "T0", "shape": "diatomic"}
+  ],
+  "isomers": {
+    "C3H5+1": [
+      {"name": "allyl cation", "case": "allyl cation pi", "smiles": "C=C[CH2+]"},
+      {"name": "cyclopropyl cation", "case": null, "smiles": "C1C[CH+]1", "why_not_built": "no sourced geometry, and a σ framework the π-only template does not describe"}
+    ],
+    "H3+1": [
+      {"name": "triangular H3+ (D3h)", "case": "H3+"},
+      {"name": "linear H3+", "case": null, "why_not_built": "drawn only as the midpoint of the 'H3+: assemble' morph, not as a case", "morph": "H3+: assemble"}
+    ]
+  }
+}
