@@ -1,4 +1,42 @@
 {
+  "Al2": [
+    {
+      "electrons": 2,
+      "energy_eV": -13.645089151581603,
+      "irrep": "Ag",
+      "multiplicity": 1
+    },
+    {
+      "electrons": 2,
+      "energy_eV": -10.334969067396743,
+      "irrep": "B1u",
+      "multiplicity": 1
+    },
+    {
+      "electrons": 2,
+      "energy_eV": -8.501361372522558,
+      "irrep": "Ag",
+      "multiplicity": 1
+    },
+    {
+      "electrons": 0,
+      "energy_eV": -6.826039854423359,
+      "irrep": "B2u+B3u",
+      "multiplicity": 2
+    },
+    {
+      "electrons": 0,
+      "energy_eV": -5.133960145576647,
+      "irrep": "B2g+B3g",
+      "multiplicity": 2
+    },
+    {
+      "electrons": 0,
+      "energy_eV": -2.1185804084990987,
+      "irrep": "B1u",
+      "multiplicity": 1
+    }
+  ],
   "B2": [
     {
       "electrons": 2,
@@ -168,6 +206,44 @@
       "electrons": 0,
       "energy_eV": 12.491899987006931,
       "irrep": "A1",
+      "multiplicity": 1
+    }
+  ],
+  "Cl2": [
+    {
+      "electrons": 2,
+      "energy_eV": -29.274859984517377,
+      "irrep": "Ag",
+      "multiplicity": 1
+    },
+    {
+      "electrons": 2,
+      "energy_eV": -23.322165065291355,
+      "irrep": "B1u",
+      "multiplicity": 1
+    },
+    {
+      "electrons": 2,
+      "energy_eV": -18.572272835171837,
+      "irrep": "Ag",
+      "multiplicity": 1
+    },
+    {
+      "electrons": 4,
+      "energy_eV": -15.231891720678506,
+      "irrep": "B2u+B3u",
+      "multiplicity": 2
+    },
+    {
+      "electrons": 4,
+      "energy_eV": -12.108108279321499,
+      "irrep": "B2g+B3g",
+      "multiplicity": 2
+    },
+    {
+      "electrons": 0,
+      "energy_eV": -6.6307021150194485,
+      "irrep": "B1u",
       "multiplicity": 1
     }
   ],

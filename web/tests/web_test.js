@@ -137,6 +137,11 @@ const check = (name, ok, detail = "") => { results.push({ name, ok, detail }); c
     const siTitles = await page.$$eval("#diagram .col-title", (t) => t.map((x) => x.textContent));
     const siSpin = await page.$$eval("#comparisons li", (ls) => ls.map((l) => l.dataset.agrees + ":" + l.textContent.split(":")[0]));
     check("Si2: element symbol kept in column titles; spin compared, no ordering claim", /^Si \(/.test(siTitles[0]) && JSON.stringify(siSpin) === JSON.stringify(["1:Ground-state spin"]), `${siTitles.join(" | ")}; ${siSpin}`);
+    await pick(page, "Al2");
+    await page.waitForFunction(() => document.body.dataset.rendered === "Al2|1|");
+    const alSpin = await page.$$eval("#comparisons li", (ls) => ls.map((l) => l.dataset.agrees + ":" + l.textContent.split(":")[0]));
+    const alNote = await page.textContent("#notes");
+    check("Al2: spin disagreement shown, with the on-site table note", JSON.stringify(alSpin) === JSON.stringify(["0:Ground-state spin"]) && alNote.includes("different on-site table"), `${alSpin}`);
     await pick(page, "CO");
     await page.waitForFunction(() => document.body.dataset.rendered === "CO|1|");
     const coNote = await page.textContent("#notes");

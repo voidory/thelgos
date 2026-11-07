@@ -92,7 +92,7 @@ def four_h(params, preset="fourH_diagnostic"):
                   [(a, b) for a in range(4) for b in range(a + 1, 4)], 4, group="Td", preset=preset)
 
 
-DIATOMIC_ELECTRONS = {"B2": 6, "C2": 8, "N2": 10, "O2": 12, "F2": 14, "CO": 10, "Si2": 8, "P2": 10, "S2": 12}
+DIATOMIC_ELECTRONS = {"B2": 6, "C2": 8, "N2": 10, "O2": 12, "F2": 14, "CO": 10, "Al2": 6, "Si2": 8, "P2": 10, "S2": 12, "Cl2": 14}
 
 
 def diatomic(params, name):
@@ -110,4 +110,4 @@ def release1(params):
     return [water(params, "H2O_model"), water(params, "H2O_lecture"), methane(params), borane(params),
             sf6(params, "SF6_model"), sf6(params, "SF6_lecture"), h2(params),
             ring_h(params, 2, "H3+"), ring_h(params, 3, "neutral H3"), allyl(params), six_h(params), four_h(params)] + [
-        diatomic(params, n) for n in ["B2", "C2", "N2", "O2", "F2", "CO", "Si2", "P2", "S2"]]
+        diatomic(params, n) for n in ["B2", "C2", "N2", "O2", "F2", "CO", "Al2", "Si2", "P2", "S2", "Cl2"]]

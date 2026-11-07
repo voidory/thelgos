@@ -142,6 +142,13 @@ Each entry in `levels` needs `irrep`, `energy`, `multiplicity`, `canonical_level
 - *Regenerated `checks/`.* These differ only by the additions: `release1_energies.csv`, `release1_validation.json`, `crystod_cases.json`, `crystod_manifest.json` (required cases) and `preset_schema_validation.json` (17 → 20 valid presets). `groups/` is unchanged.
 - *Results.* All three agree with CCCBDB on spin. The model puts σg(3p) below πu.
 
+**K19. Al2 and Cl2** (DECISIONS.md M5). `scripts/check_release1.py` sha256 `705e58a8a4dc2b8003909387f2cf1e3298deddb673ccbc59ae7a12a418442bec` → `a056eb0b7204892809a5b7477b07d0c14e309de8407e7c82115fe09cd82e0cf8`.
+- *Script changes.* Al2 and Cl2 are added to the diatomic loop, and `REF_STATE` gains Al2 ³Σg (3) and Cl2 ¹Σg (1).
+- *Data.* Al and Cl on-sites come from the teaching-table snapshot `evidence/libretexts_diatomic_MOs.html`. Al–Al and Cl–Cl pair rows use the Harrison η scheme, like every other pair. The presets gain `Al2_model` and `Cl2_model`.
+- *Reference spectra.* Two entries added, taken after the analytic-block assertions passed. The 21 existing entries are unchanged.
+- *Regenerated `checks/`.* These differ by additions only (preset count 20 → 22).
+- *Result.* Al2 is a spin-state disagreement and is recorded as such. Cl2 agrees.
+
 ## Verification
 
 **Environment.** `requirements-checker.lock` was installed with `--require-hashes` into `.venv` (CPython 3.12.3), and `pip check` passed. This is not the README's 3.12.8 host and not the production 3.12.7.

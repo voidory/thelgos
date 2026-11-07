@@ -145,7 +145,10 @@ def run(data,out,groups,check_reference=True):
  # transcription as S (evidence/harrison.txt lines 93-95). Ground states from the CCCBDB snapshots; no reference ordering is asserted
  # (none is sourced in CONVENTIONS A.6 for period 3), so only the spin-state comparison applies.
  REF_STATE.update({'Si2':('3Sigma_g',3),'P2':('1Sigma_g',1),'S2':('3Sigma_g',3)})
- for name,a,b,ne in [('B2','B','B',6),('C2','C','C',8),('N2','N','N',10),('O2','O','O',12),('F2','F','F',14),('CO','C','O',10),('Si2','Si','Si',8),('P2','P','P',10),('S2','S','S',12)]:
+ # [K19] Al2 and Cl2: on-sites from the teaching table already used for H and F (snapshot evidence/libretexts_diatomic_MOs.html).
+ # CCCBDB lists Al2's lowest level as 3Sigma_g with degeneracy 4; both candidate ground states are triplets, so the spin check is sound.
+ REF_STATE.update({'Al2':('3Sigma_g',3),'Cl2':('1Sigma_g',1)})
+ for name,a,b,ne in [('B2','B','B',6),('C2','C','C',8),('N2','N','N',10),('O2','O','O',12),('F2','F','F',14),('CO','C','O',10),('Al2','Al','Al',6),('Si2','Si','Si',8),('P2','P','P',10),('S2','S','S',12),('Cl2','Cl','Cl',14)]:
   preset=f'{name}_model';R=P.presets[preset]['geometry_overrides']['bond_length_angstrom']
   atoms=[(a,np.array([0,0,-R/2])),(b,np.array([0,0,R/2]))];basis=[(i,v) for i in range(2) for v in [None]+list(np.eye(3))]
   Vss,Vsp,Vps,Vpp=[P.get(a,b,ch,R,preset) for ch in ['ss_sigma','sp_sigma','pp_sigma','pp_pi']]

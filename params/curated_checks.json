@@ -8,8 +8,10 @@
     "O2": {"ordering": "sigma_g_2p_below_pi_u", "ground_state": "³Σg⁻", "multiplicity": 3, "source": "CONVENTIONS A.6; NIST CCCBDB (evidence/cccbdb_O2.html)"},
     "F2": {"ordering": "sigma_g_2p_below_pi_u", "ground_state": "¹Σg⁺", "multiplicity": 1, "source": "CONVENTIONS A.6; NIST CCCBDB (evidence/cccbdb_F2.html)"},
     "CO": {"ordering": null, "ground_state": "¹Σ⁺", "multiplicity": 1, "source": "NIST CCCBDB (evidence/cccbdb_CO.html)"},
+    "Al2": {"ordering": null, "ground_state": "³Σg", "multiplicity": 3, "source": "NIST CCCBDB (evidence/cccbdb_Al2.html; listed with degeneracy 4, but every candidate ground state is a triplet); no sourced orbital-ordering reference for period 3"},
     "Si2": {"ordering": null, "ground_state": "³Σg", "multiplicity": 3, "source": "NIST CCCBDB (evidence/cccbdb_Si2.html); no sourced orbital-ordering reference for period 3"},
     "P2": {"ordering": null, "ground_state": "¹Σg", "multiplicity": 1, "source": "NIST CCCBDB (evidence/cccbdb_P2.html); no sourced orbital-ordering reference for period 3"},
-    "S2": {"ordering": null, "ground_state": "³Σg", "multiplicity": 3, "source": "NIST CCCBDB (evidence/cccbdb_S2.html); no sourced orbital-ordering reference for period 3"}
+    "S2": {"ordering": null, "ground_state": "³Σg", "multiplicity": 3, "source": "NIST CCCBDB (evidence/cccbdb_S2.html); no sourced orbital-ordering reference for period 3"},
+    "Cl2": {"ordering": null, "ground_state": "¹Σg", "multiplicity": 1, "source": "NIST CCCBDB (evidence/cccbdb_Cl2.html); no sourced orbital-ordering reference for period 3"}
   }
 }

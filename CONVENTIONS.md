@@ -73,13 +73,15 @@ Generate exact symmetric positions from unit directions, not rounded coordinate 
 | O2 | O–O 1.2075 Å | NIST CCCBDB r_e (Huber & Herzberg 1979); `evidence/cccbdb_O2.html` |
 | F2 | F–F 1.4119 Å | NIST CCCBDB r_e (Huber & Herzberg 1979); `evidence/cccbdb_F2.html` |
 | CO | C–O 1.1282 Å; C atom 1 | NIST CCCBDB r_e (NIST diatomic); `evidence/cccbdb_CO.html` |
+| Al2 | Al–Al 2.7010 Å | NIST CCCBDB r_e (Fu, Lemire et al. 1990); `evidence/cccbdb_Al2.html`; owner request M5 |
 | Si2 | Si–Si 2.2460 Å | NIST CCCBDB r_e (Huber & Herzberg 1979); `evidence/cccbdb_Si2.html`; owner request M5 |
 | P2 | P–P 1.8934 Å | NIST CCCBDB r_e (Huber & Herzberg 1979); `evidence/cccbdb_P2.html`; owner request M5 |
 | S2 | S–S 1.8892 Å | NIST CCCBDB r_e (Huber & Herzberg 1979); `evidence/cccbdb_S2.html`; owner request M5 |
+| Cl2 | Cl–Cl 1.9879 Å | NIST CCCBDB r_e (Huber & Herzberg 1979); `evidence/cccbdb_Cl2.html`; owner request M5 |
 
 Water positions are \((0,\pm R\sin(\theta/2),R\cos(\theta/2))\). The same formula defines C1/C3 for allyl. Geometry overrides live in presets, not duplicated checker constants.
 
-The nine diatomics B2, C2, N2, O2, F2, CO, Si2, P2 and S2 are Release 1 fixtures with the geometries above (CCCBDB lists three decimals and the Cartesian distance to four; the four-decimal value is pinned). Do not interpret the H2 D2h subgroup as its exact point group: the exact linear homonuclear symmetry is D-infinity-h; D2h is the finite label-checking subgroup.
+The eleven diatomics B2, C2, N2, O2, F2, CO, Al2, Si2, P2, S2 and Cl2 are Release 1 fixtures with the geometries above (CCCBDB lists three decimals and the Cartesian distance to four; the four-decimal value is pinned). Do not interpret the H2 D2h subgroup as its exact point group: the exact linear homonuclear symmetry is D-infinity-h; D2h is the finite label-checking subgroup.
 
 ## 3. Orbital phases and local frames
 
@@ -151,7 +153,7 @@ The contact ledger counts each unordered real-basis off-diagonal pair once with 
 
 ### 9.1 On-sites
 
-`params/onsite.csv`: `element,orbital,energy_eV,source`. Composite table: [Harrison secondary transcription](https://github.com/jarvist/HarrisonSolidStateTable.jl/blob/master/src/SolidStateTable.jl) for B,C,N,O,Si,P,S; [teaching supplement](https://chem.libretexts.org/Bookshelves/Inorganic_Chemistry/Supplemental_Modules_and_Websites_(Inorganic_Chemistry)/Advanced_Inorganic_Chemistry_(Wikibook)/01%3A_Chapters/1.07%3A_Diatomic_Molecular_Orbitals) for H,F. The transcription explicitly warns its values are not well checked; do not call this a complete primary-source table. Local source snapshot is packaged.
+`params/onsite.csv`: `element,orbital,energy_eV,source`. Composite table: [Harrison secondary transcription](https://github.com/jarvist/HarrisonSolidStateTable.jl/blob/master/src/SolidStateTable.jl) for B,C,N,O,Si,P,S; [teaching supplement](https://chem.libretexts.org/Bookshelves/Inorganic_Chemistry/Supplemental_Modules_and_Websites_(Inorganic_Chemistry)/Advanced_Inorganic_Chemistry_(Wikibook)/01%3A_Chapters/1.07%3A_Diatomic_Molecular_Orbitals) for H,F,Al,Cl (snapshot `evidence/libretexts_diatomic_MOs.html`; its table is credited to Miessler, Fischer & Tarr 2014). The two tables are on different scales: the teaching table runs a few eV deeper (Si 3s −15.89 there, −13.55 in Harrison). This is harmless within one homonuclear molecule but matters for heteronuclear pairs and for comparisons along a series (DECISIONS.md M5). The transcription explicitly warns its values are not well checked; do not call this a complete primary-source table. Local source snapshot is packaged.
 
 | Element | s / eV | p / eV |
 |---|---:|---:|
@@ -244,6 +246,7 @@ Slides/aliases are nonblocking. Later d-channel parameters remain outside Releas
 | 1.2 | 2026-11-07 | A1 geometry-first mappings and D2h g/u label repair with Cartesian assertions; A2 file-driven data and corrupt-pair negative test; A3 temp regeneration/diffs/hashes; A4 computed CrystOD manifest/protocol and explicit real-adapter blocker; A5 restore column contract and define replacement A.7 with legacy-text limitation below; A6 typed pair fields and error-on-missing lookup; A7 preset schema; A8 exact snapping/residuals; A9 neutral-H3 and diagnostic warnings; A10 complete hashed lock/clean install; A11 full unscaled-coupling table; A12 benzene default and geometry assertions; A13 header/review includes CrystOD, diatomic and browser blockers. Owner approval pending. |
 | 1.3 | 2026-11-06 | Applied by Claude under the owner's standing permission. Owner decisions B1 (CrystOD deferred), B4 (N2 in), B3 orientation; delegated B2 (0.6), B3 in-plane axis, B5 (skip zero stages), M1–M4 (DECISIONS.md). Nitrogen on-sites and pairs; six diatomic geometries, A.6 blocks, Appendix B rows; CrystOD comparison rules K5–K11 written into §11; coefficient-set provenance in §9.2. Not frozen: owner sign-off B6 pending. |
 | 1.3.1 | 2026-11-06 | Applied by Claude under the owner's standing permission. Period-3 diatomics Si2, P2, S2 at the owner's request (DECISIONS.md M5): Si and P on-sites and Si–Si, P–P pair rows from the same Harrison transcription; CCCBDB geometries and ground states; Appendix B rows; checker patch K18. Al2 and Cl2 wait for a sourced Al/Cl on-site. Not frozen: owner sign-off B6 pending. |
+| 1.3.2 | 2026-11-07 | Applied by Claude under the owner's standing permission. Al2 and Cl2 added (DECISIONS.md M5, checker patch K19): Al and Cl on-sites from the teaching table (snapshot packaged), CCCBDB geometries and ground states, Appendix B rows. Al2's spin disagrees with experiment and is recorded as a fidelity warning. Not frozen: owner sign-off B6 pending. |
 
 **A5 disposition:** the pairs.csv column specification is restored in §9.2. Exact legacy Appendix A.7 text was not present in the accessible attachments or earlier inline answer; it is not silently reconstructed as a quotation. The unknown legacy A.7 is **removed as an unrecoverable legacy section**, because its original content cannot be verified; it is replaced by the explicitly newly authored ledger/limit/invariance contract below. If the owner supplies the original, review whether it contains additional obligations before freezing. No claim that its exact old content has been recovered.
 
@@ -309,7 +312,7 @@ Six-H order a1g<t1u<eg requires 2tc+tt<0 and tt>tc. Spectral trace equals the su
 
 ### A.5 Bond-order oracles
 
-Allyl cation: counting 1/2 per C–C, Coulson 1/√2. H3+: counting 1/3 per H–H, Coulson 2/3. BH3,CH4,lecture water: counting 1 per bond under the stated occupations. Diatomics, counting: B2 1, C2 2, N2 3, O2 2, F2 1, CO 3, Si2 2, P2 3, S2 2. SF6: counting 2/3 per S–F if four bonding and two ligand-only MOs are doubly occupied. Wiberg values depend on mixing and on-sites; do not set them equal to counting values. pz being BH3 LUMO requires the actual parameter ordering, not symmetry alone.
+Allyl cation: counting 1/2 per C–C, Coulson 1/√2. H3+: counting 1/3 per H–H, Coulson 2/3. BH3,CH4,lecture water: counting 1 per bond under the stated occupations. Diatomics, counting: B2 1, C2 2, N2 3, O2 2, F2 1, CO 3, Al2 1, Si2 2, P2 3, S2 2, Cl2 1. SF6: counting 2/3 per S–F if four bonding and two ligand-only MOs are doubly occupied. Wiberg values depend on mixing and on-sites; do not set them equal to counting values. pz being BH3 LUMO requires the actual parameter ordering, not symmetry alone.
 
 ### A.6 Diatomic blocks
 
@@ -324,9 +327,9 @@ Bond along z; atom 1 at −R/2, atom 2 at +R/2; basis s, px, py, pz on each atom
 
 CO (C2v, C atom 1): σ (A1) is the 4×4 block in (s_C, pz_C, s_O, pz_O) with rows (eps_sC, 0, V_sss, V_sps), (0, eps_pC, −V_sps, V_pps), (V_sss, −V_sps, eps_sO, 0), (V_sps, V_pps, 0, eps_pO); π (B1+B2) is D(eps_pC, eps_pO; V_ppp), two copies. In the finite subgroup a π pair spans two irreps, so degenerate sets are labelled by their exact irrep decomposition and mapped to D∞h/C∞v names by a fixed lookup.
 
-Reference orderings: B2, C2, N2 πu below σg(2p); O2, F2 σg(2p) below πu, with σg(2p) the higher of the two σg levels. Reference ground states from the CCCBDB pages: B2 ³Σg, C2 ¹Σg⁺, N2 ¹Σg, O2 ³Σg, F2 ¹Σg, CO ¹Σ, Si2 ³Σg, P2 ¹Σg, S2 ³Σg. No orbital-ordering reference is sourced for the period-3 diatomics, so only their spin state is compared. A disagreement is recorded as an Orbital-ordering or Spin-state fidelity warning, never tuned away. Asserted: O2 ends in a partly filled πg with the warnings; CO has counting bond order 3 and a σ HOMO with carbon weight above 0.5.
+Reference orderings: B2, C2, N2 πu below σg(2p); O2, F2 σg(2p) below πu, with σg(2p) the higher of the two σg levels. Reference ground states from the CCCBDB pages: B2 ³Σg, C2 ¹Σg⁺, N2 ¹Σg, O2 ³Σg, F2 ¹Σg, CO ¹Σ, Al2 ³Σg, Si2 ³Σg, P2 ¹Σg, S2 ³Σg, Cl2 ¹Σg (CCCBDB lists Al2's lowest level with degeneracy 4; every candidate ground state is a triplet, so the spin comparison stands). No orbital-ordering reference is sourced for the period-3 diatomics, so only their spin state is compared. A disagreement is recorded as an Orbital-ordering or Spin-state fidelity warning, never tuned away. Asserted: O2 ends in a partly filled πg with the warnings; CO has counting bond order 3 and a σ HOMO with carbon weight above 0.5.
 
-Result under the current scheme (DECISIONS.md M1): B2, C2 and N2 disagree on ordering; B2 and C2 also on spin state; O2, F2 and CO agree. Si2, P2 and S2 agree on spin state; the model puts σg(3p) below πu in all three.
+Result under the current scheme (DECISIONS.md M1): B2, C2 and N2 disagree on ordering; B2 and C2 also on spin state; O2, F2 and CO agree. Si2, P2, S2 and Cl2 agree on spin state; Al2 disagrees (model closed shell, experiment triplet). The model puts σg(3p) below πu in all five.
 
 ### A.7 Replacement ledger, limit and invariance obligations
 
@@ -353,9 +356,11 @@ Energies in eV; repeated levels have multiplicities shown. Values are model calc
 | N2 | σg −43.562631; σg −20.290444; σu −19.015983; πu×2 −16.592390; πg×2 −6.347610; σu +13.849058 |
 | O2 | σg −43.746764; σu −25.133433; σg −23.772506; πu×2 −18.363170; πg×2 −9.896830 (2 electrons, warns); σu +6.112703 |
 | F2 | σg −48.374432; σu −36.456980; σg −28.181952; πu×2 −21.746222; πg×2 −15.553778; σu −4.626636 |
+| Al2 | σg −13.645089; σu −10.334969; σg −8.501361; πu×2 −6.826040; πg×2 −5.133960; σu −2.118580 |
 | Si2 | σg −17.038338; σu −12.168011; σg −10.040620; πu×2 −7.743547 (2 electrons, warns); πg×2 −5.296453; σu −0.893031 |
 | P2 | σg −22.250436; σu −15.233427; σg −13.042091; πu×2 −10.051691; πg×2 −6.608309; σu −0.334046 |
 | S2 | σg −25.619262; σu −18.809412; σg −15.357166; πu×2 −11.999355; πg×2 −8.540645 (2 electrons, warns); σu −2.354160 |
+| Cl2 | σg −29.274860; σu −23.322165; σg −18.572273; πu×2 −15.231892; πg×2 −12.108108; σu −6.630702 |
 | CO | σ −42.990247; σ −24.079019; π×2 −17.042804; σ −15.182634 (HOMO, C weight 0.977); π×2 −6.057196; σ +12.491900 |
 
-All 21 current fixtures satisfy file-driven analytic assembly, symmetry/projector labels and residual/orthonormality checks. Still open: real CrystOD comparison (deferred, B1) and browser engine/UI gates (C4). Later advanced d blocks, exact slide aliasing and spectral fits remain unclaimed.
+All 23 current fixtures satisfy file-driven analytic assembly, symmetry/projector labels and residual/orthonormality checks. Still open: real CrystOD comparison (deferred, B1) and browser engine/UI gates (C4). Later advanced d blocks, exact slide aliasing and spectral fits remain unclaimed.

@@ -46,9 +46,11 @@
     "O2",
     "F2",
     "CO",
+    "Al2",
     "Si2",
     "P2",
-    "S2"
+    "S2",
+    "Cl2"
   ],
   "schema_version": "1.2",
   "status": "BLOCKED",

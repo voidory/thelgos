@@ -77,7 +77,7 @@ class AnalyticOracles(unittest.TestCase):
         np.testing.assert_allclose(self.spectrum(cases.allyl(P)), sorted([ec + np.sqrt(2) * t, ec, ec - np.sqrt(2) * t]), atol=1e-10)
 
     def test_homonuclear_diatomic_blocks(self):
-        for name in ["B2", "C2", "N2", "O2", "F2", "Si2", "P2", "S2"]:
+        for name in ["B2", "C2", "N2", "O2", "F2", "Al2", "Si2", "P2", "S2", "Cl2"]:
             el, R = name[:-1], P.presets[f"{name}_model"]["geometry_overrides"]["bond_length_angstrom"]
             V = {ch: P.coupling(el, el, ch, R, f"{name}_model") for ch in ["ss_sigma", "sp_sigma", "pp_sigma", "pp_pi"]}
             es, ep = P.onsite_energy(el, "s"), P.onsite_energy(el, "p")
@@ -94,7 +94,8 @@ class BondOrdersAndFrontier(unittest.TestCase):
         for s, want in [(cases.allyl(P), 0.5), (cases.ring_h(P, 2, "H3+"), 1 / 3), (cases.borane(P), 1.0),
                         (cases.methane(P), 1.0), (cases.water(P, "H2O_lecture"), 1.0), (cases.sf6(P), 2 / 3),
                         (cases.diatomic(P, "CO"), 3.0), (cases.diatomic(P, "O2"), 2.0), (cases.diatomic(P, "F2"), 1.0),
-                        (cases.diatomic(P, "Si2"), 2.0), (cases.diatomic(P, "P2"), 3.0), (cases.diatomic(P, "S2"), 2.0)]:
+                        (cases.diatomic(P, "Si2"), 2.0), (cases.diatomic(P, "P2"), 3.0), (cases.diatomic(P, "S2"), 2.0),
+                        (cases.diatomic(P, "Al2"), 1.0), (cases.diatomic(P, "Cl2"), 1.0)]:
             self.assertAlmostEqual(self.bo(s)["counting"]["per_bond"], want, delta=1e-12, msg=s.name)
 
     def test_coulson_bond_orders(self):
@@ -250,7 +251,7 @@ class DiagramSpec(unittest.TestCase):
     def test_diatomic_textbook_layout(self):
         """Atom 1 | MOs | atom 2; each MO's atomic weights over both sides sum to one."""
         from lgo_engine import app_api
-        for name in ["H2", "B2", "C2", "N2", "O2", "F2", "CO", "Si2", "P2", "S2"]:
+        for name in ["H2", "B2", "C2", "N2", "O2", "F2", "CO", "Al2", "Si2", "P2", "S2", "Cl2"]:
             d = app_api.view(P, G, name)["diagram"]
             self.assertEqual(d["columns"], ["left", "centre", "right"], name)
             self.assertEqual(sum(x["multiplicity"] for x in d["left"] + d["right"]), sum(x["multiplicity"] for x in d["centre"]), name)
