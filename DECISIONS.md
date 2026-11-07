@@ -15,6 +15,9 @@ Status key: **owner** = decided by the owner; **delegated** = decided by Claude 
 | M2 | Harrison's 1980 coupling coefficients stay | delegated |
 | M3 | SF6 F–F couplings stay at the full nearest-neighbour law | delegated |
 | M4 | Preset data unchanged; misleading "lecture" tags flagged for the spec, not renamed | delegated |
+| M5 | Period-3 diatomics Al2–Cl2 added; sources documented | owner request, details delegated |
+| M6 | One entry per molecule with a model/lecture toggle | owner |
+| M7 | All on-sites from the Miessler teaching table | owner |
 | B6 | Sign-off of CONVENTIONS v1.2 | owner only |
 
 ---
@@ -38,15 +41,15 @@ Status key: **owner** = decided by the owner; **delegated** = decided by Claude 
 **Decision.** Keep 0.6.
 
 **Why.**
-- Any value from 0.4915 to 0.8939 gives the required orderings, so the number is not fine-tuned within that range.
+- Any value from 0.4235 to 1.0313 gives the required orderings, so the number is not fine-tuned within that range. (The range was 0.4915–0.8939 before the on-site switch, M7.)
 - 0.6 is what every committed regression value, oracle and reviewed number already uses, so choosing it changes nothing that has been checked.
-- It leaves BH3's empty Lewis-acid orbital (the LUMO) 1.41 eV clear of the next level, comfortably separated for teaching.
+- It leaves BH3's empty Lewis-acid orbital (the LUMO) 2.30 eV clear of the next level (1.41 eV before M7), comfortably separated for teaching.
 
 **Condition attached.** Because 0.6 was chosen to make orderings come out right, those orderings cannot later count as independent "green" evidence in the fidelity bar. This is held spec edit D12.
 
 **Alternatives.**
 - The midpoint of the range (about 0.69) is no better justified.
-- 1.0, meaning no scale, breaks the water ordering.
+- 1.0, meaning no scale, broke the lecture-water ordering under the earlier on-sites. Under M7 it no longer does (the window now reaches 1.0313), so the scale is no longer strictly needed for these two orderings. See M7 for why 0.6 is kept for now.
 
 **Reverse.** Change `scale` on the H rows in `params/pairs.csv` and `hydrogen_scale` in the presets, then regenerate the reference spectra.
 
@@ -144,7 +147,7 @@ Skipping with a note says exactly what the model assumes.
 **Why.**
 - *Source for Si, P and S.* The Harrison transcription (`evidence/harrison.txt`, lines 93–95) has Si, P and S, the same source as S already. So Si2, P2 and S2 need no new source. Geometries and ground states come from the NIST CCCBDB pages, snapshotted in `evidence/cccbdb_{Si2,P2,S2}.html` (r_e from Huber & Herzberg 1979).
 - *Al and Cl.* The Harrison transcription has no Al or Cl, so they come from the teaching table already used for H and F, now snapshotted in `evidence/libretexts_diatomic_MOs.html`. Values: Al 3s −11.32, 3p −5.98; Cl 3s −25.23, 3p −13.67 eV. The page credits the table to Miessler, Fischer & Tarr (Pearson, 2014).
-- *Scale: owner decided to keep the mix.* The two tables are not on one scale: the teaching table is deeper (Si 3s −15.89 against Harrison's −13.55). Following the existing composite rule (Harrison where available) keeps every earlier result unchanged. The cost is that Al2 and Cl2 sit a few eV deeper than they would on Harrison's scale, so absolute energies along Al2 → Cl2 are not comparable; shapes within each molecule are unaffected. The alternative was to move every element to the teaching table, which would change every existing fixture. **Owner decision (2026-11-07): keep the mix.** The app's reading note on Al2 and Cl2 says this.
+- *Scale (superseded by M7).* The owner first chose to keep the mix, then switched to one table (M7). The two tables are not on one scale: the teaching table is deeper (Si 3s −15.89 against Harrison's −13.55). Following the existing composite rule (Harrison where available) keeps every earlier result unchanged. The cost is that Al2 and Cl2 sit a few eV deeper than they would on Harrison's scale, so absolute energies along Al2 → Cl2 are not comparable; shapes within each molecule are unaffected. The alternative was to move every element to the teaching table, which would change every existing fixture. **Owner decision (2026-11-07): keep the mix.** The app's reading note on Al2 and Cl2 says this.
 - *Al2 spin disagrees.* The model gives a closed shell, with σg(3p) about 1.7 eV below πu, while experiment gives a triplet. This is recorded as a fidelity warning, not tuned (as for B2 under M1). CCCBDB lists Al2's lowest level as ³Σg with degeneracy 4, which is not self-consistent for a ³Σ state. Every candidate ground state is a triplet, though, so the spin comparison stands.
 - *Not added.* Na2, Mg2 and Ar2 are not standard MO-diagram examples, and Mg2 and Ar2 are only van der Waals bound.
 - *No orbital-ordering reference.* None is asserted for period 3: CONVENTIONS A.6 sources only period 2, and I have no sourced period-3 ordering in hand. Only the ground-state spin is compared. Si2, P2, S2 and Cl2 agree with CCCBDB (Si2 ³Σg, P2 ¹Σg, S2 ³Σg, Cl2 ¹Σg); Al2 does not.
@@ -161,6 +164,31 @@ Skipping with a note says exactly what the model assumes.
 **How.**
 - Only the app's case list merges them. The engine, checks, evidence, share links and exports keep the two fixture names ("H2O model", "H2O lecture"), so nothing frozen changes.
 - The toggle states what the lecture preset changes, worked out from the presets: for H2O, the O 2s–H 1s coupling is switched off. For SF6 it says the two presets are identical (see M4), rather than implying a difference that does not exist.
+
+## M7. One on-site table for every element: Miessler (owner decision)
+
+**Owner decision (2026-11-07).** Take every on-site energy from the Miessler, Fischer & Tarr table as given on LibreTexts (snapshot `evidence/libretexts_diatomic_MOs.html`), because the owner's module uses Miessler. This reverses the "keep the mix" choice recorded under M5 earlier the same day.
+
+**Why the tables differ.**
+- Harrison's values are computed atomic term values (as I recall, from Herman–Skillman 1963 calculations), which come out too shallow.
+- The teaching values are measured ionisation energies averaged over each configuration's spectroscopic states. I believe they come from Mann, Meek & Allen 2000; the LibreTexts page itself credits only Miessler.
+- The teaching values run 1.5–4 eV deeper. The s–p gaps are similar.
+
+**What changed.**
+- `params/onsite.csv`: values for B, C, N, O, Si, P and S, and the source column for all rows.
+- `evidence/reference_spectra.json`, `checks/release1_energies.csv`, `checks/release1_validation.json`, `checks/crystod_cases.json`, CONVENTIONS Appendix B and §9.1–9.2, and spec F2.12.
+- Unchanged (they use no changed element): H2, H3+, neutral H3, six H, four H, F2, Al2, Cl2.
+
+**What did not change, verified before switching.**
+- Every checker assertion passes as before.
+- Every diatomic's ordering agreement, spin agreement and counting bond order is the same.
+- The CO HOMO is still 98 % carbon.
+- The engine and app code needed no changes: on-sites are data.
+- The SF6 levels shift (S is deeper, so a1g goes from −11.79 to −13.12 and t1u* from +1.43 to +0.64), but its ordering, labels and construction stages are unchanged. The eg level is F-only and does not move.
+
+**Couplings are unchanged** (Harrison η, M2). The model now pairs measured-ionisation on-sites with Harrison's couplings. It was already a pedagogical mix; this makes it no less one.
+
+**Hydrogen scale.** The window widened to 0.4235–1.0313, which now includes 1.0. Keeping 0.6 leaves every H-containing result as it would be under the decision already approved (B2), and changes one thing at a time. Whether to drop the scale altogether is a separate owner question.
 
 ## B6. Sign-off (owner only)
 

@@ -141,7 +141,7 @@ const check = (name, ok, detail = "") => { results.push({ name, ok, detail }); c
     await page.waitForFunction(() => document.body.dataset.rendered === "Al2|1|");
     const alSpin = await page.$$eval("#comparisons li", (ls) => ls.map((l) => l.dataset.agrees + ":" + l.textContent.split(":")[0]));
     const alNote = await page.textContent("#notes");
-    check("Al2: spin disagreement shown, with the on-site table note", JSON.stringify(alSpin) === JSON.stringify(["0:Ground-state spin"]) && alNote.includes("different on-site table"), `${alSpin}`);
+    check("Al2: spin disagreement shown, with its reading note", JSON.stringify(alSpin) === JSON.stringify(["0:Ground-state spin"]) && alNote.includes("Spin disagrees"), `${alSpin}`);
     await pick(page, "CO");
     await page.waitForFunction(() => document.body.dataset.rendered === "CO|1|");
     const coNote = await page.textContent("#notes");

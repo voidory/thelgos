@@ -87,67 +87,67 @@
     "levels": [
       {
         "descriptor": {
-          "bond_energy_eV": -9.44634357830807,
+          "bond_energy_eV": -8.583213992014642,
           "character": "bonding",
           "dominant_fragment": "central"
         },
         "electrons": 2,
-        "energy_eV": -34.57872049091489,
+        "energy_eV": -37.11569856519692,
         "irrep": "A1",
         "multiplicity": 1
       },
       {
         "descriptor": {
-          "bond_energy_eV": -10.244919939809348,
+          "bond_energy_eV": -10.187558414871809,
           "character": "bonding",
           "dominant_fragment": "central"
         },
         "electrons": 2,
-        "energy_eV": -24.121514087700255,
+        "energy_eV": -25.039235718049945,
         "irrep": "B2",
         "multiplicity": 1
       },
       {
         "descriptor": {
-          "bond_energy_eV": -1.9627356358407462,
+          "bond_energy_eV": -2.6224528439169195,
           "character": "bonding",
           "dominant_fragment": "central"
         },
         "electrons": 2,
-        "energy_eV": -18.575721245780272,
+        "energy_eV": -20.181834031352466,
         "irrep": "A1",
         "multiplicity": 1
       },
       {
         "descriptor": {
-          "bond_energy_eV": 9.91048896648097e-31,
+          "bond_energy_eV": 9.937917847775723e-31,
           "character": "nonbonding",
           "dominant_fragment": "central"
         },
         "electrons": 2,
-        "energy_eV": -14.129999999999997,
+        "energy_eV": -15.849999999999996,
         "irrep": "B1",
         "multiplicity": 1
       },
       {
         "descriptor": {
-          "bond_energy_eV": 11.409079214148818,
+          "bond_energy_eV": 11.20566683593156,
           "character": "antibonding",
           "dominant_fragment": "ligand"
         },
         "electrons": 0,
-        "energy_eV": -3.725558263304834,
+        "energy_eV": -4.542467403450603,
         "irrep": "A1",
         "multiplicity": 1
       },
       {
         "descriptor": {
-          "bond_energy_eV": 10.244919939809343,
+          "bond_energy_eV": 10.187558414871802,
           "character": "antibonding",
           "dominant_fragment": "ligand"
         },
         "electrons": 0,
-        "energy_eV": -3.618485912299751,
+        "energy_eV": -4.420764281950062,
         "irrep": "B2",
         "multiplicity": 1
       }
@@ -247,29 +247,29 @@
           "dominant_fragment": "central"
         },
         "electrons": 2,
-        "energy_eV": -29.14,
+        "energy_eV": -32.38,
         "irrep": "A1",
         "multiplicity": 1
       },
       {
         "descriptor": {
-          "bond_energy_eV": -10.24491993980934,
+          "bond_energy_eV": -10.187558414871804,
           "character": "bonding",
           "dominant_fragment": "central"
         },
         "electrons": 2,
-        "energy_eV": -24.12151408770025,
+        "energy_eV": -25.039235718049937,
         "irrep": "B2",
         "multiplicity": 1
       },
       {
         "descriptor": {
-          "bond_energy_eV": -7.933967330357787,
+          "bond_energy_eV": -7.860372014142429,
           "character": "bonding",
           "dominant_fragment": "central"
         },
         "electrons": 2,
-        "energy_eV": -21.812478527431413,
+        "energy_eV": -22.746842592860908,
         "irrep": "A1",
         "multiplicity": 1
       },
@@ -280,29 +280,29 @@
           "dominant_fragment": "central"
         },
         "electrons": 2,
-        "energy_eV": -14.13,
+        "energy_eV": -15.85,
         "irrep": "B1",
         "multiplicity": 1
       },
       {
         "descriptor": {
-          "bond_energy_eV": 7.933967330357785,
+          "bond_energy_eV": 7.860372014142429,
           "character": "antibonding",
           "dominant_fragment": "ligand"
         },
         "electrons": 0,
-        "energy_eV": -5.927521472568589,
+        "energy_eV": -6.713157407139077,
         "irrep": "A1",
         "multiplicity": 1
       },
       {
         "descriptor": {
-          "bond_energy_eV": 10.244919939809337,
+          "bond_energy_eV": 10.187558414871804,
           "character": "antibonding",
           "dominant_fragment": "ligand"
         },
         "electrons": 0,
-        "energy_eV": -3.618485912299751,
+        "energy_eV": -4.42076428195006,
         "irrep": "B2",
         "multiplicity": 1
       }
@@ -431,45 +431,45 @@
     "levels": [
       {
         "descriptor": {
-          "bond_energy_eV": -10.662217446452523,
+          "bond_energy_eV": -10.463559103364014,
           "character": "bonding",
           "dominant_fragment": "central"
         },
         "electrons": 2,
-        "energy_eV": -26.57437828523713,
+        "energy_eV": -27.73839940577313,
         "irrep": "A1",
         "multiplicity": 1
       },
       {
         "descriptor": {
-          "bond_energy_eV": -7.912172083034444,
+          "bond_energy_eV": -8.091976043087994,
           "character": "bonding",
           "dominant_fragment": "ligand"
         },
         "electrons": 6,
-        "energy_eV": -19.832262746343094,
+        "energy_eV": -20.48745340169946,
         "irrep": "T2",
         "multiplicity": 3
       },
       {
         "descriptor": {
-          "bond_energy_eV": 10.662217446452523,
+          "bond_energy_eV": 10.463559103364016,
           "character": "antibonding",
           "dominant_fragment": "ligand"
         },
         "electrons": 0,
-        "energy_eV": -4.555621714762864,
+        "energy_eV": -5.301600594226866,
         "irrep": "A1",
         "multiplicity": 1
       },
       {
         "descriptor": {
-          "bond_energy_eV": 7.912172083034448,
+          "bond_energy_eV": 8.091976043087996,
           "character": "antibonding",
           "dominant_fragment": "central"
         },
         "electrons": 0,
-        "energy_eV": -2.747737253656929,
+        "energy_eV": -3.7825465983005415,
         "irrep": "T2",
         "multiplicity": 3
       }
@@ -581,56 +581,56 @@
     "levels": [
       {
         "descriptor": {
-          "bond_energy_eV": -7.810687655880789,
+          "bond_energy_eV": -7.825814617288533,
           "character": "bonding",
-          "dominant_fragment": "ligand"
+          "dominant_fragment": "central"
         },
         "electrons": 2,
-        "energy_eV": -20.922162623170856,
+        "energy_eV": -21.661994396990448,
         "irrep": "A1'",
         "multiplicity": 1
       },
       {
         "descriptor": {
-          "bond_energy_eV": -6.561807542787065,
+          "bond_energy_eV": -6.834864553922112,
           "character": "bonding",
           "dominant_fragment": "ligand"
         },
         "electrons": 4,
-        "energy_eV": -18.19229641691943,
+        "energy_eV": -18.700003000544356,
         "irrep": "E'",
         "multiplicity": 2
       },
       {
         "descriptor": {
-          "bond_energy_eV": 4.3040059738399734e-30,
+          "bond_energy_eV": -4.0030246672288605e-30,
           "character": "nonbonding",
           "dominant_fragment": "central"
         },
         "electrons": 0,
-        "energy_eV": -6.640000000000008,
+        "energy_eV": -8.299999999999999,
         "irrep": "A2''",
         "multiplicity": 1
       },
       {
         "descriptor": {
-          "bond_energy_eV": 7.81068765588079,
+          "bond_energy_eV": 7.825814617288532,
           "character": "antibonding",
-          "dominant_fragment": "central"
+          "dominant_fragment": "ligand"
         },
         "electrons": 0,
-        "energy_eV": -5.227837376829143,
+        "energy_eV": -5.998005603009558,
         "irrep": "A1'",
         "multiplicity": 1
       },
       {
         "descriptor": {
-          "bond_energy_eV": 6.561807542787069,
+          "bond_energy_eV": 6.834864553922111,
           "character": "antibonding",
           "dominant_fragment": "central"
         },
         "electrons": 0,
-        "energy_eV": -2.0577035830805817,
+        "energy_eV": -3.2099969994556523,
         "irrep": "E'",
         "multiplicity": 2
       }
@@ -877,56 +877,56 @@
     "levels": [
       {
         "descriptor": {
-          "bond_energy_eV": -12.790479811947224,
+          "bond_energy_eV": -13.108126425893605,
           "character": "bonding",
           "dominant_fragment": "ligand"
         },
         "electrons": 2,
-        "energy_eV": -42.85494558900715,
+        "energy_eV": -43.4335868549612,
         "irrep": "A1g",
         "multiplicity": 1
       },
       {
         "descriptor": {
-          "bond_energy_eV": -14.039537040094663,
+          "bond_energy_eV": -14.15555140953756,
           "character": "bonding",
           "dominant_fragment": "ligand"
         },
         "electrons": 6,
-        "energy_eV": -27.81748209392437,
+        "energy_eV": -28.372628640531047,
         "irrep": "T1u",
         "multiplicity": 3
       },
       {
         "descriptor": {
-          "bond_energy_eV": -3.1554436208840472e-30,
+          "bond_energy_eV": 8.38164711797325e-31,
           "character": "nonbonding",
           "dominant_fragment": "ligand"
         },
         "electrons": 4,
-        "energy_eV": -14.850508798504222,
+        "energy_eV": -14.850508798504224,
         "irrep": "Eg",
         "multiplicity": 2
       },
       {
         "descriptor": {
-          "bond_energy_eV": 12.790479811947224,
+          "bond_energy_eV": 13.108126425893609,
           "character": "antibonding",
           "dominant_fragment": "central"
         },
         "electrons": 0,
-        "energy_eV": -11.79301921697597,
+        "energy_eV": -13.124377951021936,
         "irrep": "A1g",
         "multiplicity": 1
       },
       {
         "descriptor": {
-          "bond_energy_eV": 14.039537040094663,
+          "bond_energy_eV": 14.155551409537566,
           "character": "antibonding",
           "dominant_fragment": "central"
         },
         "electrons": 0,
-        "energy_eV": 1.430476228254875,
+        "energy_eV": 0.6356227748615577,
         "irrep": "T1u",
         "multiplicity": 3
       }
@@ -1173,56 +1173,56 @@
     "levels": [
       {
         "descriptor": {
-          "bond_energy_eV": -12.790479811947224,
+          "bond_energy_eV": -13.108126425893605,
           "character": "bonding",
           "dominant_fragment": "ligand"
         },
         "electrons": 2,
-        "energy_eV": -42.85494558900715,
+        "energy_eV": -43.4335868549612,
         "irrep": "A1g",
         "multiplicity": 1
       },
       {
         "descriptor": {
-          "bond_energy_eV": -14.039537040094663,
+          "bond_energy_eV": -14.15555140953756,
           "character": "bonding",
           "dominant_fragment": "ligand"
         },
         "electrons": 6,
-        "energy_eV": -27.81748209392437,
+        "energy_eV": -28.372628640531047,
         "irrep": "T1u",
         "multiplicity": 3
       },
       {
         "descriptor": {
-          "bond_energy_eV": -3.1554436208840472e-30,
+          "bond_energy_eV": 8.38164711797325e-31,
           "character": "nonbonding",
           "dominant_fragment": "ligand"
         },
         "electrons": 4,
-        "energy_eV": -14.850508798504222,
+        "energy_eV": -14.850508798504224,
         "irrep": "Eg",
         "multiplicity": 2
       },
       {
         "descriptor": {
-          "bond_energy_eV": 12.790479811947224,
+          "bond_energy_eV": 13.108126425893609,
           "character": "antibonding",
           "dominant_fragment": "central"
         },
         "electrons": 0,
-        "energy_eV": -11.79301921697597,
+        "energy_eV": -13.124377951021936,
         "irrep": "A1g",
         "multiplicity": 1
       },
       {
         "descriptor": {
-          "bond_energy_eV": 14.039537040094663,
+          "bond_energy_eV": 14.155551409537566,
           "character": "antibonding",
           "dominant_fragment": "central"
         },
         "electrons": 0,
-        "energy_eV": 1.430476228254875,
+        "energy_eV": 0.6356227748615577,
         "irrep": "T1u",
         "multiplicity": 3
       }
@@ -1545,34 +1545,34 @@
     "levels": [
       {
         "descriptor": {
-          "bond_energy_eV": -4.453473953917968,
+          "bond_energy_eV": -4.453473953917966,
           "character": "bonding",
           "dominant_fragment": "ligand_only"
         },
         "electrons": 2,
-        "energy_eV": -13.42347395391797,
+        "energy_eV": -15.11347395391797,
         "irrep": "B1",
         "multiplicity": 1
       },
       {
         "descriptor": {
-          "bond_energy_eV": 9.860761315262648e-32,
+          "bond_energy_eV": -3.4512664603419266e-31,
           "character": "nonbonding",
           "dominant_fragment": "ligand_only"
         },
         "electrons": 0,
-        "energy_eV": -8.969999999999999,
+        "energy_eV": -10.659999999999998,
         "irrep": "A2",
         "multiplicity": 1
       },
       {
         "descriptor": {
-          "bond_energy_eV": 4.453473953917967,
+          "bond_energy_eV": 4.453473953917966,
           "character": "antibonding",
           "dominant_fragment": "ligand_only"
         },
         "electrons": 0,
-        "energy_eV": -4.5165260460820305,
+        "energy_eV": -6.206526046082031,
         "irrep": "B1",
         "multiplicity": 1
       }
@@ -1976,45 +1976,45 @@
     "levels": [
       {
         "descriptor": {
-          "bond_energy_eV": -12.447462753340432,
+          "bond_energy_eV": -12.486811031312584,
           "character": "bonding",
           "dominant_fragment": "ligand_only"
         },
         "electrons": 2,
-        "energy_eV": -22.13156853825498,
+        "energy_eV": -23.7146825634831,
         "irrep": "Ag",
         "multiplicity": 1
       },
       {
         "descriptor": {
-          "bond_energy_eV": -1.5380599712353433,
+          "bond_energy_eV": -1.498711693263203,
           "character": "bonding",
           "dominant_fragment": "ligand_only"
         },
         "electrons": 2,
-        "energy_eV": -11.033954186320784,
+        "energy_eV": -12.620840161092666,
         "irrep": "Ag",
         "multiplicity": 1
       },
       {
         "descriptor": {
-          "bond_energy_eV": 1.1418791259720842,
+          "bond_energy_eV": 1.1284697955758756,
           "character": "antibonding",
           "dominant_fragment": "ligand_only"
         },
         "electrons": 2,
-        "energy_eV": -10.566590032745989,
+        "energy_eV": -12.097902723644722,
         "irrep": "B1u",
         "multiplicity": 1
       },
       {
         "descriptor": {
-          "bond_energy_eV": -2.4414382342470624,
+          "bond_energy_eV": -2.441438234247063,
           "character": "bonding",
           "dominant_fragment": "ligand_only"
         },
         "electrons": 0,
-        "energy_eV": -9.081438234247065,
+        "energy_eV": -10.74143823424707,
         "irrep": "B2u+B3u",
         "multiplicity": 2
       },
@@ -2025,18 +2025,18 @@
           "dominant_fragment": "ligand_only"
         },
         "electrons": 0,
-        "energy_eV": -4.198561765752938,
+        "energy_eV": -5.858561765752937,
         "irrep": "B2g+B3g",
         "multiplicity": 2
       },
       {
         "descriptor": {
-          "bond_energy_eV": 12.843643598603688,
+          "bond_energy_eV": 12.85705292899991,
           "character": "antibonding",
           "dominant_fragment": "ligand_only"
         },
         "electrons": 0,
-        "energy_eV": 5.372112757321756,
+        "energy_eV": 3.733425448220486,
         "irrep": "B1u",
         "multiplicity": 1
       }
@@ -2141,67 +2141,67 @@
     "levels": [
       {
         "descriptor": {
-          "bond_energy_eV": -20.662189286244416,
+          "bond_energy_eV": -20.609788000742164,
           "character": "bonding",
           "dominant_fragment": "ligand_only"
         },
         "electrons": 2,
-        "energy_eV": -33.78204068283793,
+        "energy_eV": -35.579485995322216,
         "irrep": "Ag",
         "multiplicity": 1
       },
       {
         "descriptor": {
-          "bond_energy_eV": -2.2401664983626253,
+          "bond_energy_eV": -2.2925677838648673,
           "character": "bonding",
           "dominant_fragment": "ligand_only"
         },
         "electrons": 2,
-        "energy_eV": -15.61031510176911,
+        "energy_eV": -17.41286978928483,
         "irrep": "Ag",
         "multiplicity": 1
       },
       {
         "descriptor": {
-          "bond_energy_eV": 1.771645661038801,
+          "bond_energy_eV": 1.7908445943884996,
           "character": "antibonding",
           "dominant_fragment": "ligand_only"
         },
         "electrons": 2,
-        "energy_eV": -14.450983511594712,
+        "energy_eV": -16.327845484398118,
         "irrep": "B1u",
         "multiplicity": 1
       },
       {
         "descriptor": {
-          "bond_energy_eV": -3.9980405572266604,
+          "bond_energy_eV": -3.998040557226661,
           "character": "bonding",
           "dominant_fragment": "ligand_only"
         },
         "electrons": 2,
-        "energy_eV": -12.968040557226669,
+        "energy_eV": -14.65804055722666,
         "irrep": "B2u+B3u",
         "multiplicity": 2
       },
       {
         "descriptor": {
-          "bond_energy_eV": 3.9980405572266617,
+          "bond_energy_eV": 3.998040557226661,
           "character": "antibonding",
           "dominant_fragment": "ligand_only"
         },
         "electrons": 0,
-        "energy_eV": -4.971959442773345,
+        "energy_eV": -6.661959442773339,
         "irrep": "B2g+B3g",
         "multiplicity": 2
       },
       {
         "descriptor": {
-          "bond_energy_eV": 21.13071012356823,
+          "bond_energy_eV": 21.11151119021855,
           "character": "antibonding",
           "dominant_fragment": "ligand_only"
         },
         "electrons": 0,
-        "energy_eV": 10.863339296201767,
+        "energy_eV": 9.14020126900516,
         "irrep": "B1u",
         "multiplicity": 1
       }
@@ -2306,67 +2306,67 @@
     "levels": [
       {
         "descriptor": {
-          "bond_energy_eV": -26.324049288656695,
+          "bond_energy_eV": -26.115750130923804,
           "character": "bonding",
           "dominant_fragment": "ligand_only"
         },
         "electrons": 2,
-        "energy_eV": -43.56263133211107,
+        "energy_eV": -45.683528551519025,
         "irrep": "Ag",
         "multiplicity": 1
       },
       {
         "descriptor": {
-          "bond_energy_eV": -3.0190256985902337,
+          "bond_energy_eV": -3.2273248563231354,
           "character": "bonding",
           "dominant_fragment": "ligand_only"
         },
         "electrons": 2,
-        "energy_eV": -20.290443655135874,
+        "energy_eV": -22.399546435727917,
         "irrep": "Ag",
         "multiplicity": 1
       },
       {
         "descriptor": {
-          "bond_energy_eV": 2.3238122955985085,
+          "bond_energy_eV": 2.3958872353130327,
           "character": "antibonding",
           "dominant_fragment": "ligand_only"
         },
         "electrons": 2,
-        "energy_eV": -19.015983413105783,
+        "energy_eV": -21.419413955862385,
         "irrep": "B1u",
         "multiplicity": 1
       },
       {
         "descriptor": {
-          "bond_energy_eV": -5.122390245618541,
+          "bond_energy_eV": -5.122390245618535,
           "character": "bonding",
           "dominant_fragment": "ligand_only"
         },
         "electrons": 4,
-        "energy_eV": -16.592390245618546,
+        "energy_eV": -18.30239024561854,
         "irrep": "B2u+B3u",
         "multiplicity": 2
       },
       {
         "descriptor": {
-          "bond_energy_eV": 5.12239024561854,
+          "bond_energy_eV": 5.122390245618535,
           "character": "antibonding",
           "dominant_fragment": "ligand_only"
         },
         "electrons": 0,
-        "energy_eV": -6.347609754381465,
+        "energy_eV": -8.057609754381465,
         "irrep": "B2g+B3g",
         "multiplicity": 2
       },
       {
         "descriptor": {
-          "bond_energy_eV": 27.019262691648425,
+          "bond_energy_eV": 26.94718775193391,
           "character": "antibonding",
           "dominant_fragment": "ligand_only"
         },
         "electrons": 0,
-        "energy_eV": 13.84905840035272,
+        "energy_eV": 12.022488943109325,
         "irrep": "B1u",
         "multiplicity": 1
       }
@@ -2471,67 +2471,67 @@
     "levels": [
       {
         "descriptor": {
-          "bond_energy_eV": -20.085091184476425,
+          "bond_energy_eV": -19.547179557215323,
           "character": "bonding",
           "dominant_fragment": "ligand_only"
         },
         "electrons": 2,
-        "energy_eV": -43.74676441359396,
+        "energy_eV": -46.45823204850101,
         "irrep": "Ag",
         "multiplicity": 1
       },
       {
         "descriptor": {
-          "bond_energy_eV": 2.4164998964160893,
+          "bond_energy_eV": 2.553684101600163,
           "character": "antibonding",
           "dominant_fragment": "ligand_only"
         },
         "electrons": 2,
-        "energy_eV": -25.133433134684246,
+        "energy_eV": -28.21915688798283,
         "irrep": "B1u",
         "multiplicity": 1
       },
       {
         "descriptor": {
-          "bond_energy_eV": -4.164179034007938,
+          "bond_energy_eV": -4.702090661269035,
           "character": "bonding",
           "dominant_fragment": "ligand_only"
         },
         "electrons": 2,
-        "energy_eV": -23.772505804890415,
+        "energy_eV": -26.02103816998336,
         "irrep": "Ag",
         "multiplicity": 1
       },
       {
         "descriptor": {
-          "bond_energy_eV": -4.233170016588865,
+          "bond_energy_eV": -4.233170016588866,
           "character": "bonding",
           "dominant_fragment": "ligand_only"
         },
         "electrons": 4,
-        "energy_eV": -18.363170016588874,
+        "energy_eV": -20.083170016588873,
         "irrep": "B2u+B3u",
         "multiplicity": 2
       },
       {
         "descriptor": {
-          "bond_energy_eV": 4.233170016588864,
+          "bond_energy_eV": 4.233170016588865,
           "character": "antibonding",
           "dominant_fragment": "ligand_only"
         },
         "electrons": 2,
-        "energy_eV": -9.89682998341114,
+        "energy_eV": -11.616829983411144,
         "irrep": "B2g+B3g",
         "multiplicity": 2
       },
       {
         "descriptor": {
-          "bond_energy_eV": 21.83277032206826,
+          "bond_energy_eV": 21.695586116884204,
           "character": "antibonding",
           "dominant_fragment": "ligand_only"
         },
         "electrons": 0,
-        "energy_eV": 6.1127033531686115,
+        "energy_eV": 4.2384271064671974,
         "irrep": "B1u",
         "multiplicity": 1
       }
@@ -2801,67 +2801,67 @@
     "levels": [
       {
         "descriptor": {
-          "bond_energy_eV": -23.625702656738984,
+          "bond_energy_eV": -23.029710558315312,
           "character": "bonding",
           "dominant_fragment": "ligand_only"
         },
         "electrons": 2,
-        "energy_eV": -42.99024697761363,
+        "energy_eV": -45.350341964610465,
         "irrep": "A1",
         "multiplicity": 1
       },
       {
         "descriptor": {
-          "bond_energy_eV": -2.1745732847813173,
+          "bond_energy_eV": -2.6383568010271654,
           "character": "bonding",
           "dominant_fragment": "ligand_only"
         },
         "electrons": 2,
-        "energy_eV": -24.07901948696066,
+        "energy_eV": -26.59706125068288,
         "irrep": "A1",
         "multiplicity": 1
       },
       {
         "descriptor": {
-          "bond_energy_eV": -4.280963495137531,
+          "bond_energy_eV": -4.275466973386463,
           "character": "bonding",
           "dominant_fragment": "ligand_only"
         },
         "electrons": 4,
-        "energy_eV": -17.042803646145202,
+        "energy_eV": -18.75486517062972,
         "irrep": "B1+B2",
         "multiplicity": 2
       },
       {
         "descriptor": {
-          "bond_energy_eV": 0.4342696803170971,
+          "bond_energy_eV": 0.37905196259645946,
           "character": "antibonding",
           "dominant_fragment": "ligand_only"
         },
         "electrons": 2,
-        "energy_eV": -15.182633522432663,
+        "energy_eV": -17.05709257007825,
         "irrep": "A1",
         "multiplicity": 1
       },
       {
         "descriptor": {
-          "bond_energy_eV": 4.280963495137531,
+          "bond_energy_eV": 4.2754669733864645,
           "character": "antibonding",
           "dominant_fragment": "ligand_only"
         },
         "electrons": 0,
-        "energy_eV": -6.057196353854816,
+        "energy_eV": -7.755134829370287,
         "irrep": "B1+B2",
         "multiplicity": 2
       },
       {
         "descriptor": {
-          "bond_energy_eV": 25.366006261203204,
+          "bond_energy_eV": 25.28901539674603,
           "character": "antibonding",
           "dominant_fragment": "ligand_only"
         },
         "electrons": 0,
-        "energy_eV": 12.491899987006931,
+        "energy_eV": 10.6844957853716,
         "irrep": "A1",
         "multiplicity": 1
       }
@@ -3131,67 +3131,67 @@
     "levels": [
       {
         "descriptor": {
-          "bond_energy_eV": -4.868240484264073,
+          "bond_energy_eV": -4.548711525847356,
           "character": "bonding",
           "dominant_fragment": "ligand_only"
         },
         "electrons": 2,
-        "energy_eV": -17.03833782475258,
+        "energy_eV": -19.19031388214743,
         "irrep": "Ag",
         "multiplicity": 1
       },
       {
         "descriptor": {
-          "bond_energy_eV": 0.9250951952728157,
+          "bond_energy_eV": 1.0030156971774964,
           "character": "antibonding",
           "dominant_fragment": "ligand_only"
         },
         "electrons": 2,
-        "energy_eV": -12.16801132252853,
+        "energy_eV": -14.443620127412046,
         "irrep": "B1u",
         "multiplicity": 1
       },
       {
         "descriptor": {
-          "bond_energy_eV": -2.140717362236956,
+          "bond_energy_eV": -2.460246320653674,
           "character": "bonding",
           "dominant_fragment": "ligand_only"
         },
         "electrons": 2,
-        "energy_eV": -10.040620021748452,
+        "energy_eV": -11.488643964353601,
         "irrep": "Ag",
         "multiplicity": 1
       },
       {
         "descriptor": {
-          "bond_energy_eV": -1.223546520617637,
+          "bond_energy_eV": -1.2235465206176372,
           "character": "bonding",
           "dominant_fragment": "ligand_only"
         },
         "electrons": 2,
-        "energy_eV": -7.743546520617642,
+        "energy_eV": -9.003546520617641,
         "irrep": "B2u+B3u",
         "multiplicity": 2
       },
       {
         "descriptor": {
-          "bond_energy_eV": 1.2235465206176368,
+          "bond_energy_eV": 1.2235465206176375,
           "character": "antibonding",
           "dominant_fragment": "ligand_only"
         },
         "electrons": 0,
-        "energy_eV": -5.296453479382363,
+        "energy_eV": -6.556453479382366,
         "irrep": "B2g+B3g",
         "multiplicity": 2
       },
       {
         "descriptor": {
-          "bond_energy_eV": 6.083862651228213,
+          "bond_energy_eV": 6.005942149323534,
           "character": "antibonding",
           "dominant_fragment": "ligand_only"
         },
         "electrons": 0,
-        "energy_eV": -0.8930308309704409,
+        "energy_eV": -2.2174220260869224,
         "irrep": "B1u",
         "multiplicity": 1
       }
@@ -3296,34 +3296,34 @@
     "levels": [
       {
         "descriptor": {
-          "bond_energy_eV": -7.221588238305718,
+          "bond_energy_eV": -7.079128667379674,
           "character": "bonding",
           "dominant_fragment": "ligand_only"
         },
         "electrons": 2,
-        "energy_eV": -22.250435812094942,
+        "energy_eV": -23.894620443066252,
         "irrep": "Ag",
         "multiplicity": 1
       },
       {
         "descriptor": {
-          "bond_energy_eV": 1.2136871590279865,
+          "bond_energy_eV": 1.2473419322413366,
           "character": "antibonding",
           "dominant_fragment": "ligand_only"
         },
         "electrons": 2,
-        "energy_eV": -15.233427147743404,
+        "energy_eV": -16.942956721137634,
         "irrep": "B1u",
         "multiplicity": 1
       },
       {
         "descriptor": {
-          "bond_energy_eV": -2.6409387883288264,
+          "bond_energy_eV": -2.7833983592548743,
           "character": "bonding",
           "dominant_fragment": "ligand_only"
         },
         "electrons": 2,
-        "energy_eV": -13.042091214539608,
+        "energy_eV": -14.457906583568299,
         "irrep": "Ag",
         "multiplicity": 1
       },
@@ -3334,29 +3334,29 @@
           "dominant_fragment": "ligand_only"
         },
         "electrons": 4,
-        "energy_eV": -10.051691140425433,
+        "energy_eV": -11.371691140425437,
         "irrep": "B2u+B3u",
         "multiplicity": 2
       },
       {
         "descriptor": {
-          "bond_energy_eV": 1.721691140425428,
+          "bond_energy_eV": 1.7216911404254278,
           "character": "antibonding",
           "dominant_fragment": "ligand_only"
         },
         "electrons": 0,
-        "energy_eV": -6.608308859574574,
+        "energy_eV": -7.928308859574578,
         "irrep": "B2g+B3g",
         "multiplicity": 2
       },
       {
         "descriptor": {
-          "bond_energy_eV": 8.648839867606561,
+          "bond_energy_eV": 8.615185094393212,
           "character": "antibonding",
           "dominant_fragment": "ligand_only"
         },
         "electrons": 0,
-        "energy_eV": -0.3340458256220513,
+        "energy_eV": -1.6845162522278239,
         "irrep": "B1u",
         "multiplicity": 1
       }
@@ -3461,67 +3461,67 @@
     "levels": [
       {
         "descriptor": {
-          "bond_energy_eV": -6.697296926739128,
+          "bond_energy_eV": -6.533310310544847,
           "character": "bonding",
           "dominant_fragment": "ligand_only"
         },
         "electrons": 2,
-        "energy_eV": -25.6192622660847,
+        "energy_eV": -27.43371032530015,
         "irrep": "Ag",
         "multiplicity": 1
       },
       {
         "descriptor": {
-          "bond_energy_eV": 1.3516817703411488,
+          "bond_energy_eV": 1.3917866485200898,
           "character": "antibonding",
           "dominant_fragment": "ligand_only"
         },
         "electrons": 2,
-        "energy_eV": -18.80941185350596,
+        "energy_eV": -20.68648849172433,
         "irrep": "B1u",
         "multiplicity": 1
       },
       {
         "descriptor": {
-          "bond_energy_eV": -3.2091308601407853,
+          "bond_energy_eV": -3.373117476335072,
           "character": "bonding",
           "dominant_fragment": "ligand_only"
         },
         "electrons": 2,
-        "energy_eV": -15.357165520795215,
+        "energy_eV": -16.802717461579764,
         "irrep": "Ag",
         "multiplicity": 1
       },
       {
         "descriptor": {
-          "bond_energy_eV": -1.7293548507268817,
+          "bond_energy_eV": -1.7293548507268819,
           "character": "bonding",
           "dominant_fragment": "ligand_only"
         },
         "electrons": 4,
-        "energy_eV": -11.999354850726881,
+        "energy_eV": -13.349354850726879,
         "irrep": "B2u+B3u",
         "multiplicity": 2
       },
       {
         "descriptor": {
-          "bond_energy_eV": 1.7293548507268817,
+          "bond_energy_eV": 1.7293548507268812,
           "character": "antibonding",
           "dominant_fragment": "ligand_only"
         },
         "electrons": 2,
-        "energy_eV": -8.540645149273116,
+        "energy_eV": -9.89064514927312,
         "irrep": "B2g+B3g",
         "multiplicity": 2
       },
       {
         "descriptor": {
-          "bond_energy_eV": 8.554746016538761,
+          "bond_energy_eV": 8.51464113835983,
           "character": "antibonding",
           "dominant_fragment": "ligand_only"
         },
         "electrons": 0,
-        "energy_eV": -2.354160359614127,
+        "energy_eV": -3.737083721395762,
         "irrep": "B1u",
         "multiplicity": 1
       }

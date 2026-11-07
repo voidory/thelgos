@@ -153,7 +153,7 @@ The contact ledger counts each unordered real-basis off-diagonal pair once with 
 
 ### 9.1 On-sites
 
-`params/onsite.csv`: `element,orbital,energy_eV,source`. Composite table: [Harrison secondary transcription](https://github.com/jarvist/HarrisonSolidStateTable.jl/blob/master/src/SolidStateTable.jl) for B,C,N,O,Si,P,S; [teaching supplement](https://chem.libretexts.org/Bookshelves/Inorganic_Chemistry/Supplemental_Modules_and_Websites_(Inorganic_Chemistry)/Advanced_Inorganic_Chemistry_(Wikibook)/01%3A_Chapters/1.07%3A_Diatomic_Molecular_Orbitals) for H,F,Al,Cl (snapshot `evidence/libretexts_diatomic_MOs.html`; its table is credited to Miessler, Fischer & Tarr 2014). The two tables are on different scales: the teaching table runs a few eV deeper (Si 3s −15.89 there, −13.55 in Harrison). This is harmless within one homonuclear molecule but matters for heteronuclear pairs and for comparisons along a series. The owner chose to keep this composite on 2026-11-07 (DECISIONS.md M5). The transcription explicitly warns its values are not well checked; do not call this a complete primary-source table. Local source snapshot is packaged.
+`params/onsite.csv`: `element,orbital,energy_eV,source`. Single table for every element: the orbital potential energies of the [teaching supplement](https://chem.libretexts.org/Bookshelves/Inorganic_Chemistry/Supplemental_Modules_and_Websites_(Inorganic_Chemistry)/Advanced_Inorganic_Chemistry_(Wikibook)/01%3A_Chapters/1.07%3A_Diatomic_Molecular_Orbitals), whose table is credited to Miessler, Fischer & Tarr 2014. Snapshot: `evidence/libretexts_diatomic_MOs.html`. Owner decision M7 (2026-11-07) replaced the earlier composite, which took Harrison's solid-state table for B, C, N, O, Si, P and S, because the owner's module uses Miessler. The teaching values are configuration-averaged ionisation energies, a few eV deeper than Harrison's computed term values. On-sites are not Harrison's; only the couplings are (§9.2).
 
 | Element | s / eV | p / eV |
 |---|---:|---:|
@@ -165,7 +165,7 @@ The contact ledger counts each unordered real-basis off-diagonal pair once with 
 | N (n=2) | −23.04 | −11.47 |
 | S (n=3) | −20.80 | −10.27 |
 
-All p directions share the p on-site. No main-group d parameters. Nitrogen was added by owner decision B4 from the same transcription (`evidence/harrison.txt`, line 87).
+All p directions share the p on-site. No main-group d parameters. Nitrogen was added by owner decision B4.
 
 ### 9.2 pairs.csv columns and lookup
 
@@ -185,7 +185,7 @@ All p directions share the p on-site. No main-group d parameters. Nitrogen was a
 
 Precedence: **preset matrix-element override → element-pair/channel row → explicit channel default → error**. Defaults live in `params/channel_defaults.json`; the supplied default list is empty. A no-match lookup must raise an error, never silently return zero. Missing orbital channels are not requested; absence is not a fit to zero. Reverse-pair Hermiticity follows §1.
 
-For `harrison_inverse_square`, V=scale×eta×K/d². Coefficients remain ss=−1.40, sp=+1.84, pp sigma=+3.24, pp pi=−0.81: Harrison's 1980 book values as transcribed in `evidence/harrison.txt`. The same file lists a second set attributed to Shi & Papaconstantopoulos (2004), which is not used (DECISIONS.md M2). **All H-containing couplings extrapolate this scheme beyond the Harrison table's H coverage.** The 0.6 factor is a declared pedagogical correction, not a published coefficient or measured fit. The strict ordering constraints give 0.4914651002<sH<0.8938796155. B2 decided under delegation: 0.6 (DECISIONS.md). Because it was chosen to reproduce orderings, those orderings are not independent fidelity evidence. The audit reads the CSV rather than these prose numbers.
+For `harrison_inverse_square`, V=scale×eta×K/d². Coefficients remain ss=−1.40, sp=+1.84, pp sigma=+3.24, pp pi=−0.81: Harrison's 1980 book values as transcribed in `evidence/harrison.txt`. The same file lists a second set attributed to Shi & Papaconstantopoulos (2004), which is not used (DECISIONS.md M2). **All H-containing couplings extrapolate this scheme beyond the Harrison table's H coverage.** The 0.6 factor is a declared pedagogical correction, not a published coefficient or measured fit. The two strict ordering constraints are: BH3's empty pz (a2″) below the antibonding a1′ (lower bound); and in lecture water, the bonding 1b2 above the decoupled O 2s (upper bound). With the M7 on-sites they give 0.4234786093<sH<1.0312679542; with the earlier composite they gave 0.4914651002<sH<0.8938796155. Not a constraint: water's 3a1*/2b2* pair crosses at sH≈0.667, and at 0.6 the two levels sit 0.12 eV apart. B2 decided under delegation: 0.6 (DECISIONS.md). Because it was chosen to reproduce orderings, those orderings are not independent fidelity evidence. The audit reads the CSV rather than these prose numbers.
 
 Neighbour lists are explicit: H2O/CH4/BH3 central-H on, H–H off; SF6 central-F and all F–F on; ligand-only H diagnostics have their declared edges on. No distance cutoff silently re-enables absent edges.
 
@@ -247,6 +247,7 @@ Slides/aliases are nonblocking. Later d-channel parameters remain outside Releas
 | 1.3 | 2026-11-06 | Applied by Claude under the owner's standing permission. Owner decisions B1 (CrystOD deferred), B4 (N2 in), B3 orientation; delegated B2 (0.6), B3 in-plane axis, B5 (skip zero stages), M1–M4 (DECISIONS.md). Nitrogen on-sites and pairs; six diatomic geometries, A.6 blocks, Appendix B rows; CrystOD comparison rules K5–K11 written into §11; coefficient-set provenance in §9.2. Not frozen: owner sign-off B6 pending. |
 | 1.3.1 | 2026-11-06 | Applied by Claude under the owner's standing permission. Period-3 diatomics Si2, P2, S2 at the owner's request (DECISIONS.md M5): Si and P on-sites and Si–Si, P–P pair rows from the same Harrison transcription; CCCBDB geometries and ground states; Appendix B rows; checker patch K18. Al2 and Cl2 wait for a sourced Al/Cl on-site. Not frozen: owner sign-off B6 pending. |
 | 1.3.2 | 2026-11-07 | Applied by Claude under the owner's standing permission. Al2 and Cl2 added (DECISIONS.md M5, checker patch K19): Al and Cl on-sites from the teaching table (snapshot packaged), CCCBDB geometries and ground states, Appendix B rows. Al2's spin disagrees with experiment and is recorded as a fidelity warning. Not frozen: owner sign-off B6 pending. |
+| 1.4 | 2026-11-07 | Applied by Claude on the owner's decision M7: all on-sites from the Miessler teaching table (§9.1); couplings unchanged (Harrison η, H scale 0.6). Every fixture involving B, C, N, O, Si, P or S has new Appendix B values. Unchanged: the H-only sets, F2, Al2, Cl2. No qualitative result changed: orderings, spin agreements and counting bond orders are as before. H-scale window updated. Not frozen: owner sign-off B6 pending. |
 
 **A5 disposition:** the pairs.csv column specification is restored in §9.2. Exact legacy Appendix A.7 text was not present in the accessible attachments or earlier inline answer; it is not silently reconstructed as a quotation. The unknown legacy A.7 is **removed as an unrecoverable legacy section**, because its original content cannot be verified; it is replaced by the explicitly newly authored ledger/limit/invariance contract below. If the owner supplies the original, review whether it contains additional obligations before freezing. No claim that its exact old content has been recovered.
 
@@ -341,26 +342,26 @@ Energies in eV; repeated levels have multiplicities shown. Values are model calc
 
 | Fixture | Levels, lowest first |
 |---|---|
-| H2O lecture | a1(O2s) −29.140000; b2 −24.121514; a1 −21.812479; b1 −14.130000; a1 −5.927521; b2 −3.618486 |
-| H2O model | a1 −34.578720; b2 −24.121514; a1 −18.575721; b1 −14.130000; a1 −3.725558; b2 −3.618486 |
-| CH4 | a1 −26.574378; t2×3 −19.832263; a1 −4.555622; t2×3 −2.747737 |
-| BH3 | a1-prime −20.922163; e-prime×2 −18.192296; a2-double-prime −6.640000; a1-prime −5.227837; e-prime×2 −2.057704 |
-| SF6 model and lecture (two executions) | a1g −42.854946; t1u×3 −27.817482; eg×2 −14.850509; a1g −11.793019; t1u×3 +1.430476 |
+| H2O lecture | a1(O2s) −32.380000; b2 −25.039236; a1 −22.746843; b1 −15.850000; a1 −6.713157; b2 −4.420764 |
+| H2O model | a1 −37.115699; b2 −25.039236; a1 −20.181834; b1 −15.850000; a1 −4.542467; b2 −4.420764 |
+| CH4 | a1 −27.738399; t2×3 −20.487453; a1 −5.301601; t2×3 −3.782547 |
+| BH3 | a1-prime −21.661994; e-prime×2 −18.700003; a2-double-prime −8.300000; a1-prime −5.998006; e-prime×2 −3.209997 |
+| SF6 model and lecture (two executions) | a1g −43.433587; t1u×3 −28.372629; eg×2 −14.850509; a1g −13.124378; t1u×3 +0.635623 |
 | H2 | Ag −20.010800; B1u −7.209200 (D2h subgroup) |
 | H3+ and neutral H3 (two executions) | a1-prime −26.411600; e-prime×2 −7.209200; neutral e-prime¹ warns |
-| Allyl cation π | b1 −13.423474; a2 −8.970000; b1 −4.516526 |
+| Allyl cation π | b1 −15.113474; a2 −10.660000; b1 −6.206526 |
 | Six H Oh | a1g −28.011800; t1u×3 −12.009800 (4 electrons, warns); eg×2 −8.809400 |
 | Four H Td | a1 −19.704354; t2×3 −11.578549 (2 electrons, warns) |
-| B2 | σg −22.131569; σg −11.033954; σu −10.566590; πu×2 −9.081438; πg×2 −4.198562; σu +5.372113 |
-| C2 | σg −33.782041; σg −15.610315; σu −14.450984; πu×2 −12.968041 (2 electrons, warns); πg×2 −4.971959; σu +10.863339 |
-| N2 | σg −43.562631; σg −20.290444; σu −19.015983; πu×2 −16.592390; πg×2 −6.347610; σu +13.849058 |
-| O2 | σg −43.746764; σu −25.133433; σg −23.772506; πu×2 −18.363170; πg×2 −9.896830 (2 electrons, warns); σu +6.112703 |
+| B2 | σg −23.714683; σg −12.620840; σu −12.097903; πu×2 −10.741438; πg×2 −5.858562; σu +3.733425 |
+| C2 | σg −35.579486; σg −17.412870; σu −16.327845; πu×2 −14.658041 (2 electrons, warns); πg×2 −6.661959; σu +9.140201 |
+| N2 | σg −45.683529; σg −22.399546; σu −21.419414; πu×2 −18.302390; πg×2 −8.057610; σu +12.022489 |
+| O2 | σg −46.458232; σu −28.219157; σg −26.021038; πu×2 −20.083170; πg×2 −11.616830 (2 electrons, warns); σu +4.238427 |
 | F2 | σg −48.374432; σu −36.456980; σg −28.181952; πu×2 −21.746222; πg×2 −15.553778; σu −4.626636 |
 | Al2 | σg −13.645089; σu −10.334969; σg −8.501361; πu×2 −6.826040; πg×2 −5.133960; σu −2.118580 |
-| Si2 | σg −17.038338; σu −12.168011; σg −10.040620; πu×2 −7.743547 (2 electrons, warns); πg×2 −5.296453; σu −0.893031 |
-| P2 | σg −22.250436; σu −15.233427; σg −13.042091; πu×2 −10.051691; πg×2 −6.608309; σu −0.334046 |
-| S2 | σg −25.619262; σu −18.809412; σg −15.357166; πu×2 −11.999355; πg×2 −8.540645 (2 electrons, warns); σu −2.354160 |
+| Si2 | σg −19.190314; σu −14.443620; σg −11.488644; πu×2 −9.003547 (2 electrons, warns); πg×2 −6.556453; σu −2.217422 |
+| P2 | σg −23.894620; σu −16.942957; σg −14.457907; πu×2 −11.371691; πg×2 −7.928309; σu −1.684516 |
+| S2 | σg −27.433710; σu −20.686488; σg −16.802717; πu×2 −13.349355; πg×2 −9.890645 (2 electrons, warns); σu −3.737084 |
 | Cl2 | σg −29.274860; σu −23.322165; σg −18.572273; πu×2 −15.231892; πg×2 −12.108108; σu −6.630702 |
-| CO | σ −42.990247; σ −24.079019; π×2 −17.042804; σ −15.182634 (HOMO, C weight 0.977); π×2 −6.057196; σ +12.491900 |
+| CO | σ −45.350342; σ −26.597061; π×2 −18.754865; σ −17.057093 (HOMO, C weight 0.977); π×2 −7.755135; σ +10.684496 |
 
 All 23 current fixtures satisfy file-driven analytic assembly, symmetry/projector labels and residual/orthonormality checks. Still open: real CrystOD comparison (deferred, B1) and browser engine/UI gates (C4). Later advanced d blocks, exact slide aliasing and spectral fits remain unclaimed.

@@ -149,6 +149,12 @@ Each entry in `levels` needs `irrep`, `energy`, `multiplicity`, `canonical_level
 - *Regenerated `checks/`.* These differ by additions only (preset count 20 → 22).
 - *Result.* Al2 is a spin-state disagreement and is recorded as such. Cl2 agrees.
 
+**Data change M7 (no script change).** On 2026-11-07 all on-sites moved to the Miessler teaching table (DECISIONS.md M7). No checker script changed.
+- The comments in K18 and K19 that name the Harrison transcription as the on-site source for Si, P and S now describe the former source. They are left as written so the script hash stays meaningful.
+- *Before switching,* a scratch copy with the new values passed every `check_release1` assertion, with the reference check off.
+- *Regenerated:* `evidence/reference_spectra.json` (15 entries change; the H-only sets, F2, Al2 and Cl2 do not), plus `checks/release1_energies.csv`, `checks/release1_validation.json` and `checks/crystod_cases.json`.
+- *Unchanged:* every other `checks/` file and `groups/`.
+
 ## Verification
 
 **Environment.** `requirements-checker.lock` was installed with `--require-hashes` into `.venv` (CPython 3.12.3), and `pip check` passed. This is not the README's 3.12.8 host and not the production 3.12.7.

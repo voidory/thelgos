@@ -214,7 +214,7 @@ def explanation(system, result, matching, frontier_levels):
 def provenance(system, params):
     preset = params.presets[system.preset]
     return {
-        "level_energy": f"Computed: eigenvalue of H built from on-site energies (params/onsite.csv) and couplings (params/pairs.csv, Harrison law), preset {system.preset} ({preset['provenance_tag']}).",
+        "level_energy": f"Computed: eigenvalue of H built from on-site energies (params/onsite.csv, Miessler table) and couplings (params/pairs.csv, Harrison law), preset {system.preset} ({preset['provenance_tag']}).",
         "level_label": f"Symmetry: projection onto the irreps of {system.group} (groups/{system.group}.json).",
         "fragment": "Symmetry: symmetry-adapted combination of the fragment's orbitals, diagonalised within each irrep.",
         "mixing_line": "Computed: weight of the fragment orbital in the MO (composition); shown when ≥ 5 % (convention).",
