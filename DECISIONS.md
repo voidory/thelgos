@@ -216,6 +216,22 @@ The owner asked for Milestone A first and for D10 to be measured on the owner's 
 
 **Known consequence.** That question asks about NH and hints that H 1s lies slightly above N 2p. Miessler puts it slightly below (−13.61 vs −13.18 eV). Miessler's value is averaged over the whole 2p³ configuration, whereas the hint follows N's ground state (first IE 14.53 eV). The expected answer is the same under both: one σ bond, a nonbonding π pair on N, and a triplet. Only the drawn position of H 1s relative to N 2p differs. If NH is added later (it needs CONVENTIONS v1.5), its reading note should explain the difference. Revisit this decision if more exam questions show the lecturer's ordering differing from Miessler.
 
+## Release 2, Milestone B: Practice and Exam modes, design choices (delegated within the owner's defaults, 2026-11-07)
+
+The owner approved these defaults: the current molecules only; two question types modelled on the owner's past paper (Q2(a) "draw the MO diagram, give the spin multiplicity" and Q2(d) "give and explain the bond order"); Practice checks step by step, Exam at the end; questions like Q2(b) and (c) left out; answers checked against the Miessler levels (M8).
+
+- **Where checking happens.** Questions and checking run in the engine (`engine/lgo_engine/exam.py`), like everything else.
+- **"Order the atomic orbitals" uses the on-site energies only.** SF6's ligand group orbitals spread over about 19 eV because of the model's F–F contacts (M3), where a textbook puts them all near F 2p. Grading LGO order would penalise the textbook answer. The paper's hint was also about atomic orbitals.
+- **"Which orbitals combine."**
+  - *Central-atom cases:* the symmetry-adapted central orbitals and the LGOs. Two orbitals combine when they share an irrep and are coupled in the chosen preset, so in lecture water O 2s correctly stays nonbonding.
+  - *Diatomics:* each atom's s, p along the bond (σ) and perpendicular p (π). A cross s–p pairing on the same σ symmetry is accepted but not required (s–p mixing).
+  - *Molecules with no central atom:* no such step.
+- **MO order** is asked as a sequence of symmetry labels, so equal labels cannot be told apart and do not need to be.
+- **Bonding character.** The model's label is accepted. "Nonbonding" is also accepted when an orbital's contacts sum to under 0.5 eV, which covers CO's HOMO, the textbook "carbon lone pair". Bond orders are unaffected.
+- **Spin multiplicity** follows Hund's rule from the filled levels. The engine itself still flags open shells as "spin not determined".
+- **Left out of the quizzes:** the two hydrogen-only diagnostic sets (six H Oh, four H Td), which are not molecules.
+- **Water model vs lecture.** The model counts 3a1 as bonding and gives water a bond order of 1.5; the lecture preset gives the textbook 1. The quiz uses whichever preset is selected. This is model behaviour, not a quiz bug.
+
 ## B6. Sign-off (owner only)
 
 Not delegated. On 2026-11-06 the owner gave standing permission for Claude to apply the drafted changes. They are now in `CONVENTIONS.md` v1.3 and the spec, and the drafts in `drafts/` remain as the record. Applying them is not sign-off: v1.3 stays "not frozen" until the owner reviews it.

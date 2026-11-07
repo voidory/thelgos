@@ -142,3 +142,47 @@ input[type=range], input[type=checkbox] { accent-color: var(--accent); }
 .speed { margin-top: 6px; }
 .speed button { font: inherit; font-size: 0.8rem; padding: 3px 10px; border-radius: 999px; border: 1px solid var(--rule); background: var(--panel); color: var(--fg); cursor: pointer; }
 .speed-out { white-space: pre-wrap; overflow-wrap: anywhere; font-size: 0.75rem; background: var(--panel); border: 1px solid var(--rule); border-radius: 6px; padding: 8px; color: var(--fg); }
+
+/* Practice and Exam modes. */
+.modeswitch { display: inline-flex; border: 1px solid var(--rule); border-radius: 999px; overflow: hidden; margin: 0 0 10px; }
+.modeswitch button { font: inherit; font-size: 0.85rem; border: 0; background: var(--panel); color: var(--fg); padding: 4px 14px; cursor: pointer; }
+.modeswitch button[aria-checked="true"] { background: var(--accent); color: var(--on-accent); }
+body[data-mode="practice"] .diagram > :not(.modeswitch):not(#quiz):not(#variant),
+body[data-mode="exam"] .diagram > :not(.modeswitch):not(#quiz):not(#variant),
+body[data-mode="practice"] .inspector, body[data-mode="exam"] .inspector,
+body[data-mode="practice"] .timeline, body[data-mode="exam"] .timeline { display: none !important; }
+@media (min-width: 1180px) { body[data-mode="practice"] main, body[data-mode="exam"] main { grid-template-areas: "rail stage stage"; } }
+.rail button.case:disabled { opacity: 0.35; cursor: default; }
+.quiz { background: var(--panel); border: 1px solid var(--rule); border-radius: 10px; padding: 12px 16px; }
+.quiz .qhead { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: space-between; }
+.quiz .seg { display: inline-flex; border: 1px solid var(--rule); border-radius: 999px; overflow: hidden; }
+.quiz .seg button { font: inherit; font-size: 0.82rem; border: 0; background: var(--panel); color: var(--fg); padding: 4px 12px; cursor: pointer; }
+.quiz .seg button[aria-checked="true"], .quiz .seg button[aria-pressed="true"] { background: var(--accent); color: var(--on-accent); }
+.quiz .seg.small button { font-size: 0.75rem; padding: 3px 8px; }
+.quiz .qtext { font-size: 1rem; font-weight: 600; margin: 10px 0 2px; }
+.quiz .qstep { border-top: 1px solid var(--rule); padding: 10px 0; }
+.quiz h3 { font-size: 0.92rem; margin: 0 0 8px; }
+.quiz .olist { list-style: none; padding: 0; margin: 0; display: grid; gap: 4px; max-width: 420px; }
+.quiz .olist li, .quiz .mrow { display: flex; align-items: center; gap: 6px; border: 1px solid var(--rule); border-radius: 8px; padding: 4px 8px; background: var(--bg); }
+.quiz .olabel { flex: 1; font-family: "STIX Two Text", serif; font-size: 1.05rem; }
+.quiz .olist button { font: inherit; width: 30px; height: 28px; border: 1px solid var(--rule); border-radius: 6px; background: var(--panel); color: var(--fg); cursor: pointer; }
+.quiz .olist button:disabled { opacity: 0.3; }
+.quiz .sym { color: var(--muted); font-size: 0.85em; }
+.quiz .partners { display: grid; gap: 8px; }
+.quiz .prow { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.quiz .pname { font-family: "STIX Two Text", serif; min-width: 11em; }
+.quiz .chip { font: inherit; font-size: 0.85rem; border: 1px solid var(--rule); border-radius: 999px; background: var(--bg); color: var(--fg); padding: 2px 10px; cursor: pointer; }
+.quiz .chip[aria-pressed="true"] { background: var(--accent); color: var(--on-accent); border-color: var(--accent); }
+.quiz .rows { display: grid; gap: 4px; max-width: 560px; }
+.quiz .mrow { flex-wrap: wrap; }
+.quiz .estep.mini { margin: 0; }
+.quiz .qgrid { display: flex; flex-wrap: wrap; gap: 12px; }
+.quiz .qgrid label { display: grid; gap: 4px; font-size: 0.85rem; }
+.quiz .qgrid input, .quiz .qgrid select { font: inherit; padding: 4px 8px; border: 1px solid var(--rule); border-radius: 6px; background: var(--bg); color: var(--fg); width: 10em; }
+.quiz .qcheck, .quiz .qsubmit { font: inherit; margin-top: 8px; border: 0; border-radius: 999px; padding: 5px 14px; background: var(--accent); color: var(--on-accent); cursor: pointer; }
+.quiz .qres { margin-top: 8px; padding: 6px 10px; border-radius: 8px; border-left: 4px solid; font-size: 0.88rem; background: var(--bg); }
+.quiz .qres.ok { border-color: var(--accent); }
+.quiz .qres.bad { border-color: var(--warn); }
+.quiz .qres ul { margin: 4px 0 0; padding-left: 18px; }
+.quiz .qscore { font-size: 1.05rem; }
+.quiz .chip[aria-pressed="true"] .sym { color: inherit; opacity: 0.85; }

@@ -312,6 +312,38 @@ const check = (name, ok, detail = "") => { results.push({ name, ok, detail }); c
     const speed = await page.textContent("#speed-out");
     check("D10 speed test runs every case and reports the warm budget", /Warm full update/.test(speed) && /Budget/.test(speed), speed.split("\n")[5]);
 
+    // ---- Release 2, Milestone B: Practice and Exam modes. ----
+    await pick(page, "N2");
+    await page.waitForFunction(() => document.body.dataset.rendered === "N2|1|");
+    await page.click('.modeswitch [data-mode="practice"]');
+    await page.waitForSelector("#quiz .qstep h3");
+    const qSteps = await page.$$eval("#quiz .qstep h3", (h) => h.length);
+    const diagramHidden = await page.$eval("#diagram", (d) => getComputedStyle(d).display === "none");
+    await page.$$eval("#quiz .qcheck", (b) => b[0].click());
+    await page.waitForSelector('#quiz .qres[data-step="Order the atomic orbitals"]');
+    const qfb = await page.textContent('#quiz .qres[data-step="Order the atomic orbitals"]');
+    check("Practice mode: five steps for N2, diagram hidden, a step checked with its reason",
+          qSteps === 5 && diagramHidden && /correct|Miessler/.test(qfb), `${qSteps} steps; ${qfb.slice(0, 60)}`);
+    await page.click('.modeswitch [data-mode="exam"]');
+    await page.$eval("#case", (s) => { s.value = "SF6 lecture"; s.dispatchEvent(new Event("change")); });
+    await page.waitForFunction(() => document.querySelector("#quiz .qtext") && document.querySelector("#quiz .qtext").textContent.includes("SF6 lecture"));
+    await page.$$eval("#quiz .qhead .seg button", (b) => b[1].click());
+    await page.waitForSelector('#quiz input[data-field="bonds"]');
+    for (const [k, v] of [["bonding_electrons", "8"], ["antibonding_electrons", "0"], ["bonds", "6"], ["bond_order", "2/3"]]) await page.fill(`#quiz input[data-field="${k}"]`, v);
+    await page.click("#quiz .qsubmit");
+    await page.waitForSelector("#qresult .qscore");
+    const full = await page.$eval("#qresult", (r) => r.dataset.percent);
+    await page.fill('#quiz input[data-field="bond_order"]', "1");
+    await page.fill('#quiz input[data-field="bonding_electrons"]', "12");
+    await page.click("#quiz .qsubmit");
+    await page.waitForFunction(() => document.querySelector("#qresult").dataset.percent !== "100");
+    const why = await page.textContent("#quiz .qres");
+    check("Exam mode, Q2(d)-style: SF6 bond order 2/3 scores 100 %; '1' is explained by the nonbonding eg pair",
+          full === "100" && why.includes("not a whole number") && why.includes("1eg"), `first ${full} %`);
+    await page.click('.modeswitch [data-mode="explore"]');
+    await page.waitForFunction(() => getComputedStyle(document.querySelector("#diagram")).display !== "none");
+    check("Explore mode restores the diagram", true);
+
     // Banner shows the CONVENTIONS version read from the file, not a hard-coded one.
     const convVer = fs.readFileSync(path.join(ROOT, "CONVENTIONS.md"), "utf8").match(/\*\*Version: ([0-9.]+)/)[1];
     const banner = await page.textContent("#banner");

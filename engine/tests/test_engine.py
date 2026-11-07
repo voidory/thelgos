@@ -389,6 +389,67 @@ class ReleaseTwoDials(unittest.TestCase):
         self.assertIsNone(api.view(P, G, "CH4", lone_pair_angle=45)["lone_pairs"])
 
 
+class PracticeAndExam(unittest.TestCase):
+    """Release 2, Milestone B: questions are generated and checked in the engine, against the Miessler levels (M8)."""
+
+    def perfect(self, name):
+        from lgo_engine import app_api, exam
+        _, system, ctx, H, frags = app_api._quiz_context(P, G, name)
+        lv = ctx["result"]["levels"]
+        ans = {"ao_order": [a["key"] for a in sorted(exam._ao_items(system, P), key=lambda a: a["energy_eV"])],
+               "mo_order": [exam._key(x) for x in lv],
+               "rows": [{"character": c["character"], "electrons": x["electrons"]} for x, c in zip(lv, ctx["diagram"]["centre"])],
+               "multiplicity": exam._multiplicity(lv)[0],
+               "bond_order": ctx["result"]["bond_orders"]["counting"]["per_bond"]}
+        fr = exam._fragment_items(system, P, H, ctx["diagram"], frags)
+        if fr:
+            truth = exam._partner_truth(system, H, *fr)
+            ans["partners"] = {k: v["required"] for k, v in truth.items()}
+        return ans
+
+    def test_perfect_answers_score_full_marks_on_every_case(self):
+        from lgo_engine import app_api
+        names = app_api.quiz_cases(P)
+        self.assertEqual(len(names), 21)
+        for n in names:
+            r = app_api.exam_check(P, G, n, self.perfect(n))
+            self.assertEqual(r["percent"], 100, (n, [s for s in r["steps"] if not s["correct"]]))
+
+    def test_mistakes_get_reasons(self):
+        from lgo_engine import app_api
+        a = self.perfect("H2O lecture")
+        a["partners"]["L0"] = ["R0"]           # lecture: O 2s decoupled
+        a["partners"]["L2"] = ["R0"]           # B1 with A1
+        r = app_api.exam_check(P, G, "H2O lecture", a)
+        fb = " ".join(f for s in r["steps"] for f in s["feedback"])
+        self.assertIn("switched off in this preset", fb)
+        self.assertIn("different symmetry", fb)
+        a = self.perfect("O2"); a["multiplicity"] = 1
+        fb = " ".join(f for s in app_api.exam_check(P, G, "O2", a)["steps"] for f in s["feedback"])
+        self.assertIn("2 unpaired electrons", fb)
+        self.assertIn("triplet", fb)
+        a = self.perfect("CO")
+        homo = app_api.view(P, G, "CO")["result"]["frontier"]["HOMO"]
+        a["rows"][homo]["character"] = "nonbonding"   # textbook label for the carbon lone pair, accepted
+        self.assertEqual(app_api.exam_check(P, G, "CO", a)["percent"], 100)
+        a = self.perfect("N2"); a["ao_order"] = a["ao_order"][::-1]
+        r = app_api.exam_check(P, G, "N2", a)
+        self.assertFalse(r["steps"][0]["correct"]); self.assertIn("Miessler", r["steps"][0]["feedback"][0])
+        a = self.perfect("N2"); a["partners"]["Ls"] = ["Rs", "Rpz"]   # s-p mixing accepted
+        self.assertEqual(app_api.exam_check(P, G, "N2", a)["percent"], 100)
+
+    def test_bond_order_question_sf6(self):
+        """The owner's paper, Q2(d): why the S-F bond order is not one."""
+        from lgo_engine import app_api
+        r = app_api.exam_check(P, G, "SF6 lecture", {"bonding_electrons": 8, "antibonding_electrons": 0, "bonds": 6, "bond_order": 2 / 3}, kind="bond_order")
+        self.assertEqual(r["percent"], 100)
+        r = app_api.exam_check(P, G, "SF6 lecture", {"bonding_electrons": 12, "antibonding_electrons": 0, "bonds": 6, "bond_order": 1}, kind="bond_order")
+        fb = " ".join(r["steps"][0]["feedback"])
+        self.assertIn("nonbonding", fb); self.assertIn("not a whole number", fb); self.assertIn("0.667", fb)
+        with self.assertRaises(ValueError):
+            app_api.exam_task(P, G, "six H Oh")
+
+
 class InspectorViews(unittest.TestCase):
     """L2, L3, P3, P6, F5.1, F5.2, F5.4-F5.5 on the engine side."""
 

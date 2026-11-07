@@ -549,6 +549,225 @@ async function speedTest() {
   return rows;
 }
 
+// ---- Release 2, Milestone B: Practice and Exam modes. The engine generates and checks; this only draws. ----
+// Practice: each step is checked on its own, with reasons. Exam: everything is checked at the end.
+const quiz = { mode: "explore", kind: "build", task: null, answers: null, cases: null, result: null };
+function htmlLabel(lv) {
+  if (lv === "σ" || lv === "π") return lv;
+  return labelParts(typeof lv === "string" ? { irrep: lv } : lv, { number: false }).map(([t, k]) =>
+    k === "sub" ? `<sub>${t}</sub>` : k === "sup" ? `<sup>${t}</sup>` : t.replace(/&/g, "&amp;").replace(/</g, "&lt;")).join("");
+}
+const shuffled = (xs) => { const a = [...xs]; for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+function quizSetup() {
+  const sw = document.createElement("div"); sw.className = "modeswitch"; sw.setAttribute("role", "radiogroup"); sw.setAttribute("aria-label", "Mode");
+  for (const [m, label] of [["explore", "Explore"], ["practice", "Practice"], ["exam", "Exam"]]) {
+    const b = document.createElement("button"); b.type = "button"; b.setAttribute("role", "radio"); b.dataset.mode = m; b.textContent = label;
+    b.addEventListener("click", () => setMode(m));
+    sw.append(b);
+  }
+  const box = document.createElement("section"); box.id = "quiz"; box.className = "quiz"; box.hidden = true; box.setAttribute("aria-label", "Practice and exam");
+  document.querySelector(".diagram").prepend(sw);
+  sw.after(box);
+  markMode();
+}
+function markMode() {
+  for (const b of document.querySelectorAll(".modeswitch button")) b.setAttribute("aria-checked", b.dataset.mode === quiz.mode);
+  document.body.dataset.mode = quiz.mode;
+  for (const b of document.querySelectorAll(".rail button.case")) {
+    b.disabled = quiz.mode !== "explore" && quiz.cases && !state.cases.some((x) => x.entry === b.dataset.entry && quiz.cases.includes(x.name));
+  }
+}
+async function setMode(m) {
+  quiz.mode = m;
+  if (m !== "explore" && !quiz.cases) quiz.cases = await call("quiz_cases");
+  if (m !== "explore" && !quiz.cases.includes(state.case)) { $("case").value = quiz.cases[1] || quiz.cases[0]; $("case").dispatchEvent(new Event("change")); }
+  markMode();
+  $("quiz").hidden = m === "explore";
+  if (m !== "explore") await newAttempt(); else refresh();
+}
+async function newAttempt() {
+  quiz.result = null;
+  quiz.task = await call("exam_task", { case: state.case, kind: quiz.kind });
+  const t = quiz.task;
+  quiz.answers = {
+    ao_order: shuffled(t.ao_items.map((a) => a.key)),
+    partners: t.partners ? Object.fromEntries(t.partners.left.map((l) => [l.id, []])) : undefined,
+    mo_order: shuffled(t.mo_multiset.flatMap((m) => Array(m.count).fill(m.key))),
+    rows: [], multiplicity: null, bond_order: null,
+    bonding_electrons: null, antibonding_electrons: null, bonds: null,
+  };
+  renderQuiz();
+}
+function moInfo(key) { return quiz.task.mo_multiset.find((m) => m.key === key); }
+function parseNumber(v) {
+  if (v === null || v === undefined || String(v).trim() === "") return null;
+  const m = String(v).trim().match(/^(-?\d+(?:\.\d+)?)\s*\/\s*(\d+(?:\.\d+)?)$/);
+  return m ? Number(m[1]) / Number(m[2]) : Number(String(v).replace("−", "-"));
+}
+function orderList(items, keyLabel, onMove) {
+  // Lowest first is at the bottom, as on a diagram: render top-down reversed.
+  const ol = document.createElement("ol"); ol.className = "olist"; ol.setAttribute("reversed", "");
+  const n = items.length;
+  [...items].map((k, i) => [k, i]).reverse().forEach(([k, i]) => {
+    const li = document.createElement("li"); li.dataset.key = k;
+    const lab = document.createElement("span"); lab.className = "olabel"; lab.innerHTML = keyLabel(k);
+    const up = document.createElement("button"); up.type = "button"; up.textContent = "▲"; up.setAttribute("aria-label", "Move up (higher energy)"); up.disabled = i === n - 1;
+    const dn = document.createElement("button"); dn.type = "button"; dn.textContent = "▼"; dn.setAttribute("aria-label", "Move down (lower energy)"); dn.disabled = i === 0;
+    up.addEventListener("click", () => onMove(i, i + 1)); dn.addEventListener("click", () => onMove(i, i - 1));
+    li.append(lab, up, dn); ol.append(li);
+  });
+  return ol;
+}
+function swap(arr, i, j) { [arr[i], arr[j]] = [arr[j], arr[i]]; }
+function stepBox(n, title, body, name) {
+  const sec = document.createElement("div"); sec.className = "qstep"; sec.dataset.step = name;
+  const h = document.createElement("h3"); h.textContent = `${n}. ${title}`;
+  sec.append(h, body);
+  if (quiz.mode === "practice") {
+    const b = document.createElement("button"); b.type = "button"; b.className = "qcheck"; b.textContent = "Check this step";
+    b.addEventListener("click", () => checkQuiz(name));
+    sec.append(b);
+  }
+  const fb = document.createElement("div"); fb.className = "qfeedback"; fb.dataset.for = name;
+  sec.append(fb);
+  return sec;
+}
+function renderQuiz() {
+  const box = $("quiz"), t = quiz.task, A = quiz.answers;
+  box.replaceChildren();
+  const head = document.createElement("div"); head.className = "qhead";
+  const kinds = document.createElement("div"); kinds.className = "seg"; kinds.setAttribute("role", "radiogroup"); kinds.setAttribute("aria-label", "Question type");
+  for (const [k, label] of [["build", "Draw the MO diagram"], ["bond_order", "Bond order"]]) {
+    const b = document.createElement("button"); b.type = "button"; b.setAttribute("role", "radio"); b.setAttribute("aria-checked", quiz.kind === k); b.textContent = label;
+    b.addEventListener("click", () => { quiz.kind = k; newAttempt(); });
+    kinds.append(b);
+  }
+  const again = document.createElement("button"); again.type = "button"; again.className = "linkish"; again.textContent = "New attempt";
+  again.addEventListener("click", newAttempt);
+  head.append(kinds, again);
+  const q = document.createElement("p"); q.className = "qtext"; q.textContent = t.question;
+  const note = document.createElement("p"); note.className = "muted-text";
+  note.textContent = quiz.mode === "practice" ? "Practice: check each step as you go; every mistake comes with the reason." : "Exam: answer everything, then submit. Checked against this app's model (Miessler orbital energies).";
+  box.append(head, q, note);
+  let n = 0;
+  if (t.kind === "bond_order") {
+    const g = document.createElement("div"); g.className = "qgrid";
+    for (const [k, label] of [["bonding_electrons", "Bonding electrons"], ["antibonding_electrons", "Antibonding electrons"], ["bonds", "Equivalent bonds"], ["bond_order", "Bond order per bond"]]) {
+      const lab = document.createElement("label"); lab.textContent = label;
+      const inp = document.createElement("input"); inp.type = "text"; inp.inputMode = "decimal"; inp.dataset.field = k; inp.value = A[k] ?? "";
+      inp.addEventListener("input", () => { A[k] = parseNumber(inp.value); });
+      lab.append(inp); g.append(lab);
+    }
+    box.append(stepBox(++n, "Count and give the bond order (fractions like 2/3 are fine)", g, "Bond order"));
+  } else {
+    if (t.ao_items.length > 1) {
+      const lab = Object.fromEntries(t.ao_items.map((a) => [a.key, a.label]));
+      box.append(stepBox(++n, "Order the atomic orbitals by energy (lowest at the bottom)",
+        orderList(A.ao_order, (k) => lab[k], (i, j) => { if (j < 0 || j >= A.ao_order.length) return; swap(A.ao_order, i, j); renderQuiz(); }), "Order the atomic orbitals"));
+    }
+    if (t.partners) {
+      const wrap = document.createElement("div"); wrap.className = "partners";
+      const rLab = (r) => `${r.label} <span class="sym">(${htmlLabel(r.sym)})</span>`;
+      for (const L of t.partners.left) {
+        const row = document.createElement("div"); row.className = "prow";
+        const name = document.createElement("span"); name.className = "pname"; name.innerHTML = `${rLab(L)} combines with`;
+        row.append(name);
+        for (const R of [...t.partners.right, { id: "none", label: "nothing (nonbonding)", sym: "" }]) {
+          const chip = document.createElement("button"); chip.type = "button"; chip.className = "chip";
+          const on = R.id === "none" ? A.partners[L.id].length === 0 && A.partners[L.id].touched : A.partners[L.id].includes(R.id);
+          chip.setAttribute("aria-pressed", !!on); chip.innerHTML = R.id === "none" ? R.label : rLab(R);
+          chip.addEventListener("click", () => {
+            const cur = A.partners[L.id];
+            if (R.id === "none") { A.partners[L.id] = Object.assign([], { touched: true }); }
+            else { const k = cur.indexOf(R.id); const next = k >= 0 ? cur.filter((x) => x !== R.id) : [...cur, R.id]; A.partners[L.id] = Object.assign(next, { touched: true }); }
+            renderQuiz();
+          });
+          row.append(chip);
+        }
+        wrap.append(row);
+      }
+      const rt = t.partners.right_title === "Ligand group orbitals" ? "the ligand group orbitals" : t.partners.right_title;
+      box.append(stepBox(++n, `Which orbitals combine? (${t.partners.left_title} with ${rt})`, wrap, "Which orbitals combine"));
+    }
+    box.append(stepBox(++n, "Order the MOs by energy (lowest at the bottom)",
+      orderList(A.mo_order, (k) => { const m = moInfo(k); return `${htmlLabel(m)}${m.multiplicity > 1 ? ` <span class="sym">×${m.multiplicity}</span>` : ""}`; },
+        (i, j) => { if (j < 0 || j >= A.mo_order.length) return; swap(A.mo_order, i, j); swap(A.rows, i, j); renderQuiz(); }), "Order the MOs"));
+    const rows = document.createElement("div"); rows.className = "rows";
+    A.mo_order.map((k, i) => [k, i]).reverse().forEach(([k, i]) => {
+      const m = moInfo(k); A.rows[i] = A.rows[i] || { character: null, electrons: 0 };
+      const r = A.rows[i];
+      const row = document.createElement("div"); row.className = "mrow";
+      const lab = document.createElement("span"); lab.className = "olabel"; lab.innerHTML = `${htmlLabel(m)}${m.multiplicity > 1 ? ` <span class="sym">×${m.multiplicity}</span>` : ""}`;
+      const seg = document.createElement("div"); seg.className = "seg small";
+      for (const c of ["bonding", "nonbonding", "antibonding"]) {
+        const b = document.createElement("button"); b.type = "button"; b.textContent = c; b.setAttribute("aria-pressed", r.character === c);
+        b.addEventListener("click", () => { r.character = c; renderQuiz(); });
+        seg.append(b);
+      }
+      const es = document.createElement("span"); es.className = "estep mini";
+      const minus = document.createElement("button"); minus.type = "button"; minus.textContent = "−"; minus.setAttribute("aria-label", "Fewer electrons"); minus.disabled = r.electrons <= 0;
+      const out = document.createElement("output"); out.textContent = `${r.electrons} e⁻`;
+      const plus = document.createElement("button"); plus.type = "button"; plus.textContent = "+"; plus.setAttribute("aria-label", "More electrons"); plus.disabled = r.electrons >= 2 * m.multiplicity;
+      minus.addEventListener("click", () => { r.electrons--; renderQuiz(); }); plus.addEventListener("click", () => { r.electrons++; renderQuiz(); });
+      es.append(minus, out, plus);
+      row.append(lab, seg, es); rows.append(row);
+    });
+    const total = A.rows.reduce((a, r) => a + (r ? r.electrons : 0), 0);
+    const tally = document.createElement("p"); tally.className = "muted-text"; tally.textContent = `Electrons placed: ${total} of ${t.electrons}.`;
+    rows.append(tally);
+    box.append(stepBox(++n, "Mark each MO and fill the electrons", rows, "Bonding character"));
+    const last = document.createElement("div"); last.className = "qgrid";
+    const ml = document.createElement("label"); ml.textContent = "Spin multiplicity";
+    const ms = document.createElement("select"); ms.innerHTML = `<option value="">choose</option>` + [1, 2, 3, 4].map((v) => `<option value="${v}">${v} (${["singlet", "doublet", "triplet", "quartet"][v - 1]})</option>`).join("");
+    ms.value = A.multiplicity ?? ""; ms.addEventListener("change", () => { A.multiplicity = ms.value ? Number(ms.value) : null; });
+    ml.append(ms);
+    const bl = document.createElement("label"); bl.textContent = "Bond order per bond";
+    const bi = document.createElement("input"); bi.type = "text"; bi.inputMode = "decimal"; bi.dataset.field = "bond_order"; bi.value = A.bond_order_text ?? "";
+    bi.addEventListener("input", () => { A.bond_order_text = bi.value; A.bond_order = parseNumber(bi.value); });
+    bl.append(bi);
+    last.append(ml, bl);
+    box.append(stepBox(++n, "Spin multiplicity and bond order", last, "Spin multiplicity"));
+  }
+  if (quiz.mode === "exam") {
+    const b = document.createElement("button"); b.type = "button"; b.className = "qsubmit"; b.textContent = "Submit";
+    b.addEventListener("click", () => checkQuiz(null));
+    box.append(b);
+  }
+  const res = document.createElement("div"); res.id = "qresult"; res.className = "qresult"; box.append(res);
+  if (quiz.result) showResult(quiz.lastStep);
+}
+async function checkQuiz(stepName) {
+  const A = quiz.answers;
+  const answers = { ...A, partners: A.partners ? Object.fromEntries(Object.entries(A.partners).map(([k, v]) => [k, [...v]])) : undefined,
+                    rows: A.rows.map((r) => r && { character: r.character, electrons: r.electrons }) };
+  quiz.result = await call("exam_check", { case: state.case, kind: quiz.kind, answers });
+  quiz.lastStep = stepName;
+  showResult(stepName);
+}
+function showResult(stepName) {
+  const R = quiz.result; if (!R) return;
+  const steps = stepName ? R.steps.filter((s) => s.step === stepName || (stepName === "Bonding character" && s.step === "Fill the electrons") || (stepName === "Spin multiplicity" && s.step === "Bond order")) : R.steps;
+  for (const el of document.querySelectorAll(".qfeedback")) if (!stepName || steps.some((s) => s.step === el.dataset.for || (el.dataset.for === "Bonding character" && s.step === "Fill the electrons") || (el.dataset.for === "Spin multiplicity" && s.step === "Bond order"))) el.replaceChildren();
+  for (const s of steps) {
+    const host = [...document.querySelectorAll(".qfeedback")].find((el) => el.dataset.for === s.step) ||
+      [...document.querySelectorAll(".qfeedback")].find((el) => (el.dataset.for === "Bonding character" && s.step === "Fill the electrons") || (el.dataset.for === "Spin multiplicity" && s.step === "Bond order"));
+    if (!host) continue;
+    const d = document.createElement("div"); d.className = `qres ${s.correct ? "ok" : "bad"}`; d.dataset.step = s.step;
+    d.innerHTML = `<b>${s.step}: ${s.correct ? "correct" : `${s.score} of ${s.max}`}</b>`;
+    if (s.feedback.length) { const ul = document.createElement("ul"); for (const f of s.feedback) { const li = document.createElement("li"); li.textContent = f; ul.append(li); } d.append(ul); }
+    host.append(d);
+  }
+  if (!stepName) {
+    const res = $("qresult");
+    res.innerHTML = `<p class="qscore">Score: <b>${R.percent} %</b> (${R.steps.filter((s) => s.correct).length} of ${R.steps.length} steps fully right)</p>`;
+    const show = document.createElement("button"); show.type = "button"; show.className = "linkish"; show.textContent = "Show the full diagram";
+    show.addEventListener("click", () => setMode("explore"));
+    res.append(show);
+    res.dataset.percent = R.percent;
+  }
+  document.body.dataset.quizChecked = String(Date.now());
+}
+
 function bonds(view) {
   const bo = view.result.bond_orders;
   const c = bo.counting, dm = bo.density_matrix;
@@ -1157,10 +1376,11 @@ function proposalUpdate(view) {
     const sel = $("case");
     for (const c of cases) sel.append(new Option(`${c.name} (${c.group})`, c.name));
     if (proposal) proposalSetup(cases);
+    if (proposal) quizSetup();
     state.case = cases.find((c) => c.name === "SF6 model").name;
     if (await fromLink()) $("s").value = state.s;
     sel.value = state.case;
-    sel.addEventListener("change", () => { glideToken++; state.case = sel.value; state.level = null; state.fragment = null; state.electrons = null; state.approx = null; state.dial = 0; state.lp = 0; state.s = 1; $("s").value = 1; refresh(); });
+    sel.addEventListener("change", () => { if (quiz.mode !== "explore") { state.case = sel.value; state.level = null; state.fragment = null; state.electrons = null; state.approx = null; refresh(); newAttempt(); return; } glideToken++; state.case = sel.value; state.level = null; state.fragment = null; state.electrons = null; state.approx = null; state.dial = 0; state.lp = 0; state.s = 1; $("s").value = 1; refresh(); });
     $("s").addEventListener("input", () => { glideToken++; state.s = Number($("s").value); state.level = null; state.fragment = null; refresh(); });
     $("whyjump").addEventListener("click", () => {
       const o = state.view.origins[state.level];

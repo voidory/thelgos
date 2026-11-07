@@ -213,6 +213,34 @@ def view(params, groups, name, s=1.0, level=None, conventions_sha256=None, extra
     }
 
 
+def _quiz_context(params, groups, name):
+    from . import exam
+    system = _system(params, name)
+    result = run(system, params, groups)
+    H = np.array(result["hamiltonian_eV"])
+    diagram = diagram_spec(system, H, result, groups, H_now=None, params=params)
+    frags = diagram.pop("_fragment_vectors", {})
+    ctx = {"result": {"levels": result["levels"], "bond_orders": result["bond_orders"]}, "diagram": diagram,
+           "_eigenvectors": result["eigenvectors"]}
+    return exam, system, ctx, H, frags
+
+
+def quiz_cases(params):
+    """Cases offered in Practice and Exam modes (Release 2, Milestone B)."""
+    from .exam import QUIZ_EXCLUDE
+    return [c["name"] for c in case_list(params) if c["name"] not in QUIZ_EXCLUDE]
+
+
+def exam_task(params, groups, name, kind="build"):
+    exam, system, ctx, H, frags = _quiz_context(params, groups, name)
+    return exam.task(system, params, ctx, H, frags, kind)
+
+
+def exam_check(params, groups, name, answers, kind="build"):
+    exam, system, ctx, H, frags = _quiz_context(params, groups, name)
+    return exam.check(system, params, ctx, H, frags, answers, kind)
+
+
 def export(params, groups, name, s=1.0, level=None, conventions_sha256=None):
     """F5.4: config, full Result, software version and conventions hash, all as JSON."""
     from . import __version__
